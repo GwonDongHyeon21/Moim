@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # MySQL
+  moim-db:
+    image: mysql:8.0
+    container_name: moim-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: moim_db
+      MYSQL_USER: moim_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - moim-db-data:/var/lib/mysql
+    networks:
+      - moim-network
+    restart: always
+
+  # Redis
+  moim-redis:
+    image: redis:7.0-alpine
+    container_name: moim-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - moim-redis-data:/data
+    networks:
+      - moim-network
+    restart: always
+
+volumes:
+  moim-db-data:
+  moim-redis-data:
+
+networks:
+  moim-network:
+    driver: bridge
