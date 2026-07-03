@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">moim</string>
+
+    <!-- Google Login -->
+    <string name="google_login">구글 로그인</string>
+
+    <!-- Error Message -->
+    <string name="google_login_error">로그인 중 오류가 발생했습니다.</string>
 </resources>
