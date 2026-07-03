@@ -221,3 +221,5 @@ gradle-app.setting
 # 3. 스프링 빌드/로그 관련 추가 짜잘이
 .mvn/
 help.md
+
+src/main/resources/application-secret.properties
