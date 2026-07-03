@@ -1,6 +1,8 @@
 package com.moim.backend.domain.user.controller
 
+import com.moim.backend.core.error.ErrorException
 import com.moim.backend.core.response.ApiResponse
+import com.moim.backend.core.util.JwtProvider
 import com.moim.backend.domain.user.dto.GoogleLoginRequest
 import com.moim.backend.domain.user.dto.LoginResponse
 import com.moim.backend.domain.user.dto.UserResponse
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/users")
 class UserController(
     private val userService: UserService,
-//    private val jwtProvider: JwtProvider
+    private val jwtProvider: JwtProvider
 ) {
 
     @PostMapping("/login/google")
@@ -24,8 +26,10 @@ class UserController(
 
         val user = userService.googleLogin(request.idToken)
 
-        val accessToken = ""    // jwt accessToken 생성
-        val refreshToken = ""   // jwt refreshToken 생성
+        val userId = user.id ?: throw ErrorException("User not found", "유저 ID가 존재하지 않습니다.")
+
+        val accessToken = jwtProvider.createAccessToken(userId = userId, email = user.email)
+        val refreshToken = jwtProvider.createRefreshToken(userId)
 
         val response = LoginResponse(
             accessToken = accessToken,
