@@ -1,5 +1,6 @@
-package com.moim.backend.core.util
+package com.moim.backend.core.jwt
 
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
@@ -39,5 +40,26 @@ class JwtProvider(
             .setExpiration(expirationDate)
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
+    }
+
+    fun validateToken(token: String): Boolean {
+        return try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+            true
+        } catch (e: JwtException) {
+            false // 만료되었거나 위조된 토큰
+        } catch (e: IllegalArgumentException) {
+            false // 토큰이 비어있는 경우
+        }
+    }
+
+    fun getUserIdFromToken(token: String): Long {
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .body
+
+        return claims.subject.toLong()
     }
 }
