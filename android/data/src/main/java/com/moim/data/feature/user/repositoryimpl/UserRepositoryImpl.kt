@@ -1,23 +1,28 @@
 package com.moim.data.feature.user.repositoryimpl
 
-import com.moim.data.feature.user.datasource.UserService
+import com.moim.data.common.source.TokenDataStore
 import com.moim.data.feature.user.datasource.UserDataSource
 import com.moim.domain.model.UserInfo
 import com.moim.domain.repository.UserRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource,
+    private val tokenDataStore: TokenDataStore
 ) : UserRepository {
 
     override suspend fun loginWithGoogle(idToken: String): Result<UserInfo> {
         return runCatching {
-            val response = userApiService.googleLogin(GoogleLoginRequest(idToken))
+            val response = userDataSource.loginWithGoogle(idToken)
 
             if (response.success && response.data != null) {
                 val loginData = response.data
 
-                // 안드로이드 기기(EncryptedSharedPreferences 등)에 accessToken, refreshToken을 저장하는 로직
+                tokenDataStore.saveTokens(
+                    accessToken = loginData.accessToken,
+                    refreshToken = loginData.refreshToken
+                )
 
                 UserInfo(
                     id = loginData.user.id,

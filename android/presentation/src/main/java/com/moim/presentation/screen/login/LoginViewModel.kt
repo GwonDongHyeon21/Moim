@@ -42,7 +42,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun getGoogleIdToken(context: Context) {
+    private fun getGoogleIdToken(context: Context) {
         viewModelScope.launch {
             val credentialManager = CredentialManager.create(context)
 
@@ -68,13 +68,13 @@ class LoginViewModel @Inject constructor(
                         GoogleIdTokenCredential.createFrom(credential.data)
                     val idToken = googleIdTokenCredential.idToken
 
-                    runCatching {
-                        userRepository.loginWithGoogle(idToken)
-                    }.onSuccess {
-                        _uiEvent.trySend(LoginEvent.NavigateToHome)
-                    }.onFailure { exception ->
-                        _uiEvent.trySend(LoginEvent.ShowSnackBar(R.string.google_login_error))
-                    }
+                    userRepository.loginWithGoogle(idToken)
+                        .onSuccess {
+                            _uiEvent.trySend(LoginEvent.NavigateToHome)
+                        }.onFailure { exception ->
+                            Timber.e(exception)
+                            _uiEvent.trySend(LoginEvent.ShowSnackBar(R.string.google_login_error))
+                        }
                 }
             }.onFailure { error ->
                 Timber.e(error)
