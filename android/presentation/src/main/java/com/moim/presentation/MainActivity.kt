@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.moim.presentation.navigation.rememberMoimNavigator
 import com.moim.presentation.theme.MoimTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,8 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MoimTheme {
-                val navigator = rememberMoimNavigator()
-                MoimApp(navigator = navigator)
+                MoimApp()
             }
         }
     }

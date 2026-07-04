@@ -35,4 +35,8 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun getAccessToken(): Flow<String?> {
+        return tokenDataStore.accessTokenFlow
+    }
 }
