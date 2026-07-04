@@ -9,7 +9,7 @@ import retrofit2.http.POST
 interface UserService {
 
     @POST("api/v1/users/login/google")
-    suspend fun googleLogin(
+    suspend fun loginWithGoogle(
         @Body request: GoogleLoginRequest
     ): ApiResponse<LoginResponse>
 }

@@ -6,10 +6,10 @@ import com.moim.data.feature.user.model.LoginResponse
 import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(
-    private val userApiService: UserService
+    private val userService: UserService
 ) : UserDataSource {
 
     override suspend fun loginWithGoogle(idToken: String): ApiResponse<LoginResponse> {
-        return userApiService.googleLogin(GoogleLoginRequest(idToken))
+        return userService.loginWithGoogle(GoogleLoginRequest(idToken))
     }
 }

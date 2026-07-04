@@ -1,13 +1,13 @@
 package com.moim.data.feature.user.repositoryimpl
 
 import com.moim.data.feature.user.datasource.UserService
-import com.moim.data.feature.user.model.GoogleLoginRequest
+import com.moim.data.feature.user.datasource.UserDataSource
 import com.moim.domain.model.UserInfo
 import com.moim.domain.repository.UserRepository
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userApiService: UserService
+    private val userDataSource: UserDataSource,
 ) : UserRepository {
 
     override suspend fun loginWithGoogle(idToken: String): Result<UserInfo> {
