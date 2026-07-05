@@ -12,8 +12,3 @@ class ApiResponse<T> private constructor(
             ApiResponse(false, null, ErrorResponse(code, message))
     }
 }
-
-class ErrorResponse(
-    val code: String,
-    val message: String
-)
