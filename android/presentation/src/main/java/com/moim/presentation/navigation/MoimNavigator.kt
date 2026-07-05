@@ -2,7 +2,7 @@ package com.moim.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.moim.presentation.screen.home.navigateToHome
@@ -39,6 +39,6 @@ class MoimNavigator(
 @Composable
 fun rememberMoimNavigator(
     startDestination: NavKey
-): MoimNavigator = rememberSaveable(startDestination) {
+): MoimNavigator = remember(startDestination) {
     MoimNavigator(NavBackStack(startDestination))
 }
