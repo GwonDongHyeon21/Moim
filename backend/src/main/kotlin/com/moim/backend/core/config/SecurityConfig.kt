@@ -23,7 +23,8 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers(
                     "/api/v1/users/login/google",
-                    "/api/v1/users/reissue"
+                    "/api/v1/users/reissue",
+                    "/api/v1/users/logout"
                 ).permitAll()
                 auth.anyRequest().authenticated()
             }
