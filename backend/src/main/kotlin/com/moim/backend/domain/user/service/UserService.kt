@@ -114,7 +114,7 @@ class UserService(
         )
     }
 
-    fun removeRefreshToken(refreshToken: String): Boolean? {
+    fun removeRefreshToken(refreshToken: String): Boolean {
         return redisTemplate.delete("RT:$refreshToken")
     }
 }
