@@ -1,10 +1,7 @@
 package com.moim.backend.domain.user.controller
 
 import com.moim.backend.core.response.ApiResponse
-import com.moim.backend.domain.user.dto.GoogleLoginRequest
-import com.moim.backend.domain.user.dto.LoginResponse
-import com.moim.backend.domain.user.dto.LogoutRequest
-import com.moim.backend.domain.user.dto.ReissueRequest
+import com.moim.backend.domain.user.dto.*
 import com.moim.backend.domain.user.service.UserService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -38,7 +35,7 @@ class UserController(
     @PostMapping("/reissue")
     fun reissue(
         @RequestBody request: ReissueRequest
-    ): ApiResponse<LoginResponse> {
+    ): ApiResponse<TokenResponse> {
         val response = userService.reissueToken(request.refreshToken)
 
         return ApiResponse.success(response)

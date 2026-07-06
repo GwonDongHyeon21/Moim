@@ -6,6 +6,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.moim.backend.core.error.ErrorException
 import com.moim.backend.core.jwt.JwtProvider
 import com.moim.backend.domain.user.dto.LoginResponse
+import com.moim.backend.domain.user.dto.TokenResponse
 import com.moim.backend.domain.user.dto.UserResponse
 import com.moim.backend.domain.user.entity.User
 import com.moim.backend.domain.user.repository.UserRepository
@@ -70,12 +71,14 @@ class UserService(
     }
 
     @Transactional
-    fun reissueToken(refreshToken: String): LoginResponse {
-        if (!jwtProvider.validateToken(refreshToken)) throw ErrorException(
-            httpStatus = HttpStatus.UNAUTHORIZED,
-            errorCode = "INVALID_TOKEN",
-            message = "만료되거나 유효하지 않은 Refresh Token입니다. 다시 로그인해주세요."
-        )
+    fun reissueToken(refreshToken: String): TokenResponse {
+        if (!jwtProvider.validateToken(refreshToken)) {
+            throw ErrorException(
+                httpStatus = HttpStatus.UNAUTHORIZED,
+                errorCode = "INVALID_TOKEN",
+                message = "만료되거나 유효하지 않은 Refresh Token입니다. 다시 로그인해주세요."
+            )
+        }
 
         val userIdString = redisTemplate.opsForValue().get("RT:$refreshToken")
             ?: throw ErrorException(
@@ -99,10 +102,9 @@ class UserService(
         redisTemplate.delete("RT:$refreshToken")
         saveRefreshToken(userId, newRefreshToken)
 
-        return LoginResponse(
+        return TokenResponse(
             accessToken = newAccessToken,
-            refreshToken = newRefreshToken,
-            user = UserResponse.from(user)
+            refreshToken = newRefreshToken
         )
     }
 
