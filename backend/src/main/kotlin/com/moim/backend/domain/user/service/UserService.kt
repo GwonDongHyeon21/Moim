@@ -52,16 +52,18 @@ class UserService(
                 nickname = name
             )
         )
+
         val userId = user.id ?: throw ErrorException(
             httpStatus = HttpStatus.NOT_FOUND,
             errorCode = "USER_NOT_FOUND",
             message = "유저 저장/조회에 실패했습니다."
         )
+        val sessionId = UUID.randomUUID().toString()
 
-        val accessToken = jwtProvider.createAccessToken(userId, user.email)
-        val refreshToken = jwtProvider.createRefreshToken(userId)
+        val accessToken = jwtProvider.createAccessToken(userId, email)
+        val refreshToken = jwtProvider.createRefreshToken(userId, sessionId)
 
-        saveRefreshToken(userId, refreshToken)
+        saveRefreshToken(userId, sessionId, refreshToken)
 
         return LoginResponse(
             accessToken = accessToken,
@@ -81,8 +83,9 @@ class UserService(
         }
 
         val userId = jwtProvider.getUserIdFromToken(refreshToken)
+        val sessionId = jwtProvider.getSessionIdFromToken(refreshToken)
 
-        validateTokenExpiration(userId, refreshToken)
+        validateTokenExpiration(userId, sessionId, refreshToken)
 
         val user = userRepository.findById(userId).orElseThrow {
             ErrorException(
@@ -93,9 +96,9 @@ class UserService(
         }
 
         val newAccessToken = jwtProvider.createAccessToken(userId, user.email)
-        val newRefreshToken = jwtProvider.createRefreshToken(userId)
+        val newRefreshToken = jwtProvider.createRefreshToken(userId, sessionId)
 
-        saveRefreshToken(userId, newRefreshToken)
+        saveRefreshToken(userId, sessionId, newRefreshToken)
 
         return TokenResponse(
             accessToken = newAccessToken,
@@ -103,15 +106,18 @@ class UserService(
         )
     }
 
-    private fun validateTokenExpiration(userId: Long, refreshToken: String) {
-        val previousToken = redisTemplate.opsForValue().get("RT:$userId") ?: throw ErrorException(
+    private fun validateTokenExpiration(userId: Long, sessionId: String, refreshToken: String) {
+        val previousToken = redisTemplate.opsForValue().get(redisKey(userId, sessionId)) ?: throw ErrorException(
             httpStatus = HttpStatus.UNAUTHORIZED,
             errorCode = "TOKEN_EXPIRED",
             message = "이미 로그아웃 되었거나 만료된 세션입니다. 다시 로그인해주세요."
         )
 
         if (previousToken != refreshToken) {
-            logout(refreshToken)
+            val allSessionKeys = redisTemplate.keys(redisKeyAll(userId))
+            if (!allSessionKeys.isNullOrEmpty()) {
+                redisTemplate.delete(allSessionKeys)
+            }
 
             throw ErrorException(
                 httpStatus = HttpStatus.UNAUTHORIZED,
@@ -121,9 +127,9 @@ class UserService(
         }
     }
 
-    private fun saveRefreshToken(userId: Long, refreshToken: String) {
+    private fun saveRefreshToken(userId: Long, sessionId: String, refreshToken: String) {
         redisTemplate.opsForValue().set(
-            "RT:$userId",
+            redisKey(userId, sessionId),
             refreshToken,
             Duration.ofMillis(refreshExpiration)
         )
@@ -132,9 +138,14 @@ class UserService(
     fun logout(refreshToken: String): Boolean {
         return try {
             val userId = jwtProvider.getUserIdFromToken(refreshToken)
-            redisTemplate.delete("RT:$userId")
+            val sessionId = jwtProvider.getSessionIdFromToken(refreshToken)
+
+            redisTemplate.delete(redisKey(userId, sessionId))
         } catch (_: Exception) {
             false
         }
     }
+
+    private fun redisKey(userId: Long, sessionId: String) = "RT:$userId:$sessionId"
+    private fun redisKeyAll(userId: Long) = "RT:$userId:*"
 }

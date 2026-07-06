@@ -30,12 +30,13 @@ class JwtProvider(
             .compact()
     }
 
-    fun createRefreshToken(userId: Long): String {
+    fun createRefreshToken(userId: Long, sessionId: String): String {
         val nowDate = Date()
         val expirationDate = Date(nowDate.time + refreshExpiration)
 
         return Jwts.builder()
             .setSubject(userId.toString())
+            .claim("sessionId", sessionId)
             .setIssuedAt(nowDate)
             .setExpiration(expirationDate)
             .signWith(key, SignatureAlgorithm.HS256)
@@ -61,5 +62,15 @@ class JwtProvider(
             .body
 
         return claims.subject.toLong()
+    }
+
+    fun getSessionIdFromToken(token: String): String {
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .body
+
+        return claims["sessionId"].toString()
     }
 }
