@@ -2,9 +2,11 @@ package com.moim.data.feature.user.repositoryimpl
 
 import com.moim.data.common.source.TokenDataStore
 import com.moim.data.feature.user.datasource.UserDataSource
+import com.moim.domain.model.ErrorType
 import com.moim.domain.model.UserInfo
 import com.moim.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -13,27 +15,50 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     override suspend fun loginWithGoogle(idToken: String): Result<UserInfo> {
-        return runCatching {
-            val response = userDataSource.loginWithGoogle(idToken)
-
-            if (response.success && response.data != null) {
-                val loginData = response.data
-
+        return userDataSource.loginWithGoogle(idToken)
+            .onSuccess { response ->
                 tokenDataStore.saveTokens(
-                    accessToken = loginData.accessToken,
-                    refreshToken = loginData.refreshToken
+                    accessToken = response.accessToken,
+                    refreshToken = response.refreshToken
                 )
-
+            }.map { data ->
                 UserInfo(
-                    id = loginData.user.id,
-                    email = loginData.user.email,
-                    nickname = loginData.user.nickname,
-                    profileImageUrl = loginData.user.profileImageUrl
+                    id = data.user.id,
+                    email = data.user.email,
+                    nickname = data.user.nickname,
+                    profileImageUrl = data.user.profileImageUrl
                 )
-            } else {
-                throw Exception(response.error?.message ?: "서버 통신 실패")
             }
+    }
+
+    override suspend fun logout(): Result<Boolean> {
+        val refreshToken = tokenDataStore.refreshTokenFlow.firstOrNull()
+
+        if (refreshToken.isNullOrBlank()) {
+            return Result.failure(ErrorType.TokenNotFound)
         }
+
+        tokenDataStore.clearTokens()
+
+        return userDataSource.logout(refreshToken)
+    }
+
+    override suspend fun reissueToken(): Result<Boolean> {
+        val refreshToken = tokenDataStore.refreshTokenFlow.firstOrNull()
+
+        if (refreshToken.isNullOrBlank()) {
+            return Result.failure(ErrorType.TokenNotFound)
+        }
+
+        return userDataSource.reissueTokens(refreshToken)
+            .onSuccess { response ->
+                tokenDataStore.saveTokens(
+                    accessToken = response.accessToken,
+                    refreshToken = response.refreshToken
+                )
+            }.map { data ->
+                data.accessToken.isNotEmpty() && data.refreshToken.isNotEmpty()
+            }
     }
 
     override fun getAccessToken(): Flow<String?> {

@@ -4,7 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -32,16 +31,24 @@ class TokenDataStore @Inject constructor(
         }
     }
 
-    val accessTokenFlow: Flow<String?> = dataStore.data.map { preferences ->
+    val accessTokenFlow = dataStore.data.map { preferences ->
         preferences[ACCESS_TOKEN]
     }
 
-    fun getAccessTokenSync(): String? {
-        return runBlocking {
-            dataStore.data.map { preferences ->
-                preferences[ACCESS_TOKEN]
-            }.first()
-        }
+    val refreshTokenFlow = dataStore.data.map { preferences ->
+        preferences[REFRESH_TOKEN]
+    }
+
+    fun getAccessTokenSync() = runBlocking {
+        dataStore.data.map { preferences ->
+            preferences[ACCESS_TOKEN]
+        }.first()
+    }
+
+    fun getRefreshTokenSync() = runBlocking {
+        dataStore.data.map { preferences ->
+            preferences[REFRESH_TOKEN]
+        }.first()
     }
 
     companion object {
