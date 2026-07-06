@@ -2,6 +2,7 @@ package com.moim.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.moim.data.common.network.AuthInterceptor
+import com.moim.data.common.network.TokenAuthenticator
 import com.moim.data.feature.user.datasource.UserService
 import dagger.Module
 import dagger.Provides
@@ -20,14 +21,20 @@ object NetworkModule {
 
     private const val BASE_URL = "http://localhost:8080/"
 
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
+            .authenticator(tokenAuthenticator)
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 

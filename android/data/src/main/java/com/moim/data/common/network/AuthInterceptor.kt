@@ -21,12 +21,12 @@ class AuthInterceptor @Inject constructor(
             return chain.proceed(originalRequest)
         }
 
-        val accessToken = tokenDataStore.accessTokenFlow
+        val accessToken = tokenDataStore.getAccessTokenSync()
 
-        val newRequest = originalRequest.newBuilder()
+        val requestWithToken = originalRequest.newBuilder()
             .addHeader("Authorization", "Bearer $accessToken")
             .build()
 
-        return chain.proceed(newRequest)
+        return chain.proceed(requestWithToken)
     }
 }
