@@ -27,7 +27,7 @@ class UserController(
     fun logout(
         @RequestBody request: LogoutRequest
     ): ApiResponse<Boolean> {
-        val response = userService.removeRefreshToken(request.refreshToken)
+        val response = userService.logout(request.refreshToken)
 
         return ApiResponse.success(response)
     }

@@ -80,13 +80,9 @@ class UserService(
             )
         }
 
-        val userIdString = redisTemplate.opsForValue().get("RT:$refreshToken")
-            ?: throw ErrorException(
-                httpStatus = HttpStatus.UNAUTHORIZED,
-                errorCode = "TOKEN_EXPIRED",
-                message = "로그아웃 되었거나 서버에서 만료된 토큰입니다."
-            )
-        val userId = userIdString.toLong()
+        val userId = jwtProvider.getUserIdFromToken(refreshToken)
+
+        validateTokenExpiration(userId, refreshToken)
 
         val user = userRepository.findById(userId).orElseThrow {
             ErrorException(
@@ -99,7 +95,6 @@ class UserService(
         val newAccessToken = jwtProvider.createAccessToken(userId, user.email)
         val newRefreshToken = jwtProvider.createRefreshToken(userId)
 
-        redisTemplate.delete("RT:$refreshToken")
         saveRefreshToken(userId, newRefreshToken)
 
         return TokenResponse(
@@ -108,15 +103,38 @@ class UserService(
         )
     }
 
-    fun saveRefreshToken(userId: Long, refreshToken: String) {
+    private fun validateTokenExpiration(userId: Long, refreshToken: String) {
+        val previousToken = redisTemplate.opsForValue().get("RT:$userId") ?: throw ErrorException(
+            httpStatus = HttpStatus.UNAUTHORIZED,
+            errorCode = "TOKEN_EXPIRED",
+            message = "이미 로그아웃 되었거나 만료된 세션입니다. 다시 로그인해주세요."
+        )
+
+        if (previousToken != refreshToken) {
+            logout(refreshToken)
+
+            throw ErrorException(
+                httpStatus = HttpStatus.UNAUTHORIZED,
+                errorCode = "SECURITY_BREACH",
+                message = "비정상적인 접근이 감지되어 보안을 위해 강제 로그아웃 처리되었습니다."
+            )
+        }
+    }
+
+    private fun saveRefreshToken(userId: Long, refreshToken: String) {
         redisTemplate.opsForValue().set(
-            "RT:$refreshToken",
-            userId.toString(),
+            "RT:$userId",
+            refreshToken,
             Duration.ofMillis(refreshExpiration)
         )
     }
 
-    fun removeRefreshToken(refreshToken: String): Boolean {
-        return redisTemplate.delete("RT:$refreshToken")
+    fun logout(refreshToken: String): Boolean {
+        return try {
+            val userId = jwtProvider.getUserIdFromToken(refreshToken)
+            redisTemplate.delete("RT:$userId")
+        } catch (_: Exception) {
+            false
+        }
     }
 }
