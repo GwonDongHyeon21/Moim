@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.moim.presentation.screen.home.navigateToHome
+import com.moim.presentation.screen.login.navigateToLogin
 
 @Stable
 class MoimNavigator(
@@ -30,6 +31,8 @@ class MoimNavigator(
 
         backStack.add(tab.route)
     }
+
+    fun navigateToLogin() = backStack.navigateToLogin()
 
     fun navigateToHome() = backStack.navigateToHome()
 
