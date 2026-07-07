@@ -1,6 +1,7 @@
 package com.moim.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.moim.data.BuildConfig
 import com.moim.data.common.network.AuthInterceptor
 import com.moim.data.common.network.TokenAuthenticator
 import com.moim.data.feature.user.datasource.UserService
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://localhost:8080/"
+    private const val BASE_URL = BuildConfig.BASE_URL
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
