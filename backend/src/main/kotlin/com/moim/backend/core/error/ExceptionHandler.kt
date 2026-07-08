@@ -13,6 +13,6 @@ class ExceptionHandler {
 
         return ResponseEntity
             .status(e.httpStatus)
-            .body(ApiResponse.fail(e.errorCode, e.message))
+            .body(ApiResponse.fail(e.errorCode.toString(), e.errorCode.message))
     }
 }

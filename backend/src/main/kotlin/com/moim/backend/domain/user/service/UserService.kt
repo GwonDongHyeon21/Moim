@@ -3,6 +3,7 @@ package com.moim.backend.domain.user.service
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
+import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
 import com.moim.backend.core.jwt.JwtProvider
 import com.moim.backend.domain.user.dto.LoginResponse
@@ -36,8 +37,7 @@ class UserService(
 
         val idToken = verifier.verify(idToken) ?: throw ErrorException(
             httpStatus = HttpStatus.UNAUTHORIZED,
-            errorCode = "INVALID_GOOGLE_TOKEN",
-            message = "유효하지 않거나 위조된 구글 토큰입니다."
+            errorCode = ErrorCode.INVALID_GOOGLE_TOKEN
         )
 
         val payLoad = idToken.payload
@@ -55,8 +55,7 @@ class UserService(
 
         val userId = user.id ?: throw ErrorException(
             httpStatus = HttpStatus.NOT_FOUND,
-            errorCode = "USER_NOT_FOUND",
-            message = "유저 저장/조회에 실패했습니다."
+            errorCode = ErrorCode.USER_NOT_FOUND
         )
         val sessionId = UUID.randomUUID().toString()
 
@@ -77,8 +76,7 @@ class UserService(
         if (!jwtProvider.validateToken(refreshToken)) {
             throw ErrorException(
                 httpStatus = HttpStatus.UNAUTHORIZED,
-                errorCode = "INVALID_TOKEN",
-                message = "만료되거나 유효하지 않은 Refresh Token입니다. 다시 로그인해주세요."
+                errorCode = ErrorCode.EXPIRED_TOKEN
             )
         }
 
@@ -90,8 +88,7 @@ class UserService(
         val user = userRepository.findById(userId).orElseThrow {
             ErrorException(
                 httpStatus = HttpStatus.NOT_FOUND,
-                errorCode = "USER_NOT_FOUND",
-                message = "존재하지 않는 유저입니다."
+                errorCode = ErrorCode.USER_NOT_FOUND
             )
         }
 
@@ -109,8 +106,7 @@ class UserService(
     private fun validateTokenExpiration(userId: Long, sessionId: String, refreshToken: String) {
         val previousToken = redisTemplate.opsForValue().get(redisKey(userId, sessionId)) ?: throw ErrorException(
             httpStatus = HttpStatus.UNAUTHORIZED,
-            errorCode = "TOKEN_EXPIRED",
-            message = "이미 로그아웃 되었거나 만료된 세션입니다. 다시 로그인해주세요."
+            errorCode = ErrorCode.EXPIRED_TOKEN
         )
 
         if (previousToken != refreshToken) {
@@ -121,8 +117,7 @@ class UserService(
 
             throw ErrorException(
                 httpStatus = HttpStatus.UNAUTHORIZED,
-                errorCode = "SECURITY_BREACH",
-                message = "비정상적인 접근이 감지되어 보안을 위해 강제 로그아웃 처리되었습니다."
+                errorCode = ErrorCode.SECURITY_BREACH
             )
         }
     }
