@@ -2,6 +2,7 @@ package com.moim.data.feature.user.repositoryimpl
 
 import com.moim.data.common.source.TokenDataStore
 import com.moim.data.feature.user.datasource.UserDataSource
+import com.moim.data.feature.user.model.toDomain
 import com.moim.domain.model.ErrorType
 import com.moim.domain.model.UserInfo
 import com.moim.domain.repository.UserRepository
@@ -22,12 +23,7 @@ class UserRepositoryImpl @Inject constructor(
                     refreshToken = response.refreshToken
                 )
             }.map { data ->
-                UserInfo(
-                    id = data.user.id,
-                    email = data.user.email,
-                    nickname = data.user.nickname,
-                    profileImageUrl = data.user.profileImageUrl
-                )
+                data.user.toDomain()
             }
     }
 
