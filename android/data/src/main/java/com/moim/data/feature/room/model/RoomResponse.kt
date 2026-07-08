@@ -1,5 +1,6 @@
 package com.moim.data.feature.room.model
 
+import com.moim.domain.model.RoomInfo
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,4 +11,8 @@ data class RoomResponse(
     val description: String?,
     val maxCount: Int,
     val currentMemberCount: Int
+)
+
+fun RoomResponse.toDomain() = RoomInfo(
+    roomCode = code
 )
