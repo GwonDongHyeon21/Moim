@@ -2,10 +2,7 @@ package com.moim.backend.domain.room.service
 
 import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
-import com.moim.backend.domain.room.dto.CreateRoomRequest
-import com.moim.backend.domain.room.dto.JoinRoomRequest
-import com.moim.backend.domain.room.dto.RoomDetailResponse
-import com.moim.backend.domain.room.dto.RoomResponse
+import com.moim.backend.domain.room.dto.*
 import com.moim.backend.domain.room.entity.Room
 import com.moim.backend.domain.room.entity.RoomMember
 import com.moim.backend.domain.room.model.RoomRole
@@ -53,12 +50,9 @@ class RoomService(
 
         val roomMembers = roomMemberRepository.findAllByRoomIdWithUser(roomId)
         val members = roomMembers.map { member ->
-            RoomMember(
-                id = member.id,
-                room = member.room,
+            RoomMemberResponse.from(
                 user = member.user,
-                role = member.role,
-                joinedAt = member.joinedAt,
+                role = member.role.name
             )
         }
 
