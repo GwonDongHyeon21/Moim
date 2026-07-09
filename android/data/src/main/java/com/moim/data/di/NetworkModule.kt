@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.moim.data.BuildConfig
 import com.moim.data.common.network.AuthInterceptor
 import com.moim.data.common.network.TokenAuthenticator
+import com.moim.data.feature.room.datasource.RoomService
 import com.moim.data.feature.user.datasource.UserService
 import dagger.Module
 import dagger.Provides
@@ -59,5 +60,11 @@ object NetworkModule {
     @Singleton
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRoomService(retrofit: Retrofit): RoomService {
+        return retrofit.create(RoomService::class.java)
     }
 }
