@@ -14,5 +14,9 @@ data class RoomResponse(
 )
 
 fun RoomResponse.toDomain() = RoomInfo(
-    roomCode = code
+    code = code,
+    title = title,
+    description = description,
+    maxCount = maxCount,
+    currentMemberCount = currentMemberCount
 )
