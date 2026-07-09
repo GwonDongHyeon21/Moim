@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.moim.presentation.screen.home.navigateToHome
 import com.moim.presentation.screen.login.navigateToLogin
+import com.moim.presentation.screen.roomdetail.navigateToRoomDetail
 
 @Stable
 class MoimNavigator(
@@ -35,6 +36,8 @@ class MoimNavigator(
     fun navigateToLogin() = backStack.navigateToLogin()
 
     fun navigateToHome() = backStack.navigateToHome()
+
+    fun navigateToRoomDetail(roomId: Long) = backStack.navigateToRoomDetail(roomId)
 
     fun popBackStack() = backStack.removeLastOrNull()
 }

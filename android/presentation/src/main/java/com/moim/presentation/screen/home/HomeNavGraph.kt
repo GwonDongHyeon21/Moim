@@ -13,7 +13,7 @@ fun NavBackStack<NavKey>.navigateToHome() {
 
 fun EntryProviderScope<NavKey>.home(
     metadata: Map<String, Any>,
-    onNavigateToRoomDetail: (String) -> Unit,
+    onNavigateToRoomDetail: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     entry<Home>(metadata = metadata) {
