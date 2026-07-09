@@ -42,6 +42,7 @@ fun MoimNav(
 
             home(
                 metadata = fadeTransition,
+                onNavigateToRoomDetail = { navigator.navigateToRoomDetail(it) },
                 modifier = modifier.padding(innerPadding)
             )
         }
