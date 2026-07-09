@@ -2,12 +2,13 @@ package com.moim.backend.domain.room.service
 
 import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
-import com.moim.backend.domain.room.model.RoomRole
 import com.moim.backend.domain.room.dto.CreateRoomRequest
 import com.moim.backend.domain.room.dto.JoinRoomRequest
+import com.moim.backend.domain.room.dto.RoomDetailResponse
 import com.moim.backend.domain.room.dto.RoomResponse
 import com.moim.backend.domain.room.entity.Room
 import com.moim.backend.domain.room.entity.RoomMember
+import com.moim.backend.domain.room.model.RoomRole
 import com.moim.backend.domain.room.repository.RoomMemberRepository
 import com.moim.backend.domain.room.repository.RoomRepository
 import com.moim.backend.domain.room.service.Room.MAX_ROOM_COUNT
@@ -35,9 +36,41 @@ class RoomService(
 
     private val secureRandom = SecureRandom()
 
+    fun getMyRooms(userId: Long): List<RoomResponse> {
+        val rooms = roomRepository.findJoinedRoomsByUserId(userId)
+
+        return rooms.map { room ->
+            val currentMemberCount = roomMemberRepository.countByRoomId(room.id!!)
+
+            RoomResponse.from(room, currentMemberCount)
+        }
+    }
+
+
+    fun getRoomDetail(userId: Long, roomId: Long): RoomDetailResponse {
+        val roomMember = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+            ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
+
+        val roomMembers = roomMemberRepository.findAllByRoomIdWithUser(roomId)
+        val members = roomMembers.map { member ->
+            RoomMember(
+                id = member.id,
+                room = member.room,
+                user = member.user,
+                role = member.role,
+                joinedAt = member.joinedAt,
+            )
+        }
+
+        return RoomDetailResponse(
+            roomInfo = RoomResponse.from(roomMember.room, members.size),
+            role = roomMember.role.name,
+            members = members
+        )
+    }
+
     @Transactional
     fun createRoom(userId: Long, request: CreateRoomRequest): RoomResponse {
-
         val user = userRepository.findById(userId).orElseThrow {
             ErrorException(
                 httpStatus = HttpStatus.NOT_FOUND,
@@ -83,7 +116,6 @@ class RoomService(
 
     @Transactional
     fun joinRoom(userId: Long, request: JoinRoomRequest): RoomResponse {
-
         val user = userRepository.findById(userId).orElseThrow {
             ErrorException(
                 httpStatus = HttpStatus.NOT_FOUND,
