@@ -9,12 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.moim.domain.model.RoomInfo
+import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.util.DummyData
 
 @Composable
 fun RoomCard(
-    room: RoomInfo,
+    room: RoomInfoUiModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -3,6 +3,7 @@ package com.moim.presentation.screen.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moim.domain.repository.RoomRepository
+import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
@@ -43,7 +44,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             roomRepository.loadRooms()
                 .onSuccess { data ->
-                    _uiState.update { it.copy(rooms = data) }
+                    _uiState.update { it.copy(rooms = data.map { room -> room.toUiModel() }) }
                 }.onFailure {
                     // 아직
                 }
