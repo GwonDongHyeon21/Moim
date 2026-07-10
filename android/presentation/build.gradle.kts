@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
@@ -6,7 +8,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dagger.hilt.root)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
+
+val properties = Properties().apply {
+    load(FileInputStream(rootProject.file("local.properties")))
+}
+val webClientId: String? = properties.getProperty("GOOGLE_WEB_CLIENT_ID")
 
 android {
     namespace = "com.moim.presentation"
@@ -19,6 +27,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        // client ID
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$webClientId\"")
     }
 
     buildTypes {
@@ -40,6 +51,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -55,6 +67,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,4 +80,18 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Google ID
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+
+    // Timber
+    implementation(libs.timber)
 }
