@@ -1,8 +1,10 @@
 package com.moim.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.moim.data.BuildConfig
 import com.moim.data.common.network.AuthInterceptor
 import com.moim.data.common.network.TokenAuthenticator
+import com.moim.data.feature.room.datasource.RoomService
 import com.moim.data.feature.user.datasource.UserService
 import dagger.Module
 import dagger.Provides
@@ -19,7 +21,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://localhost:8080/"
+    private const val BASE_URL = BuildConfig.BASE_URL
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -58,5 +60,11 @@ object NetworkModule {
     @Singleton
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRoomService(retrofit: Retrofit): RoomService {
+        return retrofit.create(RoomService::class.java)
     }
 }

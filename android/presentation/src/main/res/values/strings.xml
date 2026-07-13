@@ -6,4 +6,10 @@
 
     <!-- Error Message -->
     <string name="google_login_error">로그인 중 오류가 발생했습니다.</string>
+
+    <!-- Home Screen -->
+    <string name="add">추가</string>
+    <string name="cancel">취소</string>
+    <string name="join">참여</string>
+    <string name="expand_menu_description">메뉴 펼치기</string>
 </resources>

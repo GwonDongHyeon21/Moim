@@ -1,6 +1,8 @@
 package com.moim.data.di
 
+import com.moim.data.feature.room.repositoryimpl.RoomRepositoryImpl
 import com.moim.data.feature.user.repositoryimpl.UserRepositoryImpl
+import com.moim.domain.repository.RoomRepository
 import com.moim.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -17,4 +19,10 @@ abstract class RepositoryModule {
     abstract fun bindUserRepository(
         authRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRoomRepository(
+        romRepositoryImpl: RoomRepositoryImpl
+    ): RoomRepository
 }

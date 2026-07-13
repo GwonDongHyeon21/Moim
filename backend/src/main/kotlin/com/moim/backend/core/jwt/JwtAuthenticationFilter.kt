@@ -1,5 +1,6 @@
 package com.moim.backend.core.jwt
 
+import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -36,8 +37,7 @@ class JwtAuthenticationFilter(
                 if (!jwtProvider.validateToken(it)) {
                     throw ErrorException(
                         httpStatus = HttpStatus.UNAUTHORIZED,
-                        errorCode = "EXPIRED_ACCESS_TOKEN",
-                        message = "Access Token이 만료되었거나 유효하지 않습니다."
+                        errorCode = ErrorCode.EXPIRED_TOKEN
                     )
                 }
 
