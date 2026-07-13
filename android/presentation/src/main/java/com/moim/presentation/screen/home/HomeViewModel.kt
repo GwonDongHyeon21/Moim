@@ -2,6 +2,7 @@ package com.moim.presentation.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moim.domain.model.CreateRoomParams
 import com.moim.domain.repository.RoomRepository
 import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
@@ -37,6 +38,14 @@ class HomeViewModel @Inject constructor(
             is HomeAction.ClickRoom -> {
                 _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(action.roomId))
             }
+
+            is HomeAction.CreateRoom -> {
+                createRoom(action.roomInfo)
+            }
+
+            is HomeAction.JoinRoom -> {
+                joinRoom(action.roomCode)
+            }
         }
     }
 
@@ -45,6 +54,29 @@ class HomeViewModel @Inject constructor(
             roomRepository.loadRooms()
                 .onSuccess { data ->
                     _uiState.update { it.copy(rooms = data.map { room -> room.toUiModel() }) }
+                }.onFailure {
+                    // 아직
+                }
+        }
+    }
+
+    fun createRoom(roomInfo: CreateRoomParams) {
+        viewModelScope.launch {
+            roomRepository.createRoom(roomInfo)
+                .onSuccess {
+                    loadRooms()
+                }.onFailure {
+                    // 아직
+                }
+        }
+    }
+
+    fun joinRoom(roomCode: String) {
+        viewModelScope.launch {
+            roomRepository.joinRoom(roomCode)
+                .onSuccess { data ->
+                    _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
+                    loadRooms()
                 }.onFailure {
                     // 아직
                 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moim.presentation.model.RoomInfoUiModel
+import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.util.DummyData
 
 @Composable
@@ -25,7 +26,7 @@ fun RoomCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(MoimPadding.PaddingSmall)
         ) {
             Text(text = room.title)
             Text(text = room.description.toString())
