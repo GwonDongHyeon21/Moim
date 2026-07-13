@@ -12,11 +12,13 @@ fun NavBackStack<NavKey>.navigateToRoomDetail(roomId: Long) {
 
 fun EntryProviderScope<NavKey>.roomDetail(
     metadata: Map<String, Any>,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     entry<RoomDetail>(metadata = metadata) { route ->
         RoomDetailScreen(
             route = route,
+            onNavigateBack = onNavigateBack,
             modifier = modifier
         )
     }

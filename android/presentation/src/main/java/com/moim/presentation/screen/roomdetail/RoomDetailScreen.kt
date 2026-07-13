@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,21 +20,24 @@ import com.moim.presentation.util.collectWithLifecycle
 fun RoomDetailScreen(
     route: RoomDetail,
     modifier: Modifier = Modifier,
-    viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
-        creationCallback = { factory -> factory.create(route) }
-    )
+    onNavigateBack: () -> Unit,
+    viewModel: RoomDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
-
+            RoomDetailEvent.NavigateBack -> onNavigateBack()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onAction(RoomDetailAction.LoadRoomDetail(route.roomId))
     }
 
     RoomDetailScreen(
         uiState = uiState,
-        onAction = {},
+        onAction = viewModel::onAction,
         modifier = modifier
     )
 }

@@ -50,6 +50,7 @@ fun MoimNav(
 
             roomDetail(
                 metadata = fadeTransition,
+                onNavigateBack = navigator::popBackStack,
                 modifier = modifier.padding(innerPadding)
             )
         }
