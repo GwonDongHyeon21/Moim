@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +23,7 @@ import com.moim.presentation.R
 import com.moim.presentation.screen.component.MoimButton
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
+import com.moim.presentation.theme.MoimTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +42,8 @@ fun CreateRoomDialog(
             Column(
                 modifier = Modifier
                     .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = MaterialTheme.shapes.small
+                        color = MoimTheme.colors.background,
+                        shape = MoimTheme.shapes.roundedSmall
                     )
                     .padding(MoimPadding.PaddingSmall)
             ) {
