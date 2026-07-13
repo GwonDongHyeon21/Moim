@@ -10,7 +10,7 @@ class Room(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(name = "room_code", nullable = false, unique = true, length = 20)
+    @Column(name = "room_code", nullable = false, unique = true, length = 8)
     val code: String,
 
     @Column(nullable = false, length = 100)
