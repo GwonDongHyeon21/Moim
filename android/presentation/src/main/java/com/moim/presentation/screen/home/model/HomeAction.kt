@@ -10,5 +10,7 @@ interface HomeAction {
 
     data class JoinRoom(val roomCode: String) : HomeAction
 
+    data object RefreshHome : HomeAction
+
     data object Logout : HomeAction
 }

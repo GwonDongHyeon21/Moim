@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,6 +63,8 @@ fun HomeScreen(
     var isExpanded by remember { mutableStateOf(false) }
     var roomOption by remember { mutableStateOf("") }
 
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -86,20 +90,23 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = { onAction(HomeAction.RefreshHome) },
+            state = pullToRefreshState,
+            modifier = Modifier.padding(innerPadding)
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(
-                    items = uiState.rooms,
-                    key = { it.code }
-                ) { room ->
-                    RoomCard(
-                        room = room,
-                        onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
-                    )
+            Column(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(
+                        items = uiState.rooms,
+                        key = { it.code }
+                    ) { room ->
+                        RoomCard(
+                            room = room,
+                            onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
+                        )
+                    }
                 }
             }
         }

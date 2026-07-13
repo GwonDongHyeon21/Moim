@@ -12,6 +12,7 @@ import com.moim.presentation.screen.home.model.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -49,6 +50,8 @@ class HomeViewModel @Inject constructor(
                 joinRoom(action.roomCode)
             }
 
+            HomeAction.RefreshHome -> refreshRooms()
+
             HomeAction.Logout -> logout()
         }
     }
@@ -61,6 +64,15 @@ class HomeViewModel @Inject constructor(
                 }.onFailure {
                     // 아직
                 }
+        }
+    }
+
+    fun refreshRooms() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true) }
+            loadRooms()
+            delay(1000)
+            _uiState.update { it.copy(isRefreshing = false) }
         }
     }
 
