@@ -4,6 +4,7 @@ import com.moim.data.feature.room.datasource.RoomDataSource
 import com.moim.data.feature.room.model.CreateRoomRequest
 import com.moim.data.feature.room.model.JoinRoomRequest
 import com.moim.data.feature.room.model.toDomain
+import com.moim.domain.model.CreateRoomParams
 import com.moim.domain.model.RoomDetailInfo
 import com.moim.domain.model.RoomInfo
 import com.moim.domain.repository.RoomRepository
@@ -23,15 +24,12 @@ class RoomRepositoryImpl @Inject constructor(
             .map { it.toDomain() }
     }
 
-    override suspend fun createRoom(
-        title: String,
-        description: String
-    ): Result<RoomInfo> {
+    override suspend fun createRoom(roomInfo: CreateRoomParams): Result<RoomInfo> {
         return roomDataSource.createRoom(
             CreateRoomRequest(
-                title = title,
-                description = description,
-                maxCount = 10
+                title = roomInfo.title,
+                description = roomInfo.description,
+                maxCount = roomInfo.maxCount
             )
         ).map { it.toDomain() }
     }
