@@ -31,6 +31,7 @@ class RoomDetailViewModel @Inject constructor(
     fun onAction(action: RoomDetailAction) {
         when (action) {
             is RoomDetailAction.LoadRoomDetail -> loadRoomDetail(action.roomId)
+            is RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail(action.roomId)
             RoomDetailAction.NavigateBack -> _uiEvent.trySend(RoomDetailEvent.NavigateBack)
         }
     }
@@ -43,6 +44,14 @@ class RoomDetailViewModel @Inject constructor(
                 }.onFailure {
                     // 아직
                 }
+        }
+    }
+
+    private fun refreshRoomDetail(roomId: Long) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true) }
+            loadRoomDetail(roomId)
+            _uiState.update { it.copy(isRefreshing = false) }
         }
     }
 }
