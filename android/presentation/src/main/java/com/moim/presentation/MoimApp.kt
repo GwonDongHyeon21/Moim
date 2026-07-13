@@ -1,8 +1,8 @@
 package com.moim.presentation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -36,12 +36,11 @@ fun MoimApp(viewModel: MainViewModel = hiltViewModel()) {
         bottomBar = {
 
         },
+        contentWindowInsets = WindowInsets()
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            MoimNav(
-                navigator = navigator,
-                innerPadding = innerPadding
-            )
-        }
+        MoimNav(
+            navigator = navigator,
+            innerPadding = innerPadding
+        )
     }
 }

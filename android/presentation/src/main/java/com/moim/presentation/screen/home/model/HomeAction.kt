@@ -9,4 +9,6 @@ interface HomeAction {
     data class CreateRoom(val roomInfo: CreateRoomParams) : HomeAction
 
     data class JoinRoom(val roomCode: String) : HomeAction
+
+    data object Logout : HomeAction
 }

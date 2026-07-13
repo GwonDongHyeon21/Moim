@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moim.presentation.R
+import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.home.component.CreateRoomDialog
 import com.moim.presentation.screen.home.component.JoinRoomDialog
 import com.moim.presentation.screen.home.component.RoomCard
@@ -29,6 +31,7 @@ import com.moim.presentation.util.collectWithLifecycle
 @Composable
 fun HomeScreen(
     onNavigateToRoomDetail: (Long) -> Unit,
+    onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -37,6 +40,7 @@ fun HomeScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             is HomeEvent.NavigateToRoomDetail -> onNavigateToRoomDetail(event.roomId)
+            HomeEvent.NavigateToLogin -> onNavigateToLogin()
             is HomeEvent.ShowSnackBar -> {}
         }
     }
@@ -58,6 +62,14 @@ fun HomeScreen(
     var roomOption by remember { mutableStateOf("") }
 
     Scaffold(
+        modifier = modifier,
+        topBar = {
+            MoimTopBar(
+                value = "",
+                actionIcon = R.drawable.logout_24,
+                onClickActionIcon = { onAction(HomeAction.Logout) },
+            )
+        },
         floatingActionButton = {
             RoomFloatingActionButton { option ->
                 when (option) {
@@ -75,7 +87,7 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {

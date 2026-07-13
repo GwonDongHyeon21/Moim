@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moim.domain.model.CreateRoomParams
 import com.moim.domain.repository.RoomRepository
+import com.moim.domain.repository.UserRepository
 import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -46,6 +48,8 @@ class HomeViewModel @Inject constructor(
             is HomeAction.JoinRoom -> {
                 joinRoom(action.roomCode)
             }
+
+            HomeAction.Logout -> logout()
         }
     }
 
@@ -63,7 +67,8 @@ class HomeViewModel @Inject constructor(
     fun createRoom(roomInfo: CreateRoomParams) {
         viewModelScope.launch {
             roomRepository.createRoom(roomInfo)
-                .onSuccess {
+                .onSuccess { data ->
+                    _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
                     loadRooms()
                 }.onFailure {
                     // 아직
@@ -77,6 +82,17 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { data ->
                     _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
                     loadRooms()
+                }.onFailure {
+                    // 아직
+                }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            userRepository.logout()
+                .onSuccess {
+                    _uiEvent.trySend(HomeEvent.NavigateToLogin)
                 }.onFailure {
                     // 아직
                 }
