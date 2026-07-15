@@ -11,10 +11,11 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.moim.domain.repository.UserRepository
 import com.moim.presentation.BuildConfig
-import com.moim.presentation.R
 import com.moim.presentation.screen.login.model.LoginAction
 import com.moim.presentation.screen.login.model.LoginEvent
 import com.moim.presentation.screen.login.model.LoginUiState
+import com.moim.presentation.util.snackbar.SnackBarEvent
+import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
@@ -27,7 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    private val snackBarManager: SnackBarManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -72,15 +74,15 @@ class LoginViewModel @Inject constructor(
                         .onSuccess {
                             _uiEvent.trySend(LoginEvent.NavigateToHome)
                         }.onFailure { exception ->
+                            snackBarManager.show(SnackBarEvent.GOOGLE_LOGIN_ERROR)
                             Timber.e(exception)
-                            _uiEvent.trySend(LoginEvent.ShowSnackBar(R.string.google_login_error))
+                            FirebaseCrashlytics.getInstance().recordException(exception)
                         }
                 }
-            }.onFailure { error ->
-                Timber.e(error)
-                FirebaseCrashlytics.getInstance().recordException(error)
-
-                _uiEvent.trySend(LoginEvent.ShowSnackBar(R.string.google_login_error))
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.GOOGLE_LOGIN_ERROR)
+                Timber.e(exception)
+                FirebaseCrashlytics.getInstance().recordException(exception)
             }
         }
     }

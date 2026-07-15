@@ -2,6 +2,7 @@ package com.moim.presentation.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.moim.domain.model.CreateRoomParams
 import com.moim.domain.repository.RoomRepository
 import com.moim.domain.repository.UserRepository
@@ -9,6 +10,8 @@ import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
+import com.moim.presentation.util.snackbar.SnackBarEvent
+import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
@@ -18,12 +21,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val snackBarManager: SnackBarManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -61,8 +66,10 @@ class HomeViewModel @Inject constructor(
             roomRepository.loadRooms()
                 .onSuccess { data ->
                     _uiState.update { it.copy(rooms = data.map { room -> room.toUiModel() }) }
-                }.onFailure {
-                    // 아직
+                }.onFailure { exception ->
+                    snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+                    Timber.e(exception)
+                    FirebaseCrashlytics.getInstance().recordException(exception)
                 }
         }
     }
@@ -82,8 +89,10 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { data ->
                     _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
                     loadRooms()
-                }.onFailure {
-                    // 아직
+                }.onFailure { exception ->
+                    snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+                    Timber.e(exception)
+                    FirebaseCrashlytics.getInstance().recordException(exception)
                 }
         }
     }
@@ -94,8 +103,10 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { data ->
                     _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
                     loadRooms()
-                }.onFailure {
-                    // 아직
+                }.onFailure { exception ->
+                    snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+                    Timber.e(exception)
+                    FirebaseCrashlytics.getInstance().recordException(exception)
                 }
         }
     }
