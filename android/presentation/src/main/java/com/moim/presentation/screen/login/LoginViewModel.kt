@@ -41,8 +41,8 @@ class LoginViewModel @Inject constructor(
 
     fun onAction(action: LoginAction) {
         when (action) {
-            is LoginAction.GoogleLogin -> getGoogleIdToken(action.context)
-        }
+            is LoginAction.GoogleLoginSuccess -> getGoogleIdToken(action.idToken)
+            is LoginAction.GoogleLoginError -> showSnackBar(action.event)
     }
 
     private fun getGoogleIdToken(context: Context) {
@@ -92,4 +92,7 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    private fun showSnackBar(event: SnackBarEvent) =
+        viewModelScope.launch { snackBarManager.show(event) }
 }

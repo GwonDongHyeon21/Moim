@@ -1,8 +1,10 @@
 package com.moim.presentation.screen.login.model
 
-import android.content.Context
+import com.moim.presentation.util.snackbar.SnackBarEvent
 
 sealed interface LoginAction {
 
-    data class GoogleLogin(val context: Context) : LoginAction
+    data class GoogleLoginSuccess(val idToken: String) : LoginAction
+
+    data class GoogleLoginError(val event: SnackBarEvent) : LoginAction
 }

@@ -2,6 +2,8 @@ package com.moim.presentation.util.snackbar
 
 import androidx.annotation.StringRes
 import com.moim.presentation.R
+import com.moim.presentation.screen.login.model.GoogleLoginResult
+import timber.log.Timber
 
 enum class SnackBarEvent(
     @param:StringRes val messageResId: Int
@@ -12,5 +14,7 @@ enum class SnackBarEvent(
     DATA_SAVE_FAILED(R.string.snack_bar_data_save_failed),
 
     // Login
-    GOOGLE_LOGIN_ERROR(R.string.snack_bar_google_login_error)
+    GOOGLE_LOGIN_ERROR(R.string.snack_bar_google_login_error),
+    USER_LOGIN_CANCEL(R.string.snack_bar_user_login_cancel),
+    NOT_FOUND_GOOGLE_ACCOUNT(R.string.snack_bar_not_found_google_account),
 }
