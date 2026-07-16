@@ -15,7 +15,6 @@ import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -38,22 +37,22 @@ class HomeViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        loadRooms()
+        viewModelScope.launch {
+            try {
+                loadRooms()
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
     }
 
     fun onAction(action: HomeAction) {
         when (action) {
-            is HomeAction.ClickRoom -> {
-                _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(action.roomId))
-            }
+            is HomeAction.ClickRoom -> _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(action.roomId))
 
-            is HomeAction.CreateRoom -> {
-                createRoom(action.roomInfo)
-            }
+            is HomeAction.CreateRoom -> createRoom(action.roomInfo)
 
-            is HomeAction.JoinRoom -> {
-                joinRoom(action.roomCode)
-            }
+            is HomeAction.JoinRoom -> joinRoom(action.roomCode)
 
             HomeAction.RefreshHome -> refreshRooms()
 
@@ -61,64 +60,91 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun loadRooms() {
-        viewModelScope.launch {
-            roomRepository.loadRooms()
-                .onSuccess { data ->
-                    _uiState.update { it.copy(rooms = data.map { room -> room.toUiModel() }) }
-                }.onFailure { exception ->
-                    snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
-                    Timber.e(exception)
-                    FirebaseCrashlytics.getInstance().recordException(exception)
-                }
-        }
+    suspend fun loadRooms() {
+        roomRepository.loadRooms()
+            .onSuccess { data ->
+                _uiState.update { it.copy(rooms = data.map { room -> room.toUiModel() }) }
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+                FirebaseCrashlytics.getInstance().recordException(exception)
+            }
     }
 
     fun refreshRooms() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true) }
-            loadRooms()
-            delay(1000)
-            _uiState.update { it.copy(isRefreshing = false) }
+            try {
+                _uiState.update { it.copy(isRefreshing = true) }
+                loadRooms()
+            } finally {
+                _uiState.update { it.copy(isRefreshing = false) }
+            }
         }
     }
 
     fun createRoom(roomInfo: CreateRoomParams) {
+        if (_uiState.value.isLoading) return
+
         viewModelScope.launch {
-            roomRepository.createRoom(roomInfo)
-                .onSuccess { data ->
-                    _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
-                    loadRooms()
-                }.onFailure { exception ->
-                    snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
-                    Timber.e(exception)
-                    FirebaseCrashlytics.getInstance().recordException(exception)
-                }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+
+                roomRepository.createRoom(roomInfo)
+                    .onSuccess { data ->
+                        _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
+                        loadRooms()
+                    }.onFailure { exception ->
+                        snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+
+                        Timber.e(exception)
+                        FirebaseCrashlytics.getInstance().recordException(exception)
+                    }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun joinRoom(roomCode: String) {
+        if (_uiState.value.isLoading) return
+
         viewModelScope.launch {
-            roomRepository.joinRoom(roomCode)
-                .onSuccess { data ->
-                    _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
-                    loadRooms()
-                }.onFailure { exception ->
-                    snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
-                    Timber.e(exception)
-                    FirebaseCrashlytics.getInstance().recordException(exception)
-                }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+
+                roomRepository.joinRoom(roomCode)
+                    .onSuccess { data ->
+                        _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
+                        loadRooms()
+                    }.onFailure { exception ->
+                        snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                        Timber.e(exception)
+                        FirebaseCrashlytics.getInstance().recordException(exception)
+                    }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun logout() {
+        if (_uiState.value.isLoading) return
+
         viewModelScope.launch {
-            userRepository.logout()
-                .onSuccess {
-                    _uiEvent.trySend(HomeEvent.NavigateToLogin)
-                }.onFailure {
-                    // 아직
-                }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+
+                userRepository.logout()
+                    .onSuccess {
+                        _uiEvent.trySend(HomeEvent.NavigateToLogin)
+                    }.onFailure {
+                        // 아직
+                    }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 }

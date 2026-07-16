@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.login.model.LoginAction
 import com.moim.presentation.screen.login.model.LoginEvent
 import com.moim.presentation.screen.login.model.LoginUiState
@@ -40,6 +41,10 @@ fun LoginScreen(
         onAction = viewModel::onAction,
         modifier = modifier
     )
+
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    }
 }
 
 @Composable

@@ -14,10 +14,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.home.component.CreateRoomDialog
 import com.moim.presentation.screen.home.component.JoinRoomDialog
@@ -52,6 +54,10 @@ fun HomeScreen(
         onAction = viewModel::onAction,
         modifier = modifier
     )
+
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    }
 }
 
 @Composable
@@ -116,7 +122,10 @@ fun HomeScreen(
         when (roomOption) {
             RoomOptions.CREATE.name -> {
                 CreateRoomDialog(
-                    onConfirm = { onAction(HomeAction.CreateRoom(it)) },
+                    onConfirm = {
+                        onAction(HomeAction.CreateRoom(it))
+                        isExpanded = false
+                    },
                     onDismissRequest = {
                         isExpanded = false
                         roomOption = ""
@@ -126,7 +135,10 @@ fun HomeScreen(
 
             RoomOptions.JOIN.name -> {
                 JoinRoomDialog(
-                    onConfirm = { onAction(HomeAction.JoinRoom(it)) },
+                    onConfirm = {
+                        onAction(HomeAction.JoinRoom(it))
+                        isExpanded = false
+                    },
                     onDismissRequest = {
                         isExpanded = false
                         roomOption = ""

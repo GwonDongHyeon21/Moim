@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
 import com.moim.presentation.navigation.RoomDetail
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.roomdetail.component.RoomCodeDialog
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
@@ -53,6 +54,10 @@ fun RoomDetailScreen(
         onAction = viewModel::onAction,
         modifier = modifier
     )
+
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    }
 }
 
 @Composable

@@ -22,6 +22,7 @@ import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -61,6 +62,8 @@ class LoginViewModel @Inject constructor(
             runCatching {
                 credentialManager.getCredential(context = context, request = request)
             }.onSuccess { result ->
+                _uiState.update { it.copy(isLoading = true) }
+
                 val credential = result.credential
 
                 if (credential is CustomCredential &&
@@ -74,13 +77,16 @@ class LoginViewModel @Inject constructor(
                         .onSuccess {
                             _uiEvent.trySend(LoginEvent.NavigateToHome)
                         }.onFailure { exception ->
+                            _uiState.update { it.copy(isLoading = false) }
                             snackBarManager.show(SnackBarEvent.GOOGLE_LOGIN_ERROR)
+
                             Timber.e(exception)
                             FirebaseCrashlytics.getInstance().recordException(exception)
                         }
                 }
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.GOOGLE_LOGIN_ERROR)
+
                 Timber.e(exception)
                 FirebaseCrashlytics.getInstance().recordException(exception)
             }
