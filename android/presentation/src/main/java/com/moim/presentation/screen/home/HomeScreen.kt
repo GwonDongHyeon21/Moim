@@ -10,11 +10,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -66,9 +62,6 @@ fun HomeScreen(
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    var roomOption by remember { mutableStateOf("") }
-
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -84,13 +77,11 @@ fun HomeScreen(
             RoomFloatingActionButton { option ->
                 when (option) {
                     RoomOptions.CREATE -> {
-                        isExpanded = true
-                        roomOption = RoomOptions.CREATE.name
+                        onAction(HomeAction.ClickDialog(true, RoomOptions.CREATE.name))
                     }
 
                     RoomOptions.JOIN -> {
-                        isExpanded = true
-                        roomOption = RoomOptions.JOIN.name
+                        onAction(HomeAction.ClickDialog(true, RoomOptions.JOIN.name))
                     }
                 }
             }
@@ -118,17 +109,19 @@ fun HomeScreen(
         }
     }
 
-    if (isExpanded) {
-        when (roomOption) {
+    if (uiState.isExpanded) {
+        when (uiState.roomOption) {
             RoomOptions.CREATE.name -> {
                 CreateRoomDialog(
+                    title = uiState.title,
+                    description = uiState.description,
+                    onTitleChanged = { onAction(HomeAction.OnTitleChanged(it)) },
+                    onDescriptionChanged = { onAction(HomeAction.OnDescriptionChanged(it)) },
                     onConfirm = {
                         onAction(HomeAction.CreateRoom(it))
-                        isExpanded = false
                     },
                     onDismissRequest = {
-                        isExpanded = false
-                        roomOption = ""
+                        onAction(HomeAction.ClickDialog(false, ""))
                     }
                 )
             }
@@ -137,11 +130,9 @@ fun HomeScreen(
                 JoinRoomDialog(
                     onConfirm = {
                         onAction(HomeAction.JoinRoom(it))
-                        isExpanded = false
                     },
                     onDismissRequest = {
-                        isExpanded = false
-                        roomOption = ""
+                        onAction(HomeAction.ClickDialog(false, ""))
                     }
                 )
             }

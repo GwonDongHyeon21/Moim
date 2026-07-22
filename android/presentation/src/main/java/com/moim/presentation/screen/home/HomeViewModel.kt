@@ -32,6 +32,13 @@ class HomeViewModel @Inject constructor(
         when (action) {
             is HomeAction.ClickRoom -> sendEvent(HomeEvent.NavigateToRoomDetail(action.roomId))
 
+            is HomeAction.ClickDialog ->
+                updateState { copy(isExpanded = action.isExpanded, roomOption = action.roomOption) }
+
+            is HomeAction.OnTitleChanged -> updateState { copy(title = action.title) }
+
+            is HomeAction.OnDescriptionChanged -> updateState { copy(description = action.description) }
+
             is HomeAction.CreateRoom -> createRoom(action.roomInfo)
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)
@@ -57,6 +64,14 @@ class HomeViewModel @Inject constructor(
         roomRepository.createRoom(roomInfo)
             .onSuccess { data ->
                 sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
+                updateState {
+                    copy(
+                        title = "",
+                        description = "",
+                        isExpanded = false,
+                        roomOption = ""
+                    )
+                }
                 loadRooms()
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
@@ -69,6 +84,14 @@ class HomeViewModel @Inject constructor(
         roomRepository.joinRoom(roomCode)
             .onSuccess { data ->
                 sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
+                updateState {
+                    copy(
+                        title = "",
+                        description = "",
+                        isExpanded = false,
+                        roomOption = ""
+                    )
+                }
                 loadRooms()
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
