@@ -15,11 +15,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
+import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.home.component.CreateRoomDialog
 import com.moim.presentation.screen.home.component.JoinRoomDialog
 import com.moim.presentation.screen.home.component.RoomCard
+import com.moim.presentation.screen.home.component.RoomFilterTab
 import com.moim.presentation.screen.home.component.RoomFloatingActionButton
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
@@ -35,6 +37,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val filteredRooms by viewModel.filteredRooms.collectAsStateWithLifecycle()
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
@@ -45,6 +48,7 @@ fun HomeScreen(
 
     HomeScreen(
         uiState = uiState,
+        filteredRooms = filteredRooms,
         onAction = viewModel::onAction,
         modifier = modifier
     )
@@ -57,6 +61,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    filteredRooms: List<RoomInfoUiModel>,
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -99,7 +104,7 @@ fun HomeScreen(
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(
-                        items = uiState.rooms,
+                        items = filteredRooms,
                         key = { it.code }
                     ) { room ->
                         RoomCard(
@@ -142,6 +147,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(rooms = DummyData.dummyRooms),
+        filteredRooms = DummyData.dummyRooms,
         onAction = {}
     )
 }

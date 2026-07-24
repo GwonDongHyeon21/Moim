@@ -1,5 +1,6 @@
 package com.moim.presentation.screen.home
 
+import androidx.lifecycle.viewModelScope
 import com.moim.domain.model.CreateRoomParams
 import com.moim.domain.repository.RoomRepository
 import com.moim.domain.repository.UserRepository
@@ -8,10 +9,15 @@ import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
+import com.moim.presentation.screen.home.model.RoomFilterStatus
+import com.moim.presentation.util.WhileUiSubscribed
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +29,24 @@ class HomeViewModel @Inject constructor(
 
     override fun checkLoading() = uiState.value.isLoading
     override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
+
+    val filteredRooms = uiState.map { state ->
+        val now = LocalDateTime.now()
+
+        state.rooms.filter { room ->
+            val deadline = LocalDateTime.parse(room.deadline)
+
+            if (state.roomFilterStatus == RoomFilterStatus.ONGOING) {
+                deadline.isAfter(now)
+            } else {
+                !deadline.isAfter(now)
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileUiSubscribed,
+        initialValue = emptyList()
+    )
 
     init {
         doAction { loadRooms() }
