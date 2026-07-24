@@ -55,6 +55,12 @@ fun MoimApp(
         )
     }
 
+    LaunchedEffect(isLogin) {
+        if (isLogin == false && navigator.currentDestination != MainBottomBarRoute.LOGIN.route) {
+            navigator.navigateToLogin()
+        }
+    }
+
     Scaffold(
         bottomBar = {
 
