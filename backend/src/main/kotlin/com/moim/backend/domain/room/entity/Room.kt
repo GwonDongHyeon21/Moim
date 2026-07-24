@@ -22,6 +22,9 @@ class Room(
     @Column(name = "max_count", nullable = false)
     var maxCount: Int,
 
+    @Column(nullable = false)
+    val deadline: LocalDateTime,
+
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

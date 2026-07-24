@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.security.SecureRandom
+import java.time.LocalDateTime
 
 private object Room {
     const val MAX_ROOM_COUNT = 10
@@ -90,7 +91,8 @@ class RoomService(
                 code = randomRoomCode,
                 title = request.title,
                 description = request.description,
-                maxCount = request.maxCount
+                maxCount = request.maxCount,
+                deadline = request.deadline
             )
         )
 
@@ -123,6 +125,14 @@ class RoomService(
                 errorCode = ErrorCode.ROOM_NOT_FOUND
             )
         }
+
+        if (LocalDateTime.now().isAfter(room.deadline)) {
+            throw ErrorException(
+                httpStatus = HttpStatus.FORBIDDEN,
+                errorCode = ErrorCode.ROOM_DEADLINE_EXPIRED
+            )
+        }
+
         val roomId = room.id!!
 
         if (roomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
