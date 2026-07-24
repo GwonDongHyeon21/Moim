@@ -116,7 +116,7 @@ fun HomeScreen(
                     selectedDateTime = uiState.selectedDateTime,
                     onTitleChanged = { onAction(HomeAction.OnTitleChanged(it)) },
                     onDescriptionChanged = { onAction(HomeAction.OnDescriptionChanged(it)) },
-                    onSelectedDateTimeChanged = { onAction(HomeAction.OnSelectedDateTimeChanged(it)) },
+                    onDateTimeSelected = { onAction(HomeAction.OnDateTimeSelected(it)) },
                     onConfirm = { onAction(HomeAction.CreateRoom(it)) },
                     onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )

@@ -40,7 +40,7 @@ fun CreateRoomDialog(
     selectedDateTime: LocalDateTime?,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
-    onSelectedDateTimeChanged: (LocalDateTime) -> Unit,
+    onDateTimeSelected: (LocalDateTime) -> Unit,
     onConfirm: (CreateRoomParams) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
@@ -136,7 +136,7 @@ fun CreateRoomDialog(
             initialMinute = LocalDateTime.now().minute,
             onConfirm = { hour, minute ->
                 tempDate?.let { date ->
-                    onSelectedDateTimeChanged(date.atTime(hour, minute, 0))
+                    onDateTimeSelected(date.atTime(hour, minute, 0))
                 }
 
                 showTimePicker = false
@@ -155,7 +155,7 @@ fun RoomOptionDialogPreview() {
         selectedDateTime = null,
         onTitleChanged = {},
         onDescriptionChanged = {},
-        onSelectedDateTimeChanged = {},
+        onDateTimeSelected = {},
         onConfirm = {},
         onDismissRequest = {}
     )

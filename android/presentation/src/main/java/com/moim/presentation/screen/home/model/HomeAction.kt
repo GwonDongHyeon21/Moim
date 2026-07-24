@@ -13,7 +13,7 @@ interface HomeAction {
 
     data class OnDescriptionChanged(val description: String) : HomeAction
 
-    data class OnSelectedDateTimeChanged(val selectedDateTime: LocalDateTime) : HomeAction
+    data class OnDateTimeSelected(val selectedDateTime: LocalDateTime) : HomeAction
 
     data class CreateRoom(val roomInfo: CreateRoomParams) : HomeAction
 
