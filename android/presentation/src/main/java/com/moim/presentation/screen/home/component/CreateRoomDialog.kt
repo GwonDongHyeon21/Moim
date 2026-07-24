@@ -88,9 +88,7 @@ fun CreateRoomDialog(
                         .clickable { showDatePicker = true },
                     enabled = false,
                     readOnly = true,
-                    label = {
-                        Text(text = stringResource(R.string.deadline_title))
-                    },
+                    label = { Text(text = stringResource(R.string.deadline_title)) },
                 )
 
                 Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))

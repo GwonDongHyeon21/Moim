@@ -117,22 +117,15 @@ fun HomeScreen(
                     onTitleChanged = { onAction(HomeAction.OnTitleChanged(it)) },
                     onDescriptionChanged = { onAction(HomeAction.OnDescriptionChanged(it)) },
                     onSelectedDateTimeChanged = { onAction(HomeAction.OnSelectedDateTimeChanged(it)) },
-                        onAction(HomeAction.CreateRoom(it))
-                    },
-                    onDismissRequest = {
-                        onAction(HomeAction.ClickDialog(false, ""))
-                    }
+                    onConfirm = { onAction(HomeAction.CreateRoom(it)) },
+                    onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }
 
             RoomOptions.JOIN.name -> {
                 JoinRoomDialog(
-                    onConfirm = {
-                        onAction(HomeAction.JoinRoom(it))
-                    },
-                    onDismissRequest = {
-                        onAction(HomeAction.ClickDialog(false, ""))
-                    }
+                    onConfirm = { onAction(HomeAction.JoinRoom(it)) },
+                    onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }
         }

@@ -80,8 +80,13 @@ fun LoginScreen(
             onClick = {
                 coroutineScope.launch {
                     when (val result = getGoogleIdToken(context)) {
-                        is GoogleLoginResult.Success -> onAction(LoginAction.GoogleLoginSuccess(result.idToken))
-                        is GoogleLoginResult.Error -> onAction(LoginAction.GoogleLoginError(result.event))
+                        is GoogleLoginResult.Success -> {
+                            onAction(LoginAction.GoogleLoginSuccess(result.idToken))
+                        }
+
+                        is GoogleLoginResult.Error -> {
+                            onAction(LoginAction.GoogleLoginError(result.event))
+                        }
                     }
                 }
             }
