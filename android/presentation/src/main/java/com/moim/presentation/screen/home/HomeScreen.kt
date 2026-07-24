@@ -31,7 +31,6 @@ import com.moim.presentation.util.collectWithLifecycle
 @Composable
 fun HomeScreen(
     onNavigateToRoomDetail: (Long) -> Unit,
-    onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -40,7 +39,6 @@ fun HomeScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             is HomeEvent.NavigateToRoomDetail -> onNavigateToRoomDetail(event.roomId)
-            HomeEvent.NavigateToLogin -> onNavigateToLogin()
             is HomeEvent.ShowSnackBar -> {}
         }
     }

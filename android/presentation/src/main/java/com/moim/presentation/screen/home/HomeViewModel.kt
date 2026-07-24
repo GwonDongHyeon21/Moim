@@ -109,12 +109,5 @@ class HomeViewModel @Inject constructor(
 
     private fun logout() = doAction {
         userRepository.logout()
-            .onSuccess {
-                sendEvent(HomeEvent.NavigateToLogin)
-            }.onFailure { exception ->
-                snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
-
-                Timber.e(exception)
-            }
     }
 }
