@@ -41,6 +41,8 @@ class HomeViewModel @Inject constructor(
 
             is HomeAction.OnDateTimeSelected -> updateState { copy(selectedDateTime = action.selectedDateTime) }
 
+            is HomeAction.OnRoomFilterStatusSelected -> updateState { copy(roomFilterStatus = action.roomFilterStatus) }
+
             is HomeAction.CreateRoom -> createRoom(action.roomInfo)
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)

@@ -92,6 +92,11 @@ fun HomeScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+                RoomFilterTab(
+                    selectedStatus = uiState.roomFilterStatus,
+                    onStatusSelected = { onAction(HomeAction.OnRoomFilterStatusSelected(it)) }
+                )
+
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(
                         items = uiState.rooms,

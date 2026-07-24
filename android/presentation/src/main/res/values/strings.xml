@@ -12,6 +12,8 @@
     <string name="expand_menu_description">메뉴 펼치기</string>
     <string name="deadline_title">"모임 마감 시간"</string>
     <string name="please_select_deadline">마감 시간을 선택해주세요</string>
+    <string name="on_going">진행 중</string>
+    <string name="end">마감</string>
 
     <!-- SnackBar Message -->
     <string name="snack_bar_network_error">네트워크 연결을 확인해주세요</string>

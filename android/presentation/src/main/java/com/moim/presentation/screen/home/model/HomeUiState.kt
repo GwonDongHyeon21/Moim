@@ -9,7 +9,7 @@ data class HomeUiState(
     val title: String = "",
     val description: String = "",
     val selectedDateTime: LocalDateTime? = null,
-    val roomCode: String = "",
+    val roomFilterStatus: RoomFilterStatus = RoomFilterStatus.ONGOING,
     val isExpanded: Boolean = false,
     val roomOption: String = "",
     val rooms: List<RoomInfoUiModel> = emptyList()

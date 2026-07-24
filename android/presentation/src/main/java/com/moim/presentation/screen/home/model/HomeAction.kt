@@ -15,6 +15,8 @@ interface HomeAction {
 
     data class OnDateTimeSelected(val selectedDateTime: LocalDateTime) : HomeAction
 
+    data class OnRoomFilterStatusSelected(val roomFilterStatus: RoomFilterStatus) : HomeAction
+
     data class CreateRoom(val roomInfo: CreateRoomParams) : HomeAction
 
     data class JoinRoom(val roomCode: String) : HomeAction
