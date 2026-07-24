@@ -45,7 +45,7 @@ fun RoomDetailScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(route.roomId) {
         viewModel.onAction(RoomDetailAction.LoadRoomDetail(route.roomId))
     }
 

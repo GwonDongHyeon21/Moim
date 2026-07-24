@@ -23,13 +23,13 @@ class RoomDetailViewModel @Inject constructor(
 
     fun onAction(action: RoomDetailAction) {
         when (action) {
-            is RoomDetailAction.LoadRoomDetail -> loadRoomDetail(action.roomId)
+            is RoomDetailAction.LoadRoomDetail -> fetchRoomDetail(action.roomId)
             is RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail(action.roomId)
             RoomDetailAction.NavigateBack -> sendEvent(RoomDetailEvent.NavigateBack)
         }
     }
 
-    private fun loadRoomDetail(roomId: Long) = doAction {
+    private suspend fun loadRoomDetail(roomId: Long) {
         roomRepository.loadRoomDetail(roomId.toString())
             .onSuccess { data ->
                 updateState { copy(roomDetail = data.toUiModel()) }
@@ -38,6 +38,10 @@ class RoomDetailViewModel @Inject constructor(
 
                 Timber.e(exception)
             }
+    }
+
+    private fun fetchRoomDetail(roomId: Long) = doAction {
+        loadRoomDetail(roomId)
     }
 
     private fun refreshRoomDetail(roomId: Long) = doAction(
