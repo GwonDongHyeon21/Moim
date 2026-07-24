@@ -61,7 +61,8 @@ fun JoinRoomDialog(
                     MoimButton(
                         value = stringResource(R.string.join),
                         onClick = { onConfirm(roomCode) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        enabled = roomCode.isNotEmpty()
                     )
                 }
             }
