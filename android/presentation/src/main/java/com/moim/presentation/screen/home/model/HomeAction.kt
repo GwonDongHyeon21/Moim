@@ -1,6 +1,7 @@
 package com.moim.presentation.screen.home.model
 
 import com.moim.domain.model.CreateRoomParams
+import java.time.LocalDateTime
 
 interface HomeAction {
 
@@ -11,6 +12,8 @@ interface HomeAction {
     data class OnTitleChanged(val title: String) : HomeAction
 
     data class OnDescriptionChanged(val description: String) : HomeAction
+
+    data class OnSelectedDateTimeChanged(val selectedDateTime: LocalDateTime) : HomeAction
 
     data class CreateRoom(val roomInfo: CreateRoomParams) : HomeAction
 

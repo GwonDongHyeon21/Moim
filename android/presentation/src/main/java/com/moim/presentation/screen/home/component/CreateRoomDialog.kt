@@ -37,8 +37,10 @@ import java.util.Locale
 fun CreateRoomDialog(
     title: String,
     description: String,
+    selectedDateTime: LocalDateTime?,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
+    onSelectedDateTimeChanged: (LocalDateTime) -> Unit,
     onConfirm: (CreateRoomParams) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
@@ -46,7 +48,6 @@ fun CreateRoomDialog(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
 
-    var selectedDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
     var tempDate by remember { mutableStateOf<LocalDate?>(null) }
 
     val uiFormatter =
@@ -137,7 +138,7 @@ fun CreateRoomDialog(
             initialMinute = LocalDateTime.now().minute,
             onConfirm = { hour, minute ->
                 tempDate?.let { date ->
-                    selectedDateTime = date.atTime(hour, minute, 0)
+                    onSelectedDateTimeChanged(date.atTime(hour, minute, 0))
                 }
 
                 showTimePicker = false
@@ -153,8 +154,10 @@ fun RoomOptionDialogPreview() {
     CreateRoomDialog(
         title = "test title",
         description = "test description",
+        selectedDateTime = null,
         onTitleChanged = {},
         onDescriptionChanged = {},
+        onSelectedDateTimeChanged = {},
         onConfirm = {},
         onDismissRequest = {}
     )

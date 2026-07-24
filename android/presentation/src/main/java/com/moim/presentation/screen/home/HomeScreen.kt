@@ -113,9 +113,10 @@ fun HomeScreen(
                 CreateRoomDialog(
                     title = uiState.title,
                     description = uiState.description,
+                    selectedDateTime = uiState.selectedDateTime,
                     onTitleChanged = { onAction(HomeAction.OnTitleChanged(it)) },
                     onDescriptionChanged = { onAction(HomeAction.OnDescriptionChanged(it)) },
-                    onConfirm = {
+                    onSelectedDateTimeChanged = { onAction(HomeAction.OnSelectedDateTimeChanged(it)) },
                         onAction(HomeAction.CreateRoom(it))
                     },
                     onDismissRequest = {
