@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +34,11 @@ fun RoomDetailScreen(
     route: RoomDetail,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
-    viewModel: RoomDetailViewModel = hiltViewModel()
+    viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
+        creationCallback = { factory ->
+            factory.create(route)
+        }
+    )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -43,10 +46,6 @@ fun RoomDetailScreen(
         when (event) {
             RoomDetailEvent.NavigateBack -> onNavigateBack()
         }
-    }
-
-    LaunchedEffect(route.roomId) {
-        viewModel.onAction(RoomDetailAction.LoadRoomDetail(route.roomId))
     }
 
     RoomDetailScreen(
