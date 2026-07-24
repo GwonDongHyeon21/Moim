@@ -106,7 +106,7 @@ fun CreateRoomDialog(
                                 CreateRoomParams(
                                     title = title,
                                     description = description,
-                                    deadline = "asdf" // 임시 데드라인
+                                    deadline = selectedDateTime!!.format(isoFormatter)
                                 )
                             )
                         },

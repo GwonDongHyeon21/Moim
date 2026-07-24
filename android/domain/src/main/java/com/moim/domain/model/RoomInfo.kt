@@ -6,5 +6,6 @@ data class RoomInfo(
     val title: String,
     val description: String?,
     val maxCount: Int,
-    val currentMemberCount: Int
+    val currentMemberCount: Int,
+    val deadline: String
 )

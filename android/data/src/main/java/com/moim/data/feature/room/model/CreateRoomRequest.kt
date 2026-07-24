@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class CreateRoomRequest(
     val title: String,
     val description: String?,
-    val maxCount: Int
+    val maxCount: Int,
+    val deadline: String
 )
