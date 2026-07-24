@@ -19,11 +19,11 @@ val webClientId: String? = properties.getProperty("GOOGLE_WEB_CLIENT_ID")
 android {
     namespace = "com.moim.presentation"
     compileSdk {
-        version = release(36)
+        version = release(libs.versions.android.compileSdk.get().toInt())
     }
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.android.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

@@ -11,6 +11,10 @@ composeBom = "2026.06.00"
 appcompat = "1.7.1"
 material = "1.14.0"
 
+android-compileSdk = "36"
+android-minSdk = "26"
+android-targetSdk = "36"
+
 jetbrainsKotlinJvm = "2.1.0"
 hilt = "2.57"
 ksp = "2.2.21-2.0.4"
