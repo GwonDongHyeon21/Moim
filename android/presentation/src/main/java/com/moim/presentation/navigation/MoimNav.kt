@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moim.presentation.navigation.MoimNavConstant.fadeTransition
 import com.moim.presentation.navigation.MoimNavConstant.slideTransition
@@ -32,6 +34,10 @@ fun MoimNav(
     NavDisplay(
         backStack = navigator.backStack,
         onBack = navigator::popBackStack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
         transitionSpec = { slideTransition },
         popTransitionSpec = { slideTransition },
         predictivePopTransitionSpec = { slideTransition },

@@ -13,7 +13,7 @@ import com.moim.presentation.screen.roomdetail.navigateToRoomDetail
 class MoimNavigator(
     val backStack: NavBackStack<NavKey>
 ) {
-    
+
     val currentDestination: NavKey?
         get() = backStack.lastOrNull()
 
