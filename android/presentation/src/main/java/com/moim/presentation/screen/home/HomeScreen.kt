@@ -10,18 +10,18 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
+import com.moim.presentation.model.RoomInfoUiModel
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.home.component.CreateRoomDialog
 import com.moim.presentation.screen.home.component.JoinRoomDialog
 import com.moim.presentation.screen.home.component.RoomCard
+import com.moim.presentation.screen.home.component.RoomFilterTab
 import com.moim.presentation.screen.home.component.RoomFloatingActionButton
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
@@ -33,36 +33,38 @@ import com.moim.presentation.util.collectWithLifecycle
 @Composable
 fun HomeScreen(
     onNavigateToRoomDetail: (Long) -> Unit,
-    onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val filteredRooms by viewModel.filteredRooms.collectAsStateWithLifecycle()
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             is HomeEvent.NavigateToRoomDetail -> onNavigateToRoomDetail(event.roomId)
-            HomeEvent.NavigateToLogin -> onNavigateToLogin()
             is HomeEvent.ShowSnackBar -> {}
         }
     }
 
     HomeScreen(
         uiState = uiState,
+        filteredRooms = filteredRooms,
         onAction = viewModel::onAction,
         modifier = modifier
     )
+
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    }
 }
 
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    filteredRooms: List<RoomInfoUiModel>,
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    var roomOption by remember { mutableStateOf("") }
-
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -78,13 +80,11 @@ fun HomeScreen(
             RoomFloatingActionButton { option ->
                 when (option) {
                     RoomOptions.CREATE -> {
-                        isExpanded = true
-                        roomOption = RoomOptions.CREATE.name
+                        onAction(HomeAction.ClickDialog(true, RoomOptions.CREATE.name))
                     }
 
                     RoomOptions.JOIN -> {
-                        isExpanded = true
-                        roomOption = RoomOptions.JOIN.name
+                        onAction(HomeAction.ClickDialog(true, RoomOptions.JOIN.name))
                     }
                 }
             }
@@ -97,9 +97,14 @@ fun HomeScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+                RoomFilterTab(
+                    selectedStatus = uiState.roomFilterStatus,
+                    onStatusSelected = { onAction(HomeAction.OnRoomFilterStatusSelected(it)) }
+                )
+
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(
-                        items = uiState.rooms,
+                        items = filteredRooms,
                         key = { it.code }
                     ) { room ->
                         RoomCard(
@@ -112,25 +117,25 @@ fun HomeScreen(
         }
     }
 
-    if (isExpanded) {
-        when (roomOption) {
+    if (uiState.isExpanded) {
+        when (uiState.roomOption) {
             RoomOptions.CREATE.name -> {
                 CreateRoomDialog(
+                    title = uiState.title,
+                    description = uiState.description,
+                    selectedDateTime = uiState.selectedDateTime,
+                    onTitleChanged = { onAction(HomeAction.OnTitleChanged(it)) },
+                    onDescriptionChanged = { onAction(HomeAction.OnDescriptionChanged(it)) },
+                    onDateTimeSelected = { onAction(HomeAction.OnDateTimeSelected(it)) },
                     onConfirm = { onAction(HomeAction.CreateRoom(it)) },
-                    onDismissRequest = {
-                        isExpanded = false
-                        roomOption = ""
-                    }
+                    onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }
 
             RoomOptions.JOIN.name -> {
                 JoinRoomDialog(
                     onConfirm = { onAction(HomeAction.JoinRoom(it)) },
-                    onDismissRequest = {
-                        isExpanded = false
-                        roomOption = ""
-                    }
+                    onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }
         }
@@ -142,6 +147,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(rooms = DummyData.dummyRooms),
+        filteredRooms = DummyData.dummyRooms,
         onAction = {}
     )
 }

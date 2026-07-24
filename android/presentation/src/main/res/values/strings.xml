@@ -1,15 +1,29 @@
 <resources>
     <string name="app_name">moim</string>
 
-    <!-- Google Login -->
+    <!-- Login Screen -->
     <string name="google_login">구글 로그인</string>
-
-    <!-- Error Message -->
-    <string name="google_login_error">로그인 중 오류가 발생했습니다.</string>
 
     <!-- Home Screen -->
     <string name="add">추가</string>
-    <string name="cancel">취소</string>
     <string name="join">참여</string>
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
     <string name="expand_menu_description">메뉴 펼치기</string>
+    <string name="deadline_title">"모임 마감 시간"</string>
+    <string name="please_select_deadline">마감 시간을 선택해주세요</string>
+    <string name="on_going">진행 중</string>
+    <string name="end">마감</string>
+
+    <!-- SnackBar Message -->
+    <string name="snack_bar_network_error">네트워크 연결을 확인해주세요</string>
+    <string name="snack_bar_data_load_failed">데이터를 불러오지 못했습니다</string>
+    <string name="snack_bar_data_save_failed">데이터를 저장하지 못했습니다</string>
+    <string name="snack_bar_google_login_error">로그인 중 오류가 발생했습니다.</string>
+    <string name="snack_bar_user_login_cancel">사용자가 로그인을 취소했습니다.</string>
+    <string name="snack_bar_not_found_google_account">기기에 등록된 구글 계정이 없습니다.</string>
+
+    <!-- Format -->
+    <string name="ui_time_format">yyyy년 MM월 dd일 a hh:mm</string>
+    <string name="iso_time_format">yyyy-MM-dd\'T\'HH:mm:ss</string>
 </resources>

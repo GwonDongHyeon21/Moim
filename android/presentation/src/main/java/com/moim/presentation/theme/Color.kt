@@ -6,12 +6,17 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-val Transparent = Color(0x00000000)
-val Black = Color(0xFF222222)
+val primary = Color(0xFF7850C8)
+val surface = Color(0xFFF0E6FF)
+
+val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
+val Transparent = Color(0x00000000)
 
 @Immutable
 data class MoimColors(
+    val primary: Color,
+    val surface: Color,
     val background: Color,
     val black: Color,
     val white: Color,
@@ -19,6 +24,8 @@ data class MoimColors(
 )
 
 internal val lightMoimColors = MoimColors(
+    primary = primary,
+    surface = surface,
     background = White,
     black = Black,
     white = White,
@@ -26,6 +33,8 @@ internal val lightMoimColors = MoimColors(
 )
 
 internal val darkMoimColors = MoimColors(
+    primary = primary,
+    surface = surface,
     background = Black,
     black = Black,
     white = White,

@@ -10,7 +10,8 @@ data class RoomResponse(
     val title: String,
     val description: String?,
     val maxCount: Int,
-    val currentMemberCount: Int
+    val currentMemberCount: Int,
+    val deadline: String
 )
 
 fun RoomResponse.toDomain() = RoomInfo(
@@ -19,5 +20,6 @@ fun RoomResponse.toDomain() = RoomInfo(
     title = title,
     description = description,
     maxCount = maxCount,
-    currentMemberCount = currentMemberCount
+    currentMemberCount = currentMemberCount,
+    deadline = deadline
 )

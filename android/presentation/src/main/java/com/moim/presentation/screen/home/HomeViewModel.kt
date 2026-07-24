@@ -1,54 +1,75 @@
 package com.moim.presentation.screen.home
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moim.domain.model.CreateRoomParams
 import com.moim.domain.repository.RoomRepository
 import com.moim.domain.repository.UserRepository
+import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
+import com.moim.presentation.screen.home.model.RoomFilterStatus
+import com.moim.presentation.util.WhileUiSubscribed
+import com.moim.presentation.util.snackbar.SnackBarEvent
+import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
-    private val userRepository: UserRepository
-) : ViewModel() {
+    private val userRepository: UserRepository,
+    private val snackBarManager: SnackBarManager
+) : BaseViewModel<HomeUiState, HomeEvent>(HomeUiState()) {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState = _uiState.asStateFlow()
+    override fun checkLoading() = uiState.value.isLoading
+    override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
 
-    private val _uiEvent = Channel<HomeEvent>(BUFFERED)
-    val uiEvent = _uiEvent.receiveAsFlow()
+    val filteredRooms = uiState.map { state ->
+        val now = LocalDateTime.now()
+
+        state.rooms.filter { room ->
+            val deadline = LocalDateTime.parse(room.deadline)
+
+            if (state.roomFilterStatus == RoomFilterStatus.ONGOING) {
+                deadline.isAfter(now)
+            } else {
+                !deadline.isAfter(now)
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileUiSubscribed,
+        initialValue = emptyList()
+    )
 
     init {
-        loadRooms()
+        doAction { loadRooms() }
     }
 
     fun onAction(action: HomeAction) {
         when (action) {
-            is HomeAction.ClickRoom -> {
-                _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(action.roomId))
-            }
+            is HomeAction.ClickRoom -> sendEvent(HomeEvent.NavigateToRoomDetail(action.roomId))
 
-            is HomeAction.CreateRoom -> {
-                createRoom(action.roomInfo)
-            }
+            is HomeAction.ClickDialog ->
+                updateState { copy(isExpanded = action.isExpanded, roomOption = action.roomOption) }
 
-            is HomeAction.JoinRoom -> {
-                joinRoom(action.roomCode)
-            }
+            is HomeAction.OnTitleChanged -> updateState { copy(title = action.title) }
+
+            is HomeAction.OnDescriptionChanged -> updateState { copy(description = action.description) }
+
+            is HomeAction.OnDateTimeSelected -> updateState { copy(selectedDateTime = action.selectedDateTime) }
+
+            is HomeAction.OnRoomFilterStatusSelected -> updateState { copy(roomFilterStatus = action.roomFilterStatus) }
+
+            is HomeAction.CreateRoom -> createRoom(action.roomInfo)
+
+            is HomeAction.JoinRoom -> joinRoom(action.roomCode)
 
             HomeAction.RefreshHome -> refreshRooms()
 
@@ -56,58 +77,65 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun loadRooms() {
-        viewModelScope.launch {
-            roomRepository.loadRooms()
-                .onSuccess { data ->
-                    _uiState.update { it.copy(rooms = data.map { room -> room.toUiModel() }) }
-                }.onFailure {
-                    // 아직
-                }
-        }
+    private suspend fun loadRooms() {
+        roomRepository.loadRooms()
+            .onSuccess { data ->
+                updateState { copy(rooms = data.map { it.toUiModel() }) }
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
     }
 
-    fun refreshRooms() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true) }
-            loadRooms()
-            delay(1000)
-            _uiState.update { it.copy(isRefreshing = false) }
-        }
+    private fun createRoom(roomInfo: CreateRoomParams) = doAction {
+        roomRepository.createRoom(roomInfo)
+            .onSuccess { data ->
+                sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
+                updateState {
+                    copy(
+                        title = "",
+                        description = "",
+                        isExpanded = false,
+                        roomOption = ""
+                    )
+                }
+                loadRooms()
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+
+                Timber.e(exception)
+            }
     }
 
-    fun createRoom(roomInfo: CreateRoomParams) {
-        viewModelScope.launch {
-            roomRepository.createRoom(roomInfo)
-                .onSuccess { data ->
-                    _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
-                    loadRooms()
-                }.onFailure {
-                    // 아직
+    private fun joinRoom(roomCode: String) = doAction {
+        roomRepository.joinRoom(roomCode)
+            .onSuccess { data ->
+                sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
+                updateState {
+                    copy(
+                        title = "",
+                        description = "",
+                        isExpanded = false,
+                        roomOption = ""
+                    )
                 }
-        }
+                loadRooms()
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
     }
 
-    fun joinRoom(roomCode: String) {
-        viewModelScope.launch {
-            roomRepository.joinRoom(roomCode)
-                .onSuccess { data ->
-                    _uiEvent.trySend(HomeEvent.NavigateToRoomDetail(data.id))
-                    loadRooms()
-                }.onFailure {
-                    // 아직
-                }
-        }
+    private fun refreshRooms() = doAction(
+        customCheck = { uiState.value.isRefreshing },
+        customUpdate = { updateState { copy(isRefreshing = it) } }
+    ) {
+        loadRooms()
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            userRepository.logout()
-                .onSuccess {
-                    _uiEvent.trySend(HomeEvent.NavigateToLogin)
-                }.onFailure {
-                    // 아직
-                }
-        }
+    private fun logout() = doAction {
+        userRepository.logout()
     }
 }

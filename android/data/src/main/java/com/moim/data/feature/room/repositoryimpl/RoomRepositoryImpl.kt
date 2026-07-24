@@ -29,7 +29,8 @@ class RoomRepositoryImpl @Inject constructor(
             CreateRoomRequest(
                 title = roomInfo.title,
                 description = roomInfo.description,
-                maxCount = roomInfo.maxCount
+                maxCount = roomInfo.maxCount,
+                deadline = roomInfo.deadline
             )
         ).map { it.toDomain() }
     }

@@ -10,5 +10,6 @@ enum class ErrorCode(val message: String) {
     ROOM_NOT_FOUND("방 정보를 찾을 수 없습니다."),
     ALREADY_JOINED_ROOM("이미 참여한 방입니다."),
     FULL_ROOM("방 정원이 가득 찼습니다."),
-    MAX_ROOM_LIMIT("생성 가능한 방 개수가 최대치라 방 생성이 불가능 합니다.")
+    MAX_ROOM_LIMIT("생성 가능한 방 개수가 최대치라 방 생성이 불가능 합니다."),
+    ROOM_DEADLINE_EXPIRED("해당 방의 모집 마감 시간이 지났습니다.")
 }

@@ -9,6 +9,5 @@ data object Login : NavKey
 @Serializable
 data object Home : NavKey
 
-
 @Serializable
 data class RoomDetail(val roomId: Long) : NavKey

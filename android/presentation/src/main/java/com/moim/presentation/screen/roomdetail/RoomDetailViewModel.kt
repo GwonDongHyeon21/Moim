@@ -3,55 +3,84 @@ package com.moim.presentation.screen.roomdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moim.domain.repository.RoomRepository
+import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiState
 import com.moim.presentation.screen.roomdetail.model.toUiModel
+import com.moim.presentation.util.WhileUiSubscribed
+import com.moim.presentation.util.snackbar.SnackBarEvent
+import com.moim.presentation.util.snackbar.SnackBarManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import timber.log.Timber
 
-@HiltViewModel
-class RoomDetailViewModel @Inject constructor(
-    private val roomRepository: RoomRepository
+@HiltViewModel(assistedFactory = RoomDetailViewModel.Factory::class)
+class RoomDetailViewModel @AssistedInject constructor(
+    @Assisted route: RoomDetail,
+    private val roomRepository: RoomRepository,
+    private val snackBarManager: SnackBarManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(RoomDetailUiState())
-    val uiState = _uiState.asStateFlow()
+    private val refreshTrigger = MutableStateFlow(0)
 
-    private val _uiEvent = Channel<RoomDetailEvent>(BUFFERED)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<RoomDetailUiState> = refreshTrigger
+        .flatMapLatest { triggerCount ->
+            flow {
+                val isRefreshing = triggerCount != 0
+                if (isRefreshing) {
+                    emit(RoomDetailUiState(isLoading = false, isRefreshing = true))
+                } else {
+                    emit(RoomDetailUiState(isLoading = true, isRefreshing = false))
+                }
+
+                roomRepository.loadRoomDetail(route.roomId.toString())
+                    .onSuccess { data ->
+                        emit(
+                            RoomDetailUiState(
+                                isLoading = false,
+                                isRefreshing = false,
+                                roomDetail = data.toUiModel()
+                            )
+                        )
+                    }
+                    .onFailure { exception ->
+                        _uiEvent.trySend(RoomDetailEvent.NavigateBack)
+                        snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                        Timber.e(exception)
+                    }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = WhileUiSubscribed,
+            initialValue = RoomDetailUiState(isLoading = true)
+        )
+
+    private val _uiEvent = Channel<RoomDetailEvent>(Channel.BUFFERED)
     val uiEvent = _uiEvent.receiveAsFlow()
 
     fun onAction(action: RoomDetailAction) {
         when (action) {
-            is RoomDetailAction.LoadRoomDetail -> loadRoomDetail(action.roomId)
-            is RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail(action.roomId)
+            is RoomDetailAction.RefreshRoomDetail -> refreshTrigger.update { it + 1 }
             RoomDetailAction.NavigateBack -> _uiEvent.trySend(RoomDetailEvent.NavigateBack)
         }
     }
 
-    private fun loadRoomDetail(roomId: Long) {
-        viewModelScope.launch {
-            roomRepository.loadRoomDetail(roomId.toString())
-                .onSuccess { data ->
-                    _uiState.update { it.copy(roomDetail = data.toUiModel()) }
-                }.onFailure {
-                    // 아직
-                }
-        }
-    }
-
-    private fun refreshRoomDetail(roomId: Long) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true) }
-            loadRoomDetail(roomId)
-            _uiState.update { it.copy(isRefreshing = false) }
-        }
+    @AssistedFactory
+    interface Factory {
+        fun create(route: RoomDetail): RoomDetailViewModel
     }
 }

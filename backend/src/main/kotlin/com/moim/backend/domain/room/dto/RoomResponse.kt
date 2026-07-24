@@ -1,6 +1,7 @@
 package com.moim.backend.domain.room.dto
 
 import com.moim.backend.domain.room.entity.Room
+import java.time.LocalDateTime
 
 data class RoomResponse(
     val id: Long?,
@@ -8,7 +9,8 @@ data class RoomResponse(
     val title: String,
     val description: String?,
     val maxCount: Int,
-    val currentMemberCount: Int
+    val currentMemberCount: Int,
+    val deadline: LocalDateTime
 ) {
     companion object {
         fun from(room: Room, currentMemberCount: Int): RoomResponse {
@@ -18,7 +20,8 @@ data class RoomResponse(
                 title = room.title,
                 description = room.description,
                 maxCount = room.maxCount,
-                currentMemberCount = currentMemberCount
+                currentMemberCount = currentMemberCount,
+                deadline = room.deadline
             )
         }
     }

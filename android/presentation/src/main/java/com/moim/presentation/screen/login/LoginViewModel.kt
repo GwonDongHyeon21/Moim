@@ -1,87 +1,45 @@
 package com.moim.presentation.screen.login
 
-import android.content.Context
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.moim.domain.repository.UserRepository
-import com.moim.presentation.BuildConfig
-import com.moim.presentation.R
+import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.screen.login.model.LoginAction
 import com.moim.presentation.screen.login.model.LoginEvent
 import com.moim.presentation.screen.login.model.LoginUiState
+import com.moim.presentation.util.snackbar.SnackBarEvent
+import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    val userRepository: UserRepository
-) : ViewModel() {
+    val userRepository: UserRepository,
+    private val snackBarManager: SnackBarManager
+) : BaseViewModel<LoginUiState, LoginEvent>(LoginUiState()) {
 
-    private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState = _uiState.asStateFlow()
-
-    private val _uiEvent = Channel<LoginEvent>(BUFFERED)
-    val uiEvent = _uiEvent.receiveAsFlow()
+    override fun checkLoading() = uiState.value.isLoading
+    override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
 
     fun onAction(action: LoginAction) {
         when (action) {
-            is LoginAction.GoogleLogin -> getGoogleIdToken(action.context)
+            is LoginAction.GoogleLoginSuccess -> getGoogleIdToken(action.idToken)
+            is LoginAction.GoogleLoginError -> showSnackBar(action.event)
         }
     }
 
-    private fun getGoogleIdToken(context: Context) {
-        viewModelScope.launch {
-            val credentialManager = CredentialManager.create(context)
+    private fun getGoogleIdToken(idToken: String) = doAction {
+        userRepository.loginWithGoogle(idToken)
+            .onSuccess {
+                sendEvent(LoginEvent.NavigateToHome)
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.GOOGLE_LOGIN_ERROR)
 
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
-                .setAutoSelectEnabled(false)
-                .build()
-
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            runCatching {
-                credentialManager.getCredential(context = context, request = request)
-            }.onSuccess { result ->
-                val credential = result.credential
-
-                if (credential is CustomCredential &&
-                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-                ) {
-                    val googleIdTokenCredential =
-                        GoogleIdTokenCredential.createFrom(credential.data)
-                    val idToken = googleIdTokenCredential.idToken
-
-                    userRepository.loginWithGoogle(idToken)
-                        .onSuccess {
-                            _uiEvent.trySend(LoginEvent.NavigateToHome)
-                        }.onFailure { exception ->
-                            Timber.e(exception)
-                            _uiEvent.trySend(LoginEvent.ShowSnackBar(R.string.google_login_error))
-                        }
-                }
-            }.onFailure { error ->
-                Timber.e(error)
-                FirebaseCrashlytics.getInstance().recordException(error)
-
-                _uiEvent.trySend(LoginEvent.ShowSnackBar(R.string.google_login_error))
+                Timber.e(exception)
             }
-        }
     }
+
+    private fun showSnackBar(event: SnackBarEvent) =
+        viewModelScope.launch { snackBarManager.show(event) }
 }

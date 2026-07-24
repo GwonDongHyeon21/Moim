@@ -26,7 +26,7 @@ import com.moim.presentation.screen.home.model.RoomOptions
 import com.moim.presentation.theme.MoimSpace
 
 private object RoomFloatingActionButton {
-    const val ANIMATE_TARGET_VALUE = 60f
+    const val ANIMATE_TARGET_VALUE = 45f
     const val ROTATION_LABEL = "fab_rotation"
 }
 

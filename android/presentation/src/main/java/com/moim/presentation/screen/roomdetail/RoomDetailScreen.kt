@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
 import com.moim.presentation.navigation.RoomDetail
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.roomdetail.component.RoomCodeDialog
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
@@ -34,7 +34,11 @@ fun RoomDetailScreen(
     route: RoomDetail,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
-    viewModel: RoomDetailViewModel = hiltViewModel()
+    viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
+        creationCallback = { factory ->
+            factory.create(route)
+        }
+    )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -44,15 +48,15 @@ fun RoomDetailScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.onAction(RoomDetailAction.LoadRoomDetail(route.roomId))
-    }
-
     RoomDetailScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         modifier = modifier
     )
+
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    }
 }
 
 @Composable

@@ -8,7 +8,8 @@ data class RoomInfoUiModel(
     val title: String = "",
     val description: String? = "",
     val maxCount: Int = 0,
-    val currentMemberCount: Int = 0
+    val currentMemberCount: Int = 0,
+    val deadline: String = ""
 )
 
 fun RoomInfo.toUiModel() = RoomInfoUiModel(
@@ -17,5 +18,6 @@ fun RoomInfo.toUiModel() = RoomInfoUiModel(
     title = title,
     description = description,
     maxCount = maxCount,
-    currentMemberCount = currentMemberCount
+    currentMemberCount = currentMemberCount,
+    deadline = deadline
 )
