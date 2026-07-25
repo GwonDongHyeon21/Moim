@@ -1,6 +1,6 @@
 package com.moim.presentation.screen.home.model
 
-import com.moim.domain.model.CreateRoomParams
+import com.moim.domain.feature.room.model.CreateRoomParams
 import java.time.LocalDateTime
 
 interface HomeAction {

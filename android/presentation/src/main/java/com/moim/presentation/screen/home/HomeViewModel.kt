@@ -1,9 +1,9 @@
 package com.moim.presentation.screen.home
 
 import androidx.lifecycle.viewModelScope
-import com.moim.domain.model.CreateRoomParams
-import com.moim.domain.repository.RoomRepository
-import com.moim.domain.repository.UserRepository
+import com.moim.domain.feature.room.model.CreateRoomParams
+import com.moim.domain.feature.room.repository.RoomRepository
+import com.moim.domain.feature.user.repository.UserRepository
 import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction

@@ -2,7 +2,7 @@ package com.moim.presentation.screen.roomdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moim.domain.repository.RoomRepository
+import com.moim.domain.feature.room.repository.RoomRepository
 import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent

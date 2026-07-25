@@ -1,8 +1,8 @@
-package com.moim.domain.repository
+package com.moim.domain.feature.room.repository
 
-import com.moim.domain.model.CreateRoomParams
-import com.moim.domain.model.RoomDetailInfo
-import com.moim.domain.model.RoomInfo
+import com.moim.domain.feature.room.model.CreateRoomParams
+import com.moim.domain.feature.room.model.RoomDetailInfo
+import com.moim.domain.feature.room.model.RoomInfo
 
 interface RoomRepository {
 

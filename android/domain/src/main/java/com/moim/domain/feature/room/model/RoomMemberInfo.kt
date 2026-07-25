@@ -1,4 +1,4 @@
-package com.moim.domain.model
+package com.moim.domain.feature.room.model
 
 data class RoomMemberInfo(
     val userId: Long,
