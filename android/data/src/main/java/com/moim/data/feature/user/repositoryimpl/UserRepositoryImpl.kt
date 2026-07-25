@@ -31,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(
         val refreshToken = tokenDataStore.refreshTokenFlow.firstOrNull()
 
         if (refreshToken.isNullOrBlank()) {
-            return Result.failure(ErrorType.TokenNotFound)
+            return Result.failure(ErrorType.TokenNotFound())
         }
 
         tokenDataStore.clearTokens()
@@ -43,7 +43,7 @@ class UserRepositoryImpl @Inject constructor(
         val refreshToken = tokenDataStore.refreshTokenFlow.firstOrNull()
 
         if (refreshToken.isNullOrBlank()) {
-            return Result.failure(ErrorType.TokenNotFound)
+            return Result.failure(ErrorType.TokenNotFound())
         }
 
         return userDataSource.reissueTokens(refreshToken)
