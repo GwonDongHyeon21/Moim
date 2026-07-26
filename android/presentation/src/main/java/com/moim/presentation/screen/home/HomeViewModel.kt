@@ -96,6 +96,7 @@ class HomeViewModel @Inject constructor(
                     copy(
                         title = "",
                         description = "",
+                        selectedDateTime = null,
                         isExpanded = false,
                         roomOption = ""
                     )
@@ -116,6 +117,7 @@ class HomeViewModel @Inject constructor(
                     copy(
                         title = "",
                         description = "",
+                        selectedDateTime = null,
                         isExpanded = false,
                         roomOption = ""
                     )

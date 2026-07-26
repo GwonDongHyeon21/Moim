@@ -15,7 +15,7 @@ fun MoimProgressIndicator(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MoimTheme.colors.white)
+            .background(MoimTheme.colors.background)
             .pointerInput(Unit) {},
         contentAlignment = Alignment.Center
     ) {
