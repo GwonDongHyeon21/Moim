@@ -25,6 +25,7 @@ class LoginViewModel @Inject constructor(
     fun onAction(action: LoginAction) {
         when (action) {
             is LoginAction.GoogleLoginSuccess -> getGoogleIdToken(action.idToken)
+
             is LoginAction.GoogleLoginError -> showSnackBar(action.event)
         }
     }

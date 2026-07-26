@@ -42,6 +42,7 @@ fun HomeScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             is HomeEvent.NavigateToRoomDetail -> onNavigateToRoomDetail(event.roomId)
+
             is HomeEvent.ShowSnackBar -> {}
         }
     }
