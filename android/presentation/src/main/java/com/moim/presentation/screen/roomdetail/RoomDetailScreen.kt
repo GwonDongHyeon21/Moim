@@ -32,8 +32,9 @@ import com.moim.presentation.util.collectWithLifecycle
 @Composable
 fun RoomDetailScreen(
     route: RoomDetail,
-    modifier: Modifier = Modifier,
+    onNavigateToVote: (roomId: Long, category: String) -> Unit,
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
         creationCallback = { factory ->
             factory.create(route)
@@ -44,6 +45,8 @@ fun RoomDetailScreen(
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
+            is RoomDetailEvent.NavigateToVote -> onNavigateToVote(event.roomId, event.category)
+
             RoomDetailEvent.NavigateBack -> onNavigateBack()
         }
     }

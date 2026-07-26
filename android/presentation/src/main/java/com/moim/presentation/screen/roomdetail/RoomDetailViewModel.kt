@@ -33,6 +33,8 @@ class RoomDetailViewModel @AssistedInject constructor(
     private val snackBarManager: SnackBarManager
 ) : ViewModel() {
 
+    private val roomId = route.roomId
+
     private val refreshTrigger = MutableStateFlow(0)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -46,7 +48,7 @@ class RoomDetailViewModel @AssistedInject constructor(
                     emit(RoomDetailUiState(isLoading = true, isRefreshing = false))
                 }
 
-                roomRepository.loadRoomDetail(route.roomId.toString())
+                roomRepository.loadRoomDetail(roomId.toString())
                     .onSuccess { data ->
                         emit(
                             RoomDetailUiState(
@@ -75,6 +77,10 @@ class RoomDetailViewModel @AssistedInject constructor(
     fun onAction(action: RoomDetailAction) {
         when (action) {
             is RoomDetailAction.RefreshRoomDetail -> refreshTrigger.update { it + 1 }
+
+            is RoomDetailAction.NavigateToVote ->
+                _uiEvent.trySend(RoomDetailEvent.NavigateToVote(roomId, action.category))
+
             RoomDetailAction.NavigateBack -> _uiEvent.trySend(RoomDetailEvent.NavigateBack)
         }
     }

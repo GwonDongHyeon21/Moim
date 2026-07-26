@@ -18,6 +18,7 @@ import com.moim.presentation.navigation.MoimNavConstant.slideTransition
 import com.moim.presentation.screen.home.home
 import com.moim.presentation.screen.login.login
 import com.moim.presentation.screen.roomdetail.roomDetail
+import com.moim.presentation.screen.vote.vote
 
 private object MoimNavConstant {
     val fadeTransition = NavDisplay.transitionSpec { fadeIn() togetherWith fadeOut() }
@@ -54,6 +55,15 @@ fun MoimNav(
             )
 
             roomDetail(
+                metadata = fadeTransition,
+                onNavigateToVote = { roomId, category ->
+                    navigator.navigateToVote(roomId, category)
+                },
+                onNavigateBack = navigator::popBackStack,
+                modifier = modifier.padding(innerPadding)
+            )
+
+            vote(
                 metadata = fadeTransition,
                 onNavigateBack = navigator::popBackStack,
                 modifier = modifier.padding(innerPadding)
