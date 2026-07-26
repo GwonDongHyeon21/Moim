@@ -33,6 +33,7 @@ import com.moim.presentation.util.collectWithLifecycle
 fun RoomDetailScreen(
     route: RoomDetail,
     onNavigateToVote: (roomId: Long, category: String) -> Unit,
+    onNavigateToCandidateCreate: (Long) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
@@ -46,6 +47,8 @@ fun RoomDetailScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             is RoomDetailEvent.NavigateToVote -> onNavigateToVote(event.roomId, event.category)
+
+            is RoomDetailEvent.NavigateToCandidateCreate -> onNavigateToCandidateCreate(event.roomId)
 
             RoomDetailEvent.NavigateBack -> onNavigateBack()
         }

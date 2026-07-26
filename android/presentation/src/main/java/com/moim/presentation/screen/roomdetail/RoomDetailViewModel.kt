@@ -81,6 +81,9 @@ class RoomDetailViewModel @AssistedInject constructor(
             is RoomDetailAction.NavigateToVote ->
                 _uiEvent.trySend(RoomDetailEvent.NavigateToVote(roomId, action.category))
 
+            is RoomDetailAction.NavigateToCandidateCreate ->
+                _uiEvent.trySend(RoomDetailEvent.NavigateToCandidateCreate(roomId))
+
             RoomDetailAction.NavigateBack -> _uiEvent.trySend(RoomDetailEvent.NavigateBack)
         }
     }

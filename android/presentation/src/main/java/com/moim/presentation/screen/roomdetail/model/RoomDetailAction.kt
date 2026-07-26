@@ -6,5 +6,7 @@ interface RoomDetailAction {
 
     data class NavigateToVote(val category: String) : RoomDetailAction
 
+    data object NavigateToCandidateCreate : RoomDetailAction
+
     data object NavigateBack : RoomDetailAction
 }

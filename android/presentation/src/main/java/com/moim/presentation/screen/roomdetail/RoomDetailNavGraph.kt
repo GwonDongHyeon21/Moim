@@ -13,6 +13,7 @@ fun NavBackStack<NavKey>.navigateToRoomDetail(roomId: Long) {
 fun EntryProviderScope<NavKey>.roomDetail(
     metadata: Map<String, Any>,
     onNavigateToVote: (roomId: Long, category: String) -> Unit,
+    onNavigateToCandidateCreate: (Long) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -20,6 +21,7 @@ fun EntryProviderScope<NavKey>.roomDetail(
         RoomDetailScreen(
             route = route,
             onNavigateToVote = onNavigateToVote,
+            onNavigateToCandidateCreate = onNavigateToCandidateCreate,
             onNavigateBack = onNavigateBack,
             modifier = modifier
         )

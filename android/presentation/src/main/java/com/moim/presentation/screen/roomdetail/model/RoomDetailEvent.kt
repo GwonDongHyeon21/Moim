@@ -7,5 +7,7 @@ interface RoomDetailEvent {
         val category: String
     ) : RoomDetailEvent
 
+    data class NavigateToCandidateCreate(val roomId: Long) : RoomDetailEvent
+
     data object NavigateBack : RoomDetailEvent
 }
