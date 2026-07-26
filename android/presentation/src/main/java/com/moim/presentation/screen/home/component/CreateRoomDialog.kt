@@ -146,7 +146,10 @@ fun CreateRoomDialog(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 fun RoomOptionDialogPreview() {
     CreateRoomDialog(
