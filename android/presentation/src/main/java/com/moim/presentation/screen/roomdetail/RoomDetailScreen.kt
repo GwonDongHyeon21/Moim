@@ -43,6 +43,7 @@ import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
 import com.moim.presentation.util.collectWithLifecycle
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -150,6 +151,7 @@ fun RoomDetailScreen(
 fun RoomDetailInfoSection(roomInfo: RoomInfoUiModel) {
     val uiFormatter =
         DateTimeFormatter.ofPattern(stringResource(R.string.ui_time_format), Locale.KOREA)
+    val deadline = LocalDateTime.parse(roomInfo.deadline).format(uiFormatter)
 
     Column {
         Spacer(modifier = Modifier.height(MoimSpace.SpaceMedium))
@@ -159,7 +161,7 @@ fun RoomDetailInfoSection(roomInfo: RoomInfoUiModel) {
         ) {
             Text(text = roomInfo.description.toString())
             Column(horizontalAlignment = Alignment.End) {
-                Text(text = roomInfo.deadline.format(uiFormatter))
+                Text(text = deadline)
                 Text(text = "${roomInfo.currentMemberCount} / ${roomInfo.maxCount}")
             }
         }
