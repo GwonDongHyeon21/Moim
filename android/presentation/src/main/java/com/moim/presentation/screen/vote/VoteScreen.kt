@@ -19,14 +19,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
 import com.moim.presentation.navigation.Vote
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.vote.VoteScreen.REDUCTION_RATE
 import com.moim.presentation.screen.vote.component.CandidateCard
+import com.moim.presentation.screen.vote.component.EmptyCard
 import com.moim.presentation.screen.vote.model.VoteAction
+import com.moim.presentation.screen.vote.model.VoteEvent
 import com.moim.presentation.screen.vote.model.VoteUiState
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
+import com.moim.presentation.util.collectWithLifecycle
 import kotlin.math.absoluteValue
 
 private object VoteScreen {
@@ -46,11 +50,21 @@ fun VoteScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    viewModel.uiEvent.collectWithLifecycle { event ->
+        when (event) {
+            VoteEvent.NavigateBack -> onNavigateBack()
+        }
+    }
+
     VoteScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         modifier = modifier
     )
+
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    }
 }
 
 @Composable
@@ -67,7 +81,7 @@ fun VoteScreen(
             MoimTopBar(
                 value = stringResource(R.string.vote),
                 navigationIcon = R.drawable.arrow_back_24,
-                onClickNavigationIcon = { }
+                onClickNavigationIcon = { onAction(VoteAction.NavigateBack) }
             )
         }
     ) { innerPadding ->
@@ -88,8 +102,11 @@ fun VoteScreen(
                     state = pagerState,
                     modifier = Modifier.weight(1f),
                 ) { page ->
+                    val candidate = uiState.candidates[page]
+
                     CandidateCard(
-                        candidate = uiState.candidates[page],
+                        candidate = candidate,
+                        onClick = { onAction(VoteAction.CastVote(candidate.id)) },
                         modifier = Modifier.graphicsLayer {
                             val pageOffset =
                                 (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction

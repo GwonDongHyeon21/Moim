@@ -43,6 +43,7 @@ private object CandidateCard {
 @Composable
 fun CandidateCard(
     candidate: CandidateUiModel,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -98,9 +99,7 @@ fun CandidateCard(
         }
 
         IconButton(
-            onClick = {
-
-            },
+            onClick = onClick,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = MoimPadding.PaddingMedium)
@@ -122,5 +121,8 @@ fun CandidateCard(
 @Preview(showBackground = true)
 @Composable
 fun CandidateCardPreview() {
-    CandidateCard(candidate = DummyData.dummyCandidates.first())
+    CandidateCard(
+        candidate = DummyData.dummyCandidates.first(),
+        onClick = {}
+    )
 }

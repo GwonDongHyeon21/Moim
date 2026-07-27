@@ -33,7 +33,11 @@ class VoteViewModel @AssistedInject constructor(
     }
 
     fun onAction(action: VoteAction) {
+        when (action) {
+            is VoteAction.CastVote -> castVote(action.candidateId)
 
+            is VoteAction.NavigateBack -> sendEvent(VoteEvent.NavigateBack)
+        }
     }
 
     private fun loadCandidates() = doAction {
@@ -42,6 +46,17 @@ class VoteViewModel @AssistedInject constructor(
                 updateState { copy(candidates = data.map { it.toUiModel() }) }
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
+    }
+
+    private fun castVote(candidateId: Long) = doAction {
+        voteRepository.castVote(candidateId)
+            .onSuccess {
+                sendEvent(VoteEvent.NavigateBack)
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
                 Timber.e(exception)
             }

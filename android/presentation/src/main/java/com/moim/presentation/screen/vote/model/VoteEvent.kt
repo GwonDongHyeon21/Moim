@@ -1,5 +1,6 @@
 package com.moim.presentation.screen.vote.model
 
-interface VoteEvent{
+interface VoteEvent {
 
+    data object NavigateBack : VoteEvent
 }
