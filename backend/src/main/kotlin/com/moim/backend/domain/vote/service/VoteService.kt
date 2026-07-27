@@ -58,7 +58,7 @@ class VoteService(
                 id = it.id!!,
                 category = it.category,
                 content = it.content,
-                userNickname = it.user.nickname,
+                creatorNickname = it.user.nickname,
                 isVotedByMe = myVotedCandidateIds.contains(it.id)
             )
         }

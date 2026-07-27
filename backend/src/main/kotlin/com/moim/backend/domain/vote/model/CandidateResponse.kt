@@ -4,6 +4,6 @@ data class CandidateResponse(
     val id: Long,
     val category: Category,
     val content: String,
-    val userNickname: String,
+    val creatorNickname: String,
     val isVotedByMe: Boolean
 )
