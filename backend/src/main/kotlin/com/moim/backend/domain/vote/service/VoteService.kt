@@ -4,9 +4,13 @@ import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
 import com.moim.backend.domain.room.repository.RoomRepository
 import com.moim.backend.domain.user.repository.UserRepository
+import com.moim.backend.domain.vote.dto.CandidateResponse
+import com.moim.backend.domain.vote.dto.CreateCandidateRequest
+import com.moim.backend.domain.vote.dto.VoteRankDto
+import com.moim.backend.domain.vote.dto.VoteResultResponse
 import com.moim.backend.domain.vote.entity.Candidate
 import com.moim.backend.domain.vote.entity.VoteRecord
-import com.moim.backend.domain.vote.model.*
+import com.moim.backend.domain.vote.model.Category
 import com.moim.backend.domain.vote.repository.CandidateRepository
 import com.moim.backend.domain.vote.repository.VoteRecordRepository
 import org.springframework.http.HttpStatus

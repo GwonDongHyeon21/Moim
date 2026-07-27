@@ -1,4 +1,4 @@
-package com.moim.backend.domain.vote.model
+package com.moim.backend.domain.vote.dto
 
 import com.moim.backend.domain.vote.entity.Candidate
 

@@ -2,9 +2,9 @@ package com.moim.backend.domain.vote.controller
 
 import com.moim.backend.core.response.ApiResponse
 import com.moim.backend.domain.vote.model.Category
-import com.moim.backend.domain.vote.model.CreateCandidateRequest
-import com.moim.backend.domain.vote.model.CandidateResponse
-import com.moim.backend.domain.vote.model.VoteResultResponse
+import com.moim.backend.domain.vote.dto.CreateCandidateRequest
+import com.moim.backend.domain.vote.dto.CandidateResponse
+import com.moim.backend.domain.vote.dto.VoteResultResponse
 import com.moim.backend.domain.vote.service.VoteService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
