@@ -24,6 +24,7 @@
 
     <!-- Vote Screen -->
     <string name="vote">투표하기</string>
+    <string name="empty_candidate">후보지가 없습니다.</string>
     <string name="select_contentDescription">선택하기</string>
 
     <!-- SnackBar Message -->

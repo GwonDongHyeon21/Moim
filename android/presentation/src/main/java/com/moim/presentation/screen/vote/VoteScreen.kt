@@ -20,7 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
 import com.moim.presentation.navigation.Vote
 import com.moim.presentation.screen.component.MoimTopBar
-import com.moim.presentation.screen.vote.VoteScreen.SCALE_REDUCTION_RATE
+import com.moim.presentation.screen.vote.VoteScreen.REDUCTION_RATE
 import com.moim.presentation.screen.vote.component.CandidateCard
 import com.moim.presentation.screen.vote.model.VoteAction
 import com.moim.presentation.screen.vote.model.VoteUiState
@@ -30,7 +30,7 @@ import com.moim.presentation.util.DummyData
 import kotlin.math.absoluteValue
 
 private object VoteScreen {
-    const val SCALE_REDUCTION_RATE = 0.2f
+    const val REDUCTION_RATE = 0.2f
 }
 
 @Composable
@@ -79,24 +79,28 @@ fun VoteScreen(
             verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceMedium),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "${pagerState.currentPage + 1} / ${uiState.candidates.size}")
+            if (uiState.candidates.isEmpty()) {
+                EmptyCard()
+            } else {
+                Text(text = "${pagerState.currentPage + 1} / ${uiState.candidates.size}")
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f),
-            ) { page ->
-                CandidateCard(
-                    candidate = uiState.candidates[page],
-                    modifier = Modifier.graphicsLayer {
-                        val pageOffset =
-                            (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
-                        val scaleFactor =
-                            1f - (pageOffset.absoluteValue * SCALE_REDUCTION_RATE).coerceIn(0f, 1f)
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.weight(1f),
+                ) { page ->
+                    CandidateCard(
+                        candidate = uiState.candidates[page],
+                        modifier = Modifier.graphicsLayer {
+                            val pageOffset =
+                                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                            val scaleFactor =
+                                1f - (pageOffset.absoluteValue * REDUCTION_RATE).coerceIn(0f, 1f)
 
-                        scaleX = scaleFactor
-                        scaleY = scaleFactor
-                    }
-                )
+                            scaleX = scaleFactor
+                            scaleY = scaleFactor
+                        }
+                    )
+                }
             }
         }
     }
