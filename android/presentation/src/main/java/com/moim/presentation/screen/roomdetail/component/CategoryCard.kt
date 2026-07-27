@@ -14,12 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.moim.presentation.R
+import com.moim.presentation.screen.roomdetail.model.CategoryVoteStatusUiModel
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimTheme
+import com.moim.presentation.util.DummyData
 
 @Composable
 fun CategoryCard(
-    category: String,
+    category: CategoryVoteStatusUiModel,
     onClick: () -> Unit
 ) {
     Card(
@@ -34,11 +36,18 @@ fun CategoryCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = category)
-            Icon(
-                painter = painterResource(R.drawable.check_circle_24),
-                contentDescription = null
-            )
+            Text(text = category.category)
+            if (category.isVoted) {
+                Icon(
+                    painter = painterResource(R.drawable.check_circle_24),
+                    contentDescription = null
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.circle_24),
+                    contentDescription = null
+                )
+            }
         }
     }
 }
@@ -47,7 +56,7 @@ fun CategoryCard(
 @Composable
 fun CategoryCardPreview() {
     CategoryCard(
-        category = "FOOD",
+        category = DummyData.dummyCategoryVoteStatus.first(),
         onClick = {}
     )
 }

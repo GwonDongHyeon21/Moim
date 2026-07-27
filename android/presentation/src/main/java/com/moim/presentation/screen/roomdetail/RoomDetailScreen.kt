@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
-import com.moim.presentation.model.Category
 import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.component.MoimProgressIndicator
@@ -90,8 +89,9 @@ fun RoomDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val roomInfo = uiState.roomDetail.roomInfo
-    var showRoomCode by remember { mutableStateOf(false) }
+    val categoryVoteStatus = uiState.roomDetail.categoryVoteStatus
 
+    var showRoomCode by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -130,9 +130,9 @@ fun RoomDetailScreen(
             ) {
                 RoomDetailInfoSection(roomInfo = roomInfo)
 
-                Category.entries.forEach { category ->
-                    CategoryCard(category.name) {
-                        onAction(RoomDetailAction.NavigateToVote(category.name))
+                categoryVoteStatus.forEach { category ->
+                    CategoryCard(category = category) {
+                        onAction(RoomDetailAction.NavigateToVote(category.category))
                     }
                 }
             }

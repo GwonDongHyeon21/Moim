@@ -1,6 +1,7 @@
 package com.moim.presentation.util
 
 import com.moim.presentation.model.RoomInfoUiModel
+import com.moim.presentation.screen.roomdetail.model.CategoryVoteStatusUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomMemberInfoUiModel
 import com.moim.presentation.screen.vote.model.CandidateUiModel
@@ -65,10 +66,30 @@ object DummyData {
         )
     )
 
+    val dummyCategoryVoteStatus = listOf(
+        CategoryVoteStatusUiModel(
+            category = "FOOD",
+            isVoted = true
+        ),
+        CategoryVoteStatusUiModel(
+            category = "CAFE",
+            isVoted = true
+        ),
+        CategoryVoteStatusUiModel(
+            category = "PLACE",
+            isVoted = false
+        ),
+        CategoryVoteStatusUiModel(
+            category = "ACTIVITY",
+            isVoted = false
+        )
+    )
+
     val dummyRoomDetail = RoomDetailUiModel(
         roomInfo = dummyRooms.first(),
         role = "HOST",
         members = dummyMembers,
+        categoryVoteStatus = dummyCategoryVoteStatus
     )
 
     val dummyCandidates = listOf(
