@@ -6,6 +6,7 @@ import com.moim.data.common.network.AuthInterceptor
 import com.moim.data.common.network.TokenAuthenticator
 import com.moim.data.feature.room.datasource.RoomService
 import com.moim.data.feature.user.datasource.UserService
+import com.moim.data.feature.vote.datasource.VoteService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -66,5 +67,11 @@ object NetworkModule {
     @Singleton
     fun provideRoomService(retrofit: Retrofit): RoomService {
         return retrofit.create(RoomService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVoteService(retrofit: Retrofit): VoteService {
+        return retrofit.create(VoteService::class.java)
     }
 }
