@@ -1,10 +1,14 @@
 package com.moim.presentation.screen.vote
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -14,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,11 +29,13 @@ import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.vote.VoteScreen.REDUCTION_RATE
 import com.moim.presentation.screen.vote.component.CandidateCard
 import com.moim.presentation.screen.vote.component.EmptyCard
+import com.moim.presentation.screen.vote.model.CandidateUiModel
 import com.moim.presentation.screen.vote.model.VoteAction
 import com.moim.presentation.screen.vote.model.VoteEvent
 import com.moim.presentation.screen.vote.model.VoteUiState
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
+import com.moim.presentation.theme.MoimTheme
 import com.moim.presentation.util.DummyData
 import com.moim.presentation.util.collectWithLifecycle
 import kotlin.math.absoluteValue
@@ -96,7 +103,11 @@ fun VoteScreen(
             if (uiState.candidates.isEmpty()) {
                 EmptyCard()
             } else {
-                Text(text = "${pagerState.currentPage + 1} / ${uiState.candidates.size}")
+                PagerInfoSection(
+                    pagerState = pagerState,
+                    candidates = uiState.candidates,
+                    onClickReset = { onAction(VoteAction.ResetVote) }
+                )
 
                 HorizontalPager(
                     state = pagerState,
@@ -106,7 +117,8 @@ fun VoteScreen(
 
                     CandidateCard(
                         candidate = candidate,
-                        onClick = { onAction(VoteAction.CastVote(candidate.id)) },
+                        onClickVote = { onAction(VoteAction.CastVote(candidate.id)) },
+                        onClickReset = { onAction(VoteAction.ResetVote) },
                         modifier = Modifier.graphicsLayer {
                             val pageOffset =
                                 (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
@@ -120,6 +132,32 @@ fun VoteScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PagerInfoSection(
+    pagerState: PagerState,
+    candidates: List<CandidateUiModel>,
+    onClickReset: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoimPadding.AppHorizontalPadding)
+    ) {
+        Text(
+            text = "${pagerState.currentPage + 1} / ${candidates.size}",
+            modifier = Modifier.align(Alignment.Center)
+        )
+        Text(
+            text = stringResource(R.string.vote_cancel),
+            modifier = Modifier
+                .clickable { onClickReset() }
+                .align(Alignment.CenterEnd),
+            color = MoimTheme.colors.gray,
+            textDecoration = TextDecoration.Underline
+        )
     }
 }
 

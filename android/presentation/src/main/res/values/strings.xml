@@ -25,7 +25,9 @@
     <!-- Vote Screen -->
     <string name="vote">투표하기</string>
     <string name="empty_candidate">후보지가 없습니다.</string>
+    <string name="vote_cancel">투표 취소하기</string>
     <string name="select_contentDescription">선택하기</string>
+    <string name="select_cancel_contentDescription">선택 취소하기</string>
 
     <!-- SnackBar Message -->
     <string name="snack_bar_network_error">네트워크 연결을 확인해주세요</string>

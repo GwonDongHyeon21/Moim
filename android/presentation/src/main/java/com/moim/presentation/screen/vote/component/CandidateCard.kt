@@ -43,7 +43,8 @@ private object CandidateCard {
 @Composable
 fun CandidateCard(
     candidate: CandidateUiModel,
-    onClick: () -> Unit,
+    onClickVote: () -> Unit,
+    onClickReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -98,22 +99,42 @@ fun CandidateCard(
             }
         }
 
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = MoimPadding.PaddingMedium)
-                .size(iconButtonSize)
-                .border(
-                    width = borderWidth,
-                    color = MoimTheme.colors.gray,
-                    shape = MoimTheme.shapes.roundedMax
+        if (candidate.isVotedByMe) {
+            IconButton(
+                onClick = onClickReset,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = MoimPadding.PaddingMedium)
+                    .size(iconButtonSize)
+                    .border(
+                        width = borderWidth,
+                        color = MoimTheme.colors.gray,
+                        shape = MoimTheme.shapes.roundedMax
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.close_24),
+                    contentDescription = stringResource(R.string.select_cancel_contentDescription)
                 )
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.check_24),
-                contentDescription = stringResource(R.string.select_contentDescription)
-            )
+            }
+        } else {
+            IconButton(
+                onClick = onClickVote,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = MoimPadding.PaddingMedium)
+                    .size(iconButtonSize)
+                    .border(
+                        width = borderWidth,
+                        color = MoimTheme.colors.gray,
+                        shape = MoimTheme.shapes.roundedMax
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.check_24),
+                    contentDescription = stringResource(R.string.select_contentDescription)
+                )
+            }
         }
     }
 }
@@ -123,6 +144,7 @@ fun CandidateCard(
 fun CandidateCardPreview() {
     CandidateCard(
         candidate = DummyData.dummyCandidates.first(),
-        onClick = {}
+        onClickVote = {},
+        onClickReset = {}
     )
 }
