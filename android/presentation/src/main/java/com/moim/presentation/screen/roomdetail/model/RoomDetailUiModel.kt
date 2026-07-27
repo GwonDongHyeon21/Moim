@@ -7,11 +7,13 @@ import com.moim.presentation.model.toUiModel
 data class RoomDetailUiModel(
     val roomInfo: RoomInfoUiModel = RoomInfoUiModel(),
     val role: String = "",
-    val members: List<RoomMemberInfoUiModel> = emptyList()
+    val members: List<RoomMemberInfoUiModel> = emptyList(),
+    val categoryVoteStatus: List<CategoryVoteStatusUiModel> = emptyList()
 )
 
 fun RoomDetailInfo.toUiModel() = RoomDetailUiModel(
     roomInfo = roomInfo.toUiModel(),
     role = role,
-    members = members.map { it.toUiModel() }
+    members = members.map { it.toUiModel() },
+    categoryVoteStatus = categoryVoteStatus.map { it.toUiModel() }
 )

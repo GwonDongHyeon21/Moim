@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 data class RoomDetailResponse(
     val roomInfo: RoomResponse,
     val role: String,
-    val members: List<RoomMemberResponse>
+    val members: List<RoomMemberResponse>,
+    val categoryVoteStatus: List<CategoryVoteStatusResponse>
 )
 
 fun RoomDetailResponse.toDomain() = RoomDetailInfo(
     roomInfo = roomInfo.toDomain(),
     role = role,
-    members = members.map { it.toDomain() }
+    members = members.map { it.toDomain() },
+    categoryVoteStatus = categoryVoteStatus.map { it.toDomain() }
 )
