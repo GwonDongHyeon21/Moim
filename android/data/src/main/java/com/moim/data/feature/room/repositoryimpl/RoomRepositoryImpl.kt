@@ -19,7 +19,7 @@ class RoomRepositoryImpl @Inject constructor(
             .map { rooms -> rooms.map { it.toDomain() } }
     }
 
-    override suspend fun loadRoomDetail(roomId: String): Result<RoomDetailInfo> {
+    override suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailInfo> {
         return roomDataSource.loadRoomDetail(roomId)
             .map { it.toDomain() }
     }

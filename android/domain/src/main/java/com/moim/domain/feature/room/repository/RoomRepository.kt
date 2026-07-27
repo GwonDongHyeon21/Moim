@@ -8,7 +8,7 @@ interface RoomRepository {
 
     suspend fun loadRooms(): Result<List<RoomInfo>>
 
-    suspend fun loadRoomDetail(roomId: String): Result<RoomDetailInfo>
+    suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailInfo>
 
     suspend fun createRoom(roomInfo: CreateRoomParams): Result<RoomInfo>
 

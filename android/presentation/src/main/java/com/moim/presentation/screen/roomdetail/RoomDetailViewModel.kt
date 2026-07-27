@@ -48,7 +48,7 @@ class RoomDetailViewModel @AssistedInject constructor(
                     emit(RoomDetailUiState(isLoading = true, isRefreshing = false))
                 }
 
-                roomRepository.loadRoomDetail(roomId.toString())
+                roomRepository.loadRoomDetail(roomId)
                     .onSuccess { data ->
                         emit(
                             RoomDetailUiState(

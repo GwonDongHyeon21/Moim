@@ -9,7 +9,7 @@ interface RoomDataSource {
 
     suspend fun loadRooms(): Result<List<RoomResponse>>
 
-    suspend fun loadRoomDetail(roomId: String): Result<RoomDetailResponse>
+    suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailResponse>
 
     suspend fun createRoom(request: CreateRoomRequest): Result<RoomResponse>
 
