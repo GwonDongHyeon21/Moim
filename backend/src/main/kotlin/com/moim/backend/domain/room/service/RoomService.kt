@@ -12,6 +12,8 @@ import com.moim.backend.domain.room.service.Room.MAX_ROOM_COUNT
 import com.moim.backend.domain.room.service.Room.ROOM_CODE_LENGTH
 import com.moim.backend.domain.room.service.Room.charPool
 import com.moim.backend.domain.user.repository.UserRepository
+import com.moim.backend.domain.vote.model.Category
+import com.moim.backend.domain.vote.repository.VoteRecordRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,6 +31,7 @@ private object Room {
 class RoomService(
     private val roomRepository: RoomRepository,
     private val roomMemberRepository: RoomMemberRepository,
+    private val voteRecordRepository: VoteRecordRepository,
     private val userRepository: UserRepository
 ) {
 
@@ -57,10 +60,21 @@ class RoomService(
             )
         }
 
+        val myVoteRecords = voteRecordRepository.findAllByUserIdAndRoomId(userId, roomId)
+        val myVotedCategories = myVoteRecords.map { it.candidate.category }.toSet()
+
+        val categoryVoteStatus = Category.entries.map { category ->
+            CategoryVoteStatusDto(
+                category = category.name,
+                isVoted = myVotedCategories.contains(category)
+            )
+        }
+
         return RoomDetailResponse(
             roomInfo = RoomResponse.from(roomMember.room, members.size),
             role = roomMember.role.name,
-            members = members
+            members = members,
+            categoryVoteStatus = categoryVoteStatus
         )
     }
 
