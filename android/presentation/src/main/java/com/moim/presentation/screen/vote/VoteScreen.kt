@@ -1,0 +1,112 @@
+package com.moim.presentation.screen.vote
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moim.presentation.R
+import com.moim.presentation.navigation.Vote
+import com.moim.presentation.screen.component.MoimTopBar
+import com.moim.presentation.screen.vote.VoteScreen.SCALE_REDUCTION_RATE
+import com.moim.presentation.screen.vote.component.CandidateCard
+import com.moim.presentation.screen.vote.model.VoteAction
+import com.moim.presentation.screen.vote.model.VoteUiState
+import com.moim.presentation.theme.MoimPadding
+import com.moim.presentation.theme.MoimSpace
+import com.moim.presentation.util.DummyData
+import kotlin.math.absoluteValue
+
+private object VoteScreen {
+    const val SCALE_REDUCTION_RATE = 0.2f
+}
+
+@Composable
+fun VoteScreen(
+    route: Vote,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: VoteViewModel = hiltViewModel<VoteViewModel, VoteViewModel.Factory>(
+        creationCallback = { factory ->
+            factory.create(route)
+        }
+    )
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    VoteScreen(
+        uiState = uiState,
+        onAction = viewModel::onAction,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun VoteScreen(
+    uiState: VoteUiState,
+    onAction: (VoteAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val pagerState = rememberPagerState(pageCount = { uiState.candidates.size })
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            MoimTopBar(
+                value = stringResource(R.string.vote),
+                navigationIcon = R.drawable.arrow_back_24,
+                onClickNavigationIcon = { }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(vertical = MoimPadding.PaddingMedium),
+            verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceMedium),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "${pagerState.currentPage + 1} / ${uiState.candidates.size}")
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+            ) { page ->
+                CandidateCard(
+                    candidate = uiState.candidates[page],
+                    modifier = Modifier.graphicsLayer {
+                        val pageOffset =
+                            (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                        val scaleFactor =
+                            1f - (pageOffset.absoluteValue * SCALE_REDUCTION_RATE).coerceIn(0f, 1f)
+
+                        scaleX = scaleFactor
+                        scaleY = scaleFactor
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VoteScreenPreview() {
+    VoteScreen(
+        uiState = VoteUiState(candidates = DummyData.dummyCandidates),
+        onAction = {}
+    )
+}

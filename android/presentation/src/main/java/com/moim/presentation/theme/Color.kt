@@ -10,7 +10,9 @@ val primary = Color(0xFF7850C8)
 val surface = Color(0xFFF0E6FF)
 
 val Black = Color(0xFF000000)
+val Gray = Color(0xFF888888)
 val White = Color(0xFFFFFFFF)
+val Red = Color(0xFFFF0000)
 val Transparent = Color(0x00000000)
 
 @Immutable
@@ -19,7 +21,9 @@ data class MoimColors(
     val surface: Color,
     val background: Color,
     val black: Color,
+    val gray: Color,
     val white: Color,
+    val red: Color,
     val transparent: Color
 )
 
@@ -28,7 +32,9 @@ internal val lightMoimColors = MoimColors(
     surface = surface,
     background = White,
     black = Black,
+    gray = Gray,
     white = White,
+    red = Red,
     transparent = Transparent
 )
 
@@ -37,7 +43,9 @@ internal val darkMoimColors = MoimColors(
     surface = surface,
     background = Black,
     black = Black,
+    gray = Gray,
     white = White,
+    red = Red,
     transparent = Transparent
 )
 

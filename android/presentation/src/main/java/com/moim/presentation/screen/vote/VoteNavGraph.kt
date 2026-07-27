@@ -16,10 +16,10 @@ fun EntryProviderScope<NavKey>.vote(
     modifier: Modifier = Modifier
 ) {
     entry<Vote>(metadata = metadata) { route ->
-//        VoteScreen(
-//            route = route,
-//            onNavigateBack = onNavigateBack,
-//            modifier = modifier
-//        )
+        VoteScreen(
+            route = route,
+            onNavigateBack = onNavigateBack,
+            modifier = modifier
+        )
     }
 }
