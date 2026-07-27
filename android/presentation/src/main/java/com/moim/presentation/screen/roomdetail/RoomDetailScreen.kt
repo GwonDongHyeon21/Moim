@@ -151,7 +151,11 @@ fun RoomDetailScreen(
 fun RoomDetailInfoSection(roomInfo: RoomInfoUiModel) {
     val uiFormatter =
         DateTimeFormatter.ofPattern(stringResource(R.string.ui_time_format), Locale.KOREA)
-    val deadline = LocalDateTime.parse(roomInfo.deadline).format(uiFormatter)
+    val deadline = if (roomInfo.deadline.isNotEmpty()) {
+        LocalDateTime.parse(roomInfo.deadline).format(uiFormatter)
+    } else {
+        ""
+    }
 
     Column {
         Spacer(modifier = Modifier.height(MoimSpace.SpaceMedium))
