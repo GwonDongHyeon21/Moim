@@ -1,7 +1,9 @@
 package com.moim.presentation.screen.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,6 +29,8 @@ import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
 import com.moim.presentation.screen.home.model.RoomOptions
+import com.moim.presentation.theme.MoimPadding
+import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
 import com.moim.presentation.util.collectWithLifecycle
 
@@ -103,7 +107,12 @@ fun HomeScreen(
                     onStatusSelected = { onAction(HomeAction.OnRoomFilterStatusSelected(it)) }
                 )
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = MoimPadding.AppHorizontalPadding)
+                ) {
+                    item { Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall)) }
                     items(
                         items = filteredRooms,
                         key = { it.code }
@@ -112,6 +121,7 @@ fun HomeScreen(
                             room = room,
                             onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
                         )
+                        Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
                     }
                 }
             }
