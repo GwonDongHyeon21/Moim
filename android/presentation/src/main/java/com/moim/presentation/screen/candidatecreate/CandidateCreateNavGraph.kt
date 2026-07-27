@@ -16,6 +16,10 @@ fun EntryProviderScope<NavKey>.candidateCreate(
     modifier: Modifier = Modifier
 ) {
     entry<CandidateCreate>(metadata = metadata) { route ->
-//        CandidateCreateScreen()
+        CandidateCreateScreen(
+            route = route,
+            onNavigateBack = onNavigateBack,
+            modifier = modifier
+        )
     }
 }

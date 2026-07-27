@@ -14,6 +14,13 @@
     <string name="please_select_deadline">마감 시간을 선택해주세요</string>
     <string name="on_going">진행 중</string>
     <string name="end">마감</string>
+    
+    <!-- Candidate Create Screen -->
+    <string name="candidate">후보지</string>
+    <string name="candidate_create">후보지 등록</string>
+    <string name="create">등록하기</string>
+    <string name="category">카테고리</string>
+    <string name="category_placeholder">카테고리를 선택하세요.</string>
 
     <!-- SnackBar Message -->
     <string name="snack_bar_network_error">네트워크 연결을 확인해주세요</string>
