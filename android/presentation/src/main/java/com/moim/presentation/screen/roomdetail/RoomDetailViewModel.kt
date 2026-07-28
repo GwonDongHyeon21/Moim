@@ -1,29 +1,18 @@
 package com.moim.presentation.screen.roomdetail
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.moim.domain.feature.room.repository.RoomRepository
+import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiState
 import com.moim.presentation.screen.roomdetail.model.toUiModel
-import com.moim.presentation.util.WhileUiSubscribed
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = RoomDetailViewModel.Factory::class)
@@ -31,61 +20,49 @@ class RoomDetailViewModel @AssistedInject constructor(
     @Assisted route: RoomDetail,
     private val roomRepository: RoomRepository,
     private val snackBarManager: SnackBarManager
-) : ViewModel() {
+) : BaseViewModel<RoomDetailUiState, RoomDetailEvent>(RoomDetailUiState()) {
+
+    override fun checkLoading() = uiState.value.isLoading
+    override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
 
     private val roomId = route.roomId
 
-    private val refreshTrigger = MutableStateFlow(0)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val uiState: StateFlow<RoomDetailUiState> = refreshTrigger
-        .flatMapLatest { triggerCount ->
-            flow {
-                val isRefreshing = triggerCount != 0
-                if (isRefreshing) {
-                    emit(RoomDetailUiState(isLoading = false, isRefreshing = true))
-                } else {
-                    emit(RoomDetailUiState(isLoading = true, isRefreshing = false))
-                }
-
-                roomRepository.loadRoomDetail(roomId)
-                    .onSuccess { data ->
-                        emit(
-                            RoomDetailUiState(
-                                isLoading = false,
-                                isRefreshing = false,
-                                roomDetail = data.toUiModel()
-                            )
-                        )
-                    }
-                    .onFailure { exception ->
-                        _uiEvent.trySend(RoomDetailEvent.NavigateBack)
-                        snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
-
-                        Timber.e(exception)
-                    }
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = RoomDetailUiState(isLoading = true)
-        )
-
-    private val _uiEvent = Channel<RoomDetailEvent>(Channel.BUFFERED)
-    val uiEvent = _uiEvent.receiveAsFlow()
+    init {
+        doAction { loadRoomDetail() }
+    }
 
     fun onAction(action: RoomDetailAction) {
         when (action) {
-            is RoomDetailAction.RefreshRoomDetail -> refreshTrigger.update { it + 1 }
+            is RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail()
 
             is RoomDetailAction.NavigateToVote ->
-                _uiEvent.trySend(RoomDetailEvent.NavigateToVote(roomId, action.category))
+                sendEvent(RoomDetailEvent.NavigateToVote(roomId, action.category))
 
             is RoomDetailAction.NavigateToCandidateCreate ->
-                _uiEvent.trySend(RoomDetailEvent.NavigateToCandidateCreate(roomId))
+                sendEvent(RoomDetailEvent.NavigateToCandidateCreate(roomId))
 
-            RoomDetailAction.NavigateBack -> _uiEvent.trySend(RoomDetailEvent.NavigateBack)
+            RoomDetailAction.NavigateBack -> sendEvent(RoomDetailEvent.NavigateBack)
         }
+    }
+
+    private suspend fun loadRoomDetail() {
+        roomRepository.loadRoomDetail(roomId)
+            .onSuccess { data ->
+                updateState { copy(roomDetail = data.toUiModel()) }
+            }
+            .onFailure { exception ->
+                sendEvent(RoomDetailEvent.NavigateBack)
+                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
+    }
+
+    private fun refreshRoomDetail() = doAction(
+        customCheck = { uiState.value.isRefreshing },
+        customUpdate = { updateState { copy(isRefreshing = it) } }
+    ) {
+        loadRoomDetail()
     }
 
     @AssistedFactory
