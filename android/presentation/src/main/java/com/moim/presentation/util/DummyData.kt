@@ -4,6 +4,8 @@ import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.screen.roomdetail.model.CategoryVoteStatusUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomMemberInfoUiModel
+import com.moim.presentation.screen.roomdetail.model.VoteRankUiModel
+import com.moim.presentation.screen.roomdetail.model.VoteResultUiModel
 import com.moim.presentation.screen.vote.model.CandidateUiModel
 
 object DummyData {
@@ -47,7 +49,7 @@ object DummyData {
             description = "테스트 description5",
             maxCount = 15,
             currentMemberCount = 8,
-            deadline = "2026-08-01T18:45:50"
+            deadline = "2026-10-01T18:45:50"
         )
     )
 
@@ -135,5 +137,46 @@ object DummyData {
             creatorNickname = "nickname4",
             isVotedByMe = true
         ),
+    )
+
+    val dummyVoteResults = listOf(
+        VoteResultUiModel(
+            category = "FOOD",
+            rankings = listOf(
+                VoteRankUiModel(
+                    content = "강남역 쉑쉑버거",
+                    voteCount = 3
+                ),
+                VoteRankUiModel(
+                    content = "땀땀 강남본점 (매운 곱창쌀국수)",
+                    voteCount = 3
+                ),
+                VoteRankUiModel(
+                    content = "정돈 (프리미엄 돈카츠)",
+                    voteCount = 1
+                )
+            )
+        ),
+        VoteResultUiModel(
+            category = "CAFE",
+            rankings = listOf(
+                VoteRankUiModel(
+                    content = "스타벅스 강남R점",
+                    voteCount = 4
+                ),
+                VoteRankUiModel(
+                    content = "블루보틀 역삼 카페",
+                    voteCount = 1
+                )
+            )
+        ),
+        VoteResultUiModel(
+            category = "PLACE",
+            rankings = emptyList()
+        ),
+        VoteResultUiModel(
+            category = "ACTIVITY",
+            rankings = emptyList()
+        )
     )
 }

@@ -187,7 +187,24 @@ fun RoomDetailInfoSection(
 @Composable
 fun RoomDetailScreenPreview() {
     RoomDetailScreen(
-        uiState = RoomDetailUiState(roomDetail = DummyData.dummyRoomDetail),
+        uiState = RoomDetailUiState(
+            roomDetail = RoomDetailUiModel(
+                roomInfo = DummyData.dummyRooms[4],
+                categoryVoteStatus = DummyData.dummyCategoryVoteStatus
+            )
+        ),
+        onAction = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RoomDetailScreenPreview2() {
+    RoomDetailScreen(
+        uiState = RoomDetailUiState(
+            roomDetail = DummyData.dummyRoomDetail,
+            voteResult = DummyData.dummyVoteResults
+        ),
         onAction = {}
     )
 }
