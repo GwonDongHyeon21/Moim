@@ -71,14 +71,14 @@ fun RoomDetailScreen(
         }
     }
 
-    RoomDetailScreen(
-        uiState = uiState,
-        onAction = viewModel::onAction,
-        modifier = modifier
-    )
-
     if (uiState.isLoading) {
         MoimProgressIndicator()
+    } else {
+        RoomDetailScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction,
+            modifier = modifier
+        )
     }
 }
 
@@ -151,11 +151,7 @@ fun RoomDetailScreen(
 fun RoomDetailInfoSection(roomInfo: RoomInfoUiModel) {
     val uiFormatter =
         DateTimeFormatter.ofPattern(stringResource(R.string.ui_time_format), Locale.KOREA)
-    val deadline = if (roomInfo.deadline.isNotEmpty()) {
-        LocalDateTime.parse(roomInfo.deadline).format(uiFormatter)
-    } else {
-        ""
-    }
+    val deadline = LocalDateTime.parse(roomInfo.deadline).format(uiFormatter)
 
     Column {
         Spacer(modifier = Modifier.height(MoimSpace.SpaceMedium))
