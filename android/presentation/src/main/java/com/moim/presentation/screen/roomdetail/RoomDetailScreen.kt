@@ -37,6 +37,7 @@ import com.moim.presentation.screen.roomdetail.component.CategoryCard
 import com.moim.presentation.screen.roomdetail.component.RoomCodeDialog
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
+import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiState
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
@@ -90,6 +91,7 @@ fun RoomDetailScreen(
 ) {
     val roomInfo = uiState.roomDetail.roomInfo
     val categoryVoteStatus = uiState.roomDetail.categoryVoteStatus
+    val deadline = LocalDateTime.parse(roomInfo.deadline)
 
     var showRoomCode by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
@@ -114,28 +116,39 @@ fun RoomDetailScreen(
             }
         }
     ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = uiState.isRefreshing,
-            onRefresh = { onAction(RoomDetailAction.RefreshRoomDetail(roomInfo.id!!)) },
-            state = pullToRefreshState,
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = MoimPadding.AppHorizontalPadding)
-        ) {
-            Column(
+        if (deadline > LocalDateTime.now()) {
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = { onAction(RoomDetailAction.RefreshRoomDetail(roomInfo.id!!)) },
+                state = pullToRefreshState,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
+                    .padding(innerPadding)
+                    .padding(horizontal = MoimPadding.AppHorizontalPadding)
             ) {
-                RoomDetailInfoSection(roomInfo = roomInfo)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
+                ) {
+                    RoomDetailInfoSection(
+                        roomInfo = roomInfo,
+                        deadline = deadline
+                    )
 
-                categoryVoteStatus.forEach { category ->
-                    CategoryCard(category = category) {
-                        onAction(RoomDetailAction.NavigateToVote(category.category))
+                    categoryVoteStatus.forEach { category ->
+                        CategoryCard(category = category) {
+                            onAction(RoomDetailAction.NavigateToVote(category.category))
+                        }
                     }
                 }
             }
+        } else {
+            RoomDetailResultScreen(
+                currentMemberCount = roomInfo.currentMemberCount,
+                voteResult = uiState.voteResult,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
     }
 
@@ -148,10 +161,12 @@ fun RoomDetailScreen(
 }
 
 @Composable
-fun RoomDetailInfoSection(roomInfo: RoomInfoUiModel) {
+fun RoomDetailInfoSection(
+    roomInfo: RoomInfoUiModel,
+    deadline: LocalDateTime
+) {
     val uiFormatter =
         DateTimeFormatter.ofPattern(stringResource(R.string.ui_time_format), Locale.KOREA)
-    val deadline = LocalDateTime.parse(roomInfo.deadline).format(uiFormatter)
 
     Column {
         Spacer(modifier = Modifier.height(MoimSpace.SpaceMedium))
@@ -161,7 +176,7 @@ fun RoomDetailInfoSection(roomInfo: RoomInfoUiModel) {
         ) {
             Text(text = roomInfo.description.toString())
             Column(horizontalAlignment = Alignment.End) {
-                Text(text = deadline)
+                Text(text = deadline.format(uiFormatter))
                 Text(text = "${roomInfo.currentMemberCount} / ${roomInfo.maxCount}")
             }
         }

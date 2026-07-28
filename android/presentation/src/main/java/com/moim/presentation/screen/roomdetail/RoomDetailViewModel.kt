@@ -1,6 +1,7 @@
 package com.moim.presentation.screen.roomdetail
 
 import com.moim.domain.feature.room.repository.RoomRepository
+import com.moim.domain.feature.vote.repository.VoteRepository
 import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
@@ -14,11 +15,13 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import timber.log.Timber
+import java.time.LocalDateTime
 
 @HiltViewModel(assistedFactory = RoomDetailViewModel.Factory::class)
 class RoomDetailViewModel @AssistedInject constructor(
     @Assisted route: RoomDetail,
     private val roomRepository: RoomRepository,
+    private val voteRepository: VoteRepository,
     private val snackBarManager: SnackBarManager
 ) : BaseViewModel<RoomDetailUiState, RoomDetailEvent>(RoomDetailUiState()) {
 
@@ -49,6 +52,10 @@ class RoomDetailViewModel @AssistedInject constructor(
         roomRepository.loadRoomDetail(roomId)
             .onSuccess { data ->
                 updateState { copy(roomDetail = data.toUiModel()) }
+
+                if (LocalDateTime.parse(data.roomInfo.deadline) < LocalDateTime.now()) {
+                    loadVoteResults()
+                }
             }
             .onFailure { exception ->
                 sendEvent(RoomDetailEvent.NavigateBack)
@@ -63,6 +70,18 @@ class RoomDetailViewModel @AssistedInject constructor(
         customUpdate = { updateState { copy(isRefreshing = it) } }
     ) {
         loadRoomDetail()
+    }
+
+    private suspend fun loadVoteResults() {
+        voteRepository.getVoteResults(roomId)
+            .onSuccess { data ->
+                updateState { copy(voteResult = data.map { it.toUiModel() }) }
+            }.onFailure { exception ->
+                sendEvent(RoomDetailEvent.NavigateBack)
+                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
     }
 
     @AssistedFactory
