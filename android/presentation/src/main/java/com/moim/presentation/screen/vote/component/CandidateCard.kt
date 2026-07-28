@@ -43,8 +43,7 @@ private object CandidateCard {
 @Composable
 fun CandidateCard(
     candidate: CandidateUiModel,
-    onClickVote: () -> Unit,
-    onClickReset: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -101,7 +100,7 @@ fun CandidateCard(
 
         if (candidate.isVotedByMe) {
             IconButton(
-                onClick = onClickReset,
+                onClick = onClick,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = MoimPadding.PaddingMedium)
@@ -119,7 +118,7 @@ fun CandidateCard(
             }
         } else {
             IconButton(
-                onClick = onClickVote,
+                onClick = onClick,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = MoimPadding.PaddingMedium)
@@ -144,7 +143,6 @@ fun CandidateCard(
 fun CandidateCardPreview() {
     CandidateCard(
         candidate = DummyData.dummyCandidates.first(),
-        onClickVote = {},
-        onClickReset = {}
+        onClick = {}
     )
 }

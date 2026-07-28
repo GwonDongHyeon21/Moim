@@ -117,8 +117,7 @@ fun VoteScreen(
 
                     CandidateCard(
                         candidate = candidate,
-                        onClickVote = { onAction(VoteAction.CastVote(candidate.id)) },
-                        onClickReset = { onAction(VoteAction.ResetVote) },
+                        onClick = { onAction(VoteAction.CastVote(candidate.id)) },
                         modifier = Modifier.graphicsLayer {
                             val pageOffset =
                                 (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
