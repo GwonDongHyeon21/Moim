@@ -41,6 +41,15 @@ class VoteService(
             throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_DEADLINE_EXPIRED)
         }
 
+        val currentCount = candidateRepository.countByRoomIdAndCategoryAndUserId(
+            roomId = roomId,
+            category = request.category,
+            userId = userId
+        )
+        if (currentCount >= 3) {
+            throw ErrorException(HttpStatus.BAD_REQUEST, ErrorCode.CANDIDATE_COUNT_LIMIT)
+        }
+
         candidateRepository.save(
             Candidate(
                 room = room,

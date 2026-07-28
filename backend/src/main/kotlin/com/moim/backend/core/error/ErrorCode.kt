@@ -16,5 +16,6 @@ enum class ErrorCode(val message: String) {
     ROOM_DEADLINE_EXPIRED("해당 방의 모집 마감 시간이 지났습니다."),
 
     CANDIDATE_NOT_FOUND("후보지를 찾을 수 없습니다."),
-    VOTE_RESULTS_BLINDED("마감 전에는 투표 결과를 볼 수 없습니다.")
+    VOTE_RESULTS_BLINDED("마감 전에는 투표 결과를 볼 수 없습니다."),
+    CANDIDATE_COUNT_LIMIT("각 카테고리별로 최대 3개까지만 후보를 등록할 수 있습니다.")
 }
