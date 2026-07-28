@@ -28,6 +28,7 @@ abstract class BaseViewModel<S, E>(initialState: S) : ViewModel() {
     protected fun doAction(
         customCheck: (() -> Boolean)? = null,
         customUpdate: ((Boolean) -> Unit)? = null,
+        loadingOff: Boolean = true,
         action: suspend () -> Unit
     ) {
         val isLoading = customCheck?.invoke() ?: checkLoading()
@@ -38,7 +39,9 @@ abstract class BaseViewModel<S, E>(initialState: S) : ViewModel() {
                 customUpdate?.invoke(true) ?: updateLoading(true)
                 action()
             } finally {
-                customUpdate?.invoke(false) ?: updateLoading(false)
+                if(loadingOff) {
+                    customUpdate?.invoke(false) ?: updateLoading(false)
+                }
             }
         }
     }

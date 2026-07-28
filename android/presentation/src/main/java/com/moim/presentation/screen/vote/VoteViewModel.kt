@@ -53,7 +53,7 @@ class VoteViewModel @AssistedInject constructor(
             }
     }
 
-    private fun castVote(candidateId: Long) = doAction {
+    private fun castVote(candidateId: Long) = doAction(loadingOff = false) {
         voteRepository.castVote(candidateId)
             .onSuccess {
                 sendEvent(VoteEvent.NavigateBack)
@@ -64,7 +64,7 @@ class VoteViewModel @AssistedInject constructor(
             }
     }
 
-    private fun resetVote() = doAction {
+    private fun resetVote() = doAction(loadingOff = false) {
         voteRepository.resetVotes(roomId, category)
             .onSuccess {
                 sendEvent(VoteEvent.NavigateBack)
