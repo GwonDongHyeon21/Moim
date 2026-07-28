@@ -115,7 +115,7 @@ class VoteService(
             val candidatesInCategory = groupedCandidates[category] ?: emptyList()
             val rankings = candidatesInCategory.map { candidate ->
                 VoteRankDto(
-                    candidate = candidate,
+                    content = candidate.content,
                     voteCount = voteRecordRepository.countByCandidateId(candidate.id!!)
                 )
             }
