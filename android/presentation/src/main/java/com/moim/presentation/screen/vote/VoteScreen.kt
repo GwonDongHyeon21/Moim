@@ -63,14 +63,14 @@ fun VoteScreen(
         }
     }
 
-    VoteScreen(
-        uiState = uiState,
-        onAction = viewModel::onAction,
-        modifier = modifier
-    )
-
     if (uiState.isLoading) {
         MoimProgressIndicator()
+    } else {
+        VoteScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction,
+            modifier = modifier
+        )
     }
 }
 
