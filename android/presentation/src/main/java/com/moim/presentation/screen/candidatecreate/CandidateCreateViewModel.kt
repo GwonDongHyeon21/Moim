@@ -51,7 +51,7 @@ class CandidateCreateViewModel @AssistedInject constructor(
         ).onSuccess {
             sendEvent(CandidateCreateEvent.NavigateBack)
         }.onFailure { exception ->
-            snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+            snackBarManager.show(SnackBarEvent.CANDIDATE_COUNT_LIMIT)
 
             Timber.e(exception)
         }

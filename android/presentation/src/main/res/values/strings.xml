@@ -14,7 +14,7 @@
     <string name="please_select_deadline">마감 시간을 선택해주세요</string>
     <string name="on_going">진행 중</string>
     <string name="end">마감</string>
-    
+
     <!-- Candidate Create Screen -->
     <string name="candidate">후보지</string>
     <string name="candidate_create">후보지 등록</string>
@@ -36,6 +36,7 @@
     <string name="snack_bar_google_login_error">로그인 중 오류가 발생했습니다.</string>
     <string name="snack_bar_user_login_cancel">사용자가 로그인을 취소했습니다.</string>
     <string name="snack_bar_not_found_google_account">기기에 등록된 구글 계정이 없습니다.</string>
+    <string name="snack_bar_candidate_count_limit">각 카테고리별로 최대 3개까지만 후보를 등록할 수 있습니다.</string>
 
     <!-- Format -->
     <string name="ui_time_format">yyyy년 MM월 dd일 a hh:mm</string>
