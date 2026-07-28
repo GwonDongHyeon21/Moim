@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VoteRankResponse(
-    val candidate: CandidateResponse,
+    val content: String,
     val voteCount: Int
 )
 
 fun VoteRankResponse.toDomain() = VoteRankInfo(
-    candidate = candidate.toDomain(),
+    content = content,
     voteCount = voteCount
 )

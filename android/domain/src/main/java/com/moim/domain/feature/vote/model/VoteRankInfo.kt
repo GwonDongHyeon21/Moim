@@ -1,6 +1,6 @@
 package com.moim.domain.feature.vote.model
 
 class VoteRankInfo(
-    val candidate: CandidateInfo,
+    val content: String,
     val voteCount: Int
 )
