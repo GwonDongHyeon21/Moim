@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/votes")
 class VoteController(
     private val voteService: VoteService
 ) {
@@ -47,7 +47,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @DeleteMapping("/rooms/{roomId}/votes/reset")
+    @DeleteMapping("/rooms/{roomId}/reset")
     fun resetVotes(
         @AuthenticationPrincipal userId: Long,
         @PathVariable roomId: Long,
@@ -58,7 +58,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @GetMapping("/rooms/{roomId}/candidates/results")
+    @GetMapping("/rooms/{roomId}/results")
     fun getVoteResults(
         @PathVariable roomId: Long
     ): ApiResponse<List<VoteResultResponse>> {
