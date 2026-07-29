@@ -15,6 +15,11 @@
     <string name="on_going">진행 중</string>
     <string name="end">마감</string>
 
+    <!-- Room Detail Screen -->
+    <string name="vote_result_index">투표수: %d</string>
+    <string name="vote_result_detail">투표 결과</string>
+    <string name="vote_result_detail_contentDescription">투표 결과 상세보기</string>
+
     <!-- Candidate Create Screen -->
     <string name="candidate">후보지</string>
     <string name="candidate_create">후보지 등록</string>

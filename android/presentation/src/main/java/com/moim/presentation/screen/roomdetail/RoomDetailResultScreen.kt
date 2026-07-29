@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -15,6 +19,8 @@ import com.moim.presentation.screen.roomdetail.RoomDetailResultScreen.BAR_WIDTH_
 import com.moim.presentation.screen.roomdetail.RoomDetailResultScreen.JOIN_TO_STRING_SEPARATOR
 import com.moim.presentation.screen.roomdetail.RoomDetailResultScreen.MAX_LINES
 import com.moim.presentation.screen.roomdetail.component.VoteCountRatioBar
+import com.moim.presentation.screen.roomdetail.component.VoteResultDetailDialog
+import com.moim.presentation.screen.roomdetail.model.VoteRankUiModel
 import com.moim.presentation.screen.roomdetail.model.VoteResultUiModel
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
@@ -34,6 +40,9 @@ fun RoomDetailResultScreen(
     voteResult: List<VoteResultUiModel>,
     modifier: Modifier = Modifier
 ) {
+    var showVoteResultDetail by remember { mutableStateOf(false) }
+    var selectedRankings by remember { mutableStateOf(emptyList<VoteRankUiModel>()) }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
@@ -61,13 +70,23 @@ fun RoomDetailResultScreen(
                         maxVoteCount = maxVoteCount,
                         currentMemberCount = currentMemberCount,
                         modifier = Modifier.fillMaxWidth(BAR_WIDTH_RATIO),
-                        onClickDialog = { showVoteResultDetail = true }
+                        onClickDialog = {
+                            selectedRankings = rankings
+                            showVoteResultDetail = true
+                        }
                     )
                 } else {
                     Text(text = category)
                 }
             }
         }
+    }
+
+    if (showVoteResultDetail) {
+        VoteResultDetailDialog(
+            onDismissRequest = { showVoteResultDetail = false },
+            rankings = selectedRankings
+        )
     }
 }
 
