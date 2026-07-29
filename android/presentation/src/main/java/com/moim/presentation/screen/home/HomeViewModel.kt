@@ -1,23 +1,27 @@
 package com.moim.presentation.screen.home
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.moim.domain.feature.room.model.CreateRoomParams
 import com.moim.domain.feature.room.repository.RoomRepository
 import com.moim.domain.feature.user.repository.UserRepository
 import com.moim.presentation.base.BaseViewModel
+import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
-import com.moim.presentation.screen.home.model.RoomFilterStatus
-import com.moim.presentation.util.WhileUiSubscribed
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,27 +34,19 @@ class HomeViewModel @Inject constructor(
     override fun checkLoading() = uiState.value.isLoading
     override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
 
-    val filteredRooms = uiState.map { state ->
-        val now = LocalDateTime.now()
+    private var refreshTrigger = 0
 
-        state.rooms.filter { room ->
-            val deadline = LocalDateTime.parse(room.deadline)
-
-            if (state.roomFilterStatus == RoomFilterStatus.ONGOING) {
-                deadline.isAfter(now)
-            } else {
-                !deadline.isAfter(now)
-            }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val roomsPagingItems: Flow<PagingData<RoomInfoUiModel>> = uiState
+        .map { Pair(it.roomFilterStatus, refreshTrigger) }
+        .distinctUntilChanged()
+        .flatMapLatest { (status, _) ->
+            roomRepository.getRoomsPaging(status.name)
+                .map { pagingData ->
+                    pagingData.map { it.toUiModel() }
+                }
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = WhileUiSubscribed,
-        initialValue = emptyList()
-    )
-
-    init {
-        doAction { loadRooms() }
-    }
+        .cachedIn(viewModelScope)
 
     fun onAction(action: HomeAction) {
         when (action) {
@@ -71,21 +67,10 @@ class HomeViewModel @Inject constructor(
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)
 
-            HomeAction.RefreshHome -> refreshRooms()
+            HomeAction.RefreshHome -> sendEvent(HomeEvent.RefreshRoom)
 
             HomeAction.Logout -> logout()
         }
-    }
-
-    private suspend fun loadRooms() {
-//        roomRepository.loadRooms()
-//            .onSuccess { data ->
-//                updateState { copy(rooms = data.map { it.toUiModel() }) }
-//            }.onFailure { exception ->
-//                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
-//
-//                Timber.e(exception)
-//            }
     }
 
     private fun createRoom(roomInfo: CreateRoomParams) = doAction {
@@ -101,7 +86,7 @@ class HomeViewModel @Inject constructor(
                         roomOption = ""
                     )
                 }
-                loadRooms()
+                refreshTrigger++
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
@@ -122,19 +107,12 @@ class HomeViewModel @Inject constructor(
                         roomOption = ""
                     )
                 }
-                loadRooms()
+                refreshTrigger++
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
 
                 Timber.e(exception)
             }
-    }
-
-    private fun refreshRooms() = doAction(
-        customCheck = { uiState.value.isRefreshing },
-        customUpdate = { updateState { copy(isRefreshing = it) } }
-    ) {
-        loadRooms()
     }
 
     private fun logout() = doAction {

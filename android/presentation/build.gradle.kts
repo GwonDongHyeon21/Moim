@@ -89,6 +89,10 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
+    // Paging
+    implementation(libs.androidx.paging.common)
+    implementation(libs.androidx.paging.compose)
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
