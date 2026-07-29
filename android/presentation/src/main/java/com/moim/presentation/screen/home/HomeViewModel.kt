@@ -67,8 +67,6 @@ class HomeViewModel @Inject constructor(
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)
 
-            HomeAction.RefreshHome -> sendEvent(HomeEvent.RefreshRoom)
-
             HomeAction.Logout -> logout()
         }
     }

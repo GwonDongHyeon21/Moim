@@ -53,8 +53,6 @@ fun HomeScreen(
             is HomeEvent.NavigateToRoomDetail -> onNavigateToRoomDetail(event.roomId)
 
             is HomeEvent.RefreshRoom -> roomsPagingItems.refresh()
-
-            is HomeEvent.ShowSnackBar -> {}
         }
     }
 
@@ -167,7 +165,7 @@ fun HomeScreenPreview() {
     val dummyPagingItems = dummyPagingFlow.collectAsLazyPagingItems()
 
     HomeScreen(
-        uiState = HomeUiState(rooms = DummyData.dummyRooms),
+        uiState = HomeUiState(),
         roomsPagingItems = dummyPagingItems,
         onAction = {}
     )
