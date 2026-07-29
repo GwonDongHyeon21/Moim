@@ -1,6 +1,5 @@
 package com.moim.presentation.screen.home.model
 
-import com.moim.presentation.model.RoomInfoUiModel
 import java.time.LocalDateTime
 
 data class HomeUiState(

@@ -34,13 +34,11 @@ class HomeViewModel @Inject constructor(
     override fun checkLoading() = uiState.value.isLoading
     override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
 
-    private var refreshTrigger = 0
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val roomsPagingItems: Flow<PagingData<RoomInfoUiModel>> = uiState
-        .map { Pair(it.roomFilterStatus, refreshTrigger) }
+        .map { it.roomFilterStatus }
         .distinctUntilChanged()
-        .flatMapLatest { (status, _) ->
+        .flatMapLatest { status ->
             roomRepository.getRoomsPaging(status.name)
                 .map { pagingData ->
                     pagingData.map { it.toUiModel() }
@@ -84,7 +82,6 @@ class HomeViewModel @Inject constructor(
                         roomOption = ""
                     )
                 }
-                refreshTrigger++
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
@@ -105,7 +102,6 @@ class HomeViewModel @Inject constructor(
                         roomOption = ""
                     )
                 }
-                refreshTrigger++
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
 

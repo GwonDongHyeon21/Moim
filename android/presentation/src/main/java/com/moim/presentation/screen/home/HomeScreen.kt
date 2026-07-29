@@ -10,7 +10,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,9 +54,14 @@ fun HomeScreen(
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
-            is HomeEvent.NavigateToRoomDetail -> onNavigateToRoomDetail(event.roomId)
+            is HomeEvent.NavigateToRoomDetail -> {
+                onNavigateToRoomDetail(event.roomId)
+                roomsPagingItems.refresh()
+            }
 
-            is HomeEvent.RefreshRoom -> roomsPagingItems.refresh()
+            is HomeEvent.RefreshRoom -> {
+                roomsPagingItems.refresh()
+            }
         }
     }
 
@@ -76,6 +85,13 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
+
+    LaunchedEffect(roomsPagingItems.loadState.refresh) {
+        if (roomsPagingItems.loadState.refresh !is LoadState.Loading) {
+            isRefreshing = false
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -99,8 +115,11 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = roomsPagingItems.loadState.refresh is LoadState.Loading,
-            onRefresh = { roomsPagingItems.refresh() },
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                roomsPagingItems.refresh()
+            },
             state = pullToRefreshState,
             modifier = Modifier.padding(innerPadding)
         ) {
