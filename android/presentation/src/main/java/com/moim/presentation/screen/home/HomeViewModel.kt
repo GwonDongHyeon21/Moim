@@ -78,14 +78,14 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun loadRooms() {
-        roomRepository.loadRooms()
-            .onSuccess { data ->
-                updateState { copy(rooms = data.map { it.toUiModel() }) }
-            }.onFailure { exception ->
-                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
-
-                Timber.e(exception)
-            }
+//        roomRepository.loadRooms()
+//            .onSuccess { data ->
+//                updateState { copy(rooms = data.map { it.toUiModel() }) }
+//            }.onFailure { exception ->
+//                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+//
+//                Timber.e(exception)
+//            }
     }
 
     private fun createRoom(roomInfo: CreateRoomParams) = doAction {

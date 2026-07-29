@@ -1,12 +1,14 @@
 package com.moim.domain.feature.room.repository
 
+import androidx.paging.PagingData
 import com.moim.domain.feature.room.model.CreateRoomParams
 import com.moim.domain.feature.room.model.RoomDetailInfo
 import com.moim.domain.feature.room.model.RoomInfo
+import kotlinx.coroutines.flow.Flow
 
 interface RoomRepository {
 
-    suspend fun loadRooms(): Result<List<RoomInfo>>
+    fun getRoomsPaging(status: String): Flow<PagingData<RoomInfo>>
 
     suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailInfo>
 
