@@ -17,9 +17,12 @@ class RoomController(
 
     @GetMapping
     fun getMyRooms(
-        @AuthenticationPrincipal userId: Long
+        @AuthenticationPrincipal userId: Long,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "30") size: Int,
+        @RequestParam status: String
     ): ApiResponse<List<RoomResponse>> {
-        val response = roomService.getMyRooms(userId)
+        val response = roomService.getMyRooms(userId, page, size, status)
 
         return ApiResponse.success(response)
     }

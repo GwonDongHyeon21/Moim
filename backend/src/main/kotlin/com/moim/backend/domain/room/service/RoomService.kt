@@ -5,6 +5,7 @@ import com.moim.backend.core.error.ErrorException
 import com.moim.backend.domain.room.dto.*
 import com.moim.backend.domain.room.entity.Room
 import com.moim.backend.domain.room.entity.RoomMember
+import com.moim.backend.domain.room.model.RoomFilterStatus
 import com.moim.backend.domain.room.model.RoomRole
 import com.moim.backend.domain.room.repository.RoomMemberRepository
 import com.moim.backend.domain.room.repository.RoomRepository
@@ -14,6 +15,8 @@ import com.moim.backend.domain.room.service.Room.charPool
 import com.moim.backend.domain.user.repository.UserRepository
 import com.moim.backend.domain.vote.model.Category
 import com.moim.backend.domain.vote.repository.VoteRecordRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,8 +40,15 @@ class RoomService(
 
     private val secureRandom = SecureRandom()
 
-    fun getMyRooms(userId: Long): List<RoomResponse> {
-        val rooms = roomRepository.findJoinedRoomsByUserId(userId)
+    fun getMyRooms(userId: Long, page: Int, size: Int, status: String): List<RoomResponse> {
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
+        val now = LocalDateTime.now()
+
+        val rooms = if (status == RoomFilterStatus.ONGOING.name) {
+            roomRepository.findOngoingRoomsByUserIdPaged(userId, now, pageable)
+        } else {
+            roomRepository.findClosedRoomsByUserIdPaged(userId, now, pageable)
+        }
 
         return rooms.map { room ->
             val currentMemberCount = roomMemberRepository.countByRoomId(room.id!!)
