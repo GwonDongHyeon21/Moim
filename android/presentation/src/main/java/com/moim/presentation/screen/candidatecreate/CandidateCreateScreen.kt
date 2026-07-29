@@ -24,13 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
-import com.moim.presentation.model.Category
 import com.moim.presentation.navigation.CandidateCreate
 import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.CONTENT_LENGTH_LIMIT
 import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.MAX_LINES
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateAction
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateEvent
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateUiState
+import com.moim.presentation.screen.candidatecreate.model.CategoryUiModel
 import com.moim.presentation.screen.component.MoimButton
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
@@ -109,6 +109,7 @@ fun CandidateCreateScreen(
             verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
         ) {
             CategorySelectSection(
+                categories = uiState.categories,
                 selectedCategory = uiState.selectedCategory,
                 onCategorySelected = { onAction(CandidateCreateAction.OnCategorySelected(it)) }
             )
@@ -124,6 +125,7 @@ fun CandidateCreateScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategorySelectSection(
+    categories: List<CategoryUiModel>,
     selectedCategory: String,
     onCategorySelected: (String) -> Unit
 ) {
@@ -152,7 +154,7 @@ fun CategorySelectSection(
             expanded = showCategory,
             onDismissRequest = { showCategory = false }
         ) {
-            Category.entries.forEach { category ->
+            categories.forEach { category ->
                 DropdownMenuItem(
                     text = { Text(text = category.name) },
                     onClick = {
