@@ -2,7 +2,9 @@ package com.moim.presentation.screen.roomdetail.model
 
 interface RoomDetailAction {
 
-    data class RefreshRoomDetail(val roomId: Long) : RoomDetailAction
+    data object LoadRoomDetail : RoomDetailAction
+
+    data object RefreshRoomDetail : RoomDetailAction
 
     data class NavigateToVote(val category: String) : RoomDetailAction
 

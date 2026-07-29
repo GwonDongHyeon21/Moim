@@ -30,13 +30,11 @@ class RoomDetailViewModel @AssistedInject constructor(
 
     private val roomId = route.roomId
 
-    init {
-        doAction { loadRoomDetail() }
-    }
-
     fun onAction(action: RoomDetailAction) {
         when (action) {
-            is RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail()
+            RoomDetailAction.LoadRoomDetail -> doAction { loadRoomDetail() }
+
+            RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail()
 
             is RoomDetailAction.NavigateToVote ->
                 sendEvent(RoomDetailEvent.NavigateToVote(roomId, action.category))
