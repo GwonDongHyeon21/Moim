@@ -11,11 +11,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.moim.presentation.screen.roomdetail.RoomDetailResultScreen.BAR_WIDTH_RATIO
+import com.moim.presentation.screen.roomdetail.RoomDetailResultScreen.JOIN_TO_STRING_SEPARATOR
+import com.moim.presentation.screen.roomdetail.RoomDetailResultScreen.MAX_LINES
 import com.moim.presentation.screen.roomdetail.component.VoteCountRatioBar
 import com.moim.presentation.screen.roomdetail.model.VoteResultUiModel
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
+
+private object RoomDetailResultScreen {
+    const val MAX_LINES = 1
+    const val BAR_WIDTH_RATIO = 0.3f
+
+    const val JOIN_TO_STRING_SEPARATOR = ", "
+
+}
 
 @Composable
 fun RoomDetailResultScreen(
@@ -30,7 +41,7 @@ fun RoomDetailResultScreen(
         voteResult.forEach { (category, rankings) ->
             val maxVoteCount = rankings.maxOfOrNull { it.voteCount } ?: 0
             val topRankings = rankings.filter { it.voteCount == maxVoteCount }
-            val topContents = topRankings.joinToString(", ") { it.content }
+            val topContents = topRankings.joinToString(JOIN_TO_STRING_SEPARATOR) { it.content }
 
             Row(
                 modifier = Modifier
@@ -44,12 +55,13 @@ fun RoomDetailResultScreen(
                         text = "$category : $topContents",
                         modifier = Modifier.weight(1f),
                         overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
+                        maxLines = MAX_LINES
                     )
                     VoteCountRatioBar(
                         maxVoteCount = maxVoteCount,
                         currentMemberCount = currentMemberCount,
-                        modifier = Modifier.fillMaxWidth(0.3f)
+                        modifier = Modifier.fillMaxWidth(BAR_WIDTH_RATIO),
+                        onClickDialog = { showVoteResultDetail = true }
                     )
                 } else {
                     Text(text = category)
