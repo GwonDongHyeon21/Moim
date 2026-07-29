@@ -21,7 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.moim.domain.model.CreateRoomParams
+import com.moim.domain.feature.room.model.CreateRoomParams
 import com.moim.presentation.R
 import com.moim.presentation.screen.component.MoimButton
 import com.moim.presentation.theme.MoimPadding
@@ -146,7 +146,10 @@ fun CreateRoomDialog(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 fun RoomOptionDialogPreview() {
     CreateRoomDialog(

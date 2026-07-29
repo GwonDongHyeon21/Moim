@@ -2,7 +2,7 @@ package com.moim.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moim.domain.repository.UserRepository
+import com.moim.domain.feature.user.repository.UserRepository
 import com.moim.presentation.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map

@@ -1,5 +1,6 @@
 package com.moim.presentation.screen.component
 
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -16,7 +17,9 @@ fun MoimSnackBar(
 ) {
     SnackbarHost(
         hostState = hostState,
-        modifier = modifier.navigationBarsPadding()
+        modifier = modifier
+            .navigationBarsPadding()
+            .imePadding()
     ) { snackBarData ->
         MoimSnackBarContent(snackBarData.visuals.message)
     }

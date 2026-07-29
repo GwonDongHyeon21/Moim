@@ -4,6 +4,9 @@ import com.moim.data.feature.room.datasource.RoomDataSource
 import com.moim.data.feature.room.datasource.RoomDataSourceImpl
 import com.moim.data.feature.user.datasource.UserDataSource
 import com.moim.data.feature.user.datasource.UserDataSourceImpl
+import com.moim.data.feature.vote.datasource.VoteDataSource
+import com.moim.data.feature.vote.datasource.VoteDataSourceImpl
+import com.moim.data.feature.vote.repositoryimpl.VoteRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,4 +28,10 @@ abstract class DataSourceModule {
     abstract fun bindRoomRemoteDataSource(
         roomDataSourceImpl: RoomDataSourceImpl
     ): RoomDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindVoteRemoteDataSource(
+        voteDataSourceImpl: VoteDataSourceImpl
+    ): VoteDataSource
 }

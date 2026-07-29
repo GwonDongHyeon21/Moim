@@ -17,7 +17,7 @@ interface RoomService {
 
     @GET("api/v1/rooms/{roomId}")
     suspend fun getRoomDetail(
-        @Path("roomId") roomId: String
+        @Path("roomId") roomId: Long
     ): ApiResponse<RoomDetailResponse>
 
     @POST("api/v1/rooms/create")

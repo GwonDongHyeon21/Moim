@@ -4,10 +4,10 @@ import com.moim.data.feature.room.datasource.RoomDataSource
 import com.moim.data.feature.room.model.CreateRoomRequest
 import com.moim.data.feature.room.model.JoinRoomRequest
 import com.moim.data.feature.room.model.toDomain
-import com.moim.domain.model.CreateRoomParams
-import com.moim.domain.model.RoomDetailInfo
-import com.moim.domain.model.RoomInfo
-import com.moim.domain.repository.RoomRepository
+import com.moim.domain.feature.room.model.CreateRoomParams
+import com.moim.domain.feature.room.model.RoomDetailInfo
+import com.moim.domain.feature.room.model.RoomInfo
+import com.moim.domain.feature.room.repository.RoomRepository
 import javax.inject.Inject
 
 class RoomRepositoryImpl @Inject constructor(
@@ -19,7 +19,7 @@ class RoomRepositoryImpl @Inject constructor(
             .map { rooms -> rooms.map { it.toDomain() } }
     }
 
-    override suspend fun loadRoomDetail(roomId: String): Result<RoomDetailInfo> {
+    override suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailInfo> {
         return roomDataSource.loadRoomDetail(roomId)
             .map { it.toDomain() }
     }

@@ -1,6 +1,6 @@
-package com.moim.domain.repository
+package com.moim.domain.feature.user.repository
 
-import com.moim.domain.model.UserInfo
+import com.moim.domain.feature.user.model.UserInfo
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {

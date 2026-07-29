@@ -5,9 +5,11 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.moim.presentation.screen.candidatecreate.navigateToCandidateCreate
 import com.moim.presentation.screen.home.navigateToHome
 import com.moim.presentation.screen.login.navigateToLogin
 import com.moim.presentation.screen.roomdetail.navigateToRoomDetail
+import com.moim.presentation.screen.vote.navigateToVote
 
 @Stable
 class MoimNavigator(
@@ -39,6 +41,10 @@ class MoimNavigator(
     fun navigateToHome() = backStack.navigateToHome()
 
     fun navigateToRoomDetail(roomId: Long) = backStack.navigateToRoomDetail(roomId)
+
+    fun navigateToVote(roomId: Long, category: String) = backStack.navigateToVote(roomId, category)
+
+    fun navigateToCandidateCreate(roomId: Long) = backStack.navigateToCandidateCreate(roomId)
 
     fun popBackStack() = backStack.removeLastOrNull()
 }

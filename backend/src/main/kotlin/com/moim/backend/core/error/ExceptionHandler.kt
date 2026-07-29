@@ -1,6 +1,7 @@
 package com.moim.backend.core.error
 
 import com.moim.backend.core.response.ApiResponse
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -14,5 +15,13 @@ class ExceptionHandler {
         return ResponseEntity
             .status(e.httpStatus)
             .body(ApiResponse.fail(e.errorCode.toString(), e.errorCode.message))
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleUnexpectedException(e: Exception): ResponseEntity<ApiResponse<Nothing>> {
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ApiResponse.fail(ErrorCode.INTERNAL_SERVER_ERROR.name, ErrorCode.INTERNAL_SERVER_ERROR.message))
     }
 }

@@ -1,61 +1,104 @@
 package com.moim.presentation.screen.roomdetail
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
+import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
+import com.moim.presentation.screen.roomdetail.component.CategoryCard
 import com.moim.presentation.screen.roomdetail.component.RoomCodeDialog
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
+import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiState
+import com.moim.presentation.theme.MoimPadding
+import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
 import com.moim.presentation.util.collectWithLifecycle
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun RoomDetailScreen(
     route: RoomDetail,
-    modifier: Modifier = Modifier,
+    onNavigateToVote: (roomId: Long, category: String) -> Unit,
+    onNavigateToCandidateCreate: (Long) -> Unit,
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
         creationCallback = { factory ->
             factory.create(route)
         }
     )
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
+            is RoomDetailEvent.NavigateToVote -> onNavigateToVote(event.roomId, event.category)
+
+            is RoomDetailEvent.NavigateToCandidateCreate -> onNavigateToCandidateCreate(event.roomId)
+
             RoomDetailEvent.NavigateBack -> onNavigateBack()
         }
     }
 
-    RoomDetailScreen(
-        uiState = uiState,
-        onAction = viewModel::onAction,
-        modifier = modifier
-    )
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.onAction(RoomDetailAction.LoadRoomDetail)
+            }
+        }
 
-    if (uiState.isLoading) {
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    if (uiState.roomDetail.roomInfo.id == null) {
         MoimProgressIndicator()
+    } else {
+        RoomDetailScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction,
+            modifier = modifier
+        )
     }
 }
 
@@ -66,8 +109,10 @@ fun RoomDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val roomInfo = uiState.roomDetail.roomInfo
-    var isExpanded by remember { mutableStateOf(false) }
+    val categoryVoteStatus = uiState.roomDetail.categoryVoteStatus
+    val deadline = LocalDateTime.parse(roomInfo.deadline)
 
+    var showRoomCode by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -78,34 +123,82 @@ fun RoomDetailScreen(
                 navigationIcon = R.drawable.arrow_back_24,
                 actionIcon = R.drawable.more_vert_24,
                 onClickNavigationIcon = { onAction(RoomDetailAction.NavigateBack) },
-                onClickActionIcon = { isExpanded = true }
+                onClickActionIcon = { showRoomCode = true }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onAction(RoomDetailAction.NavigateToCandidateCreate) }) {
+                Icon(
+                    painter = painterResource(R.drawable.add_24),
+                    contentDescription = null
+                )
+            }
         }
     ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = uiState.isRefreshing,
-            onRefresh = { onAction(RoomDetailAction.RefreshRoomDetail(roomInfo.id!!)) },
-            state = pullToRefreshState,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            Column(
+        if (deadline > LocalDateTime.now()) {
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = { onAction(RoomDetailAction.RefreshRoomDetail) },
+                state = pullToRefreshState,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding)
+                    .padding(horizontal = MoimPadding.AppHorizontalPadding)
             ) {
-                Text(text = roomInfo.title)
-                Text(text = roomInfo.description.toString())
-                Text(text = roomInfo.currentMemberCount.toString())
-                Text(text = roomInfo.maxCount.toString())
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
+                ) {
+                    RoomDetailInfoSection(
+                        roomInfo = roomInfo,
+                        deadline = deadline
+                    )
+
+                    categoryVoteStatus.forEach { category ->
+                        CategoryCard(category = category) {
+                            onAction(RoomDetailAction.NavigateToVote(category.category))
+                        }
+                    }
+                }
             }
+        } else {
+            RoomDetailResultScreen(
+                currentMemberCount = roomInfo.currentMemberCount,
+                voteResult = uiState.voteResult,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
     }
 
-    if (isExpanded) {
+    if (showRoomCode) {
         RoomCodeDialog(
             roomCode = roomInfo.code,
-            onDismissRequest = { isExpanded = false }
+            onDismissRequest = { showRoomCode = false }
         )
+    }
+}
+
+@Composable
+fun RoomDetailInfoSection(
+    roomInfo: RoomInfoUiModel,
+    deadline: LocalDateTime
+) {
+    val uiFormatter =
+        DateTimeFormatter.ofPattern(stringResource(R.string.ui_time_format), Locale.KOREA)
+
+    Column {
+        Spacer(modifier = Modifier.height(MoimSpace.SpaceMedium))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = roomInfo.description.toString())
+            Column(horizontalAlignment = Alignment.End) {
+                Text(text = deadline.format(uiFormatter))
+                Text(text = "${roomInfo.currentMemberCount} / ${roomInfo.maxCount}")
+            }
+        }
     }
 }
 
@@ -113,7 +206,24 @@ fun RoomDetailScreen(
 @Composable
 fun RoomDetailScreenPreview() {
     RoomDetailScreen(
-        uiState = RoomDetailUiState(roomDetail = DummyData.dummyRoomDetail),
+        uiState = RoomDetailUiState(
+            roomDetail = RoomDetailUiModel(
+                roomInfo = DummyData.dummyRooms[4],
+                categoryVoteStatus = DummyData.dummyCategoryVoteStatus
+            )
+        ),
+        onAction = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RoomDetailScreenPreview2() {
+    RoomDetailScreen(
+        uiState = RoomDetailUiState(
+            roomDetail = DummyData.dummyRoomDetail,
+            voteResult = DummyData.dummyVoteResults
+        ),
         onAction = {}
     )
 }

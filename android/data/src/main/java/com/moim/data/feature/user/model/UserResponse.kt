@@ -1,6 +1,6 @@
 package com.moim.data.feature.user.model
 
-import com.moim.domain.model.UserInfo
+import com.moim.domain.feature.user.model.UserInfo
 import kotlinx.serialization.Serializable
 
 @Serializable

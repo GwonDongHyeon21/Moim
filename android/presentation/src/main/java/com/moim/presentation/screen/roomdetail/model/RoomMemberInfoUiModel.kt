@@ -1,6 +1,6 @@
 package com.moim.presentation.screen.roomdetail.model
 
-import com.moim.domain.model.RoomMemberInfo
+import com.moim.domain.feature.room.model.RoomMemberInfo
 
 data class RoomMemberInfoUiModel(
     val userId: Long? = null,

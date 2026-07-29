@@ -1,6 +1,6 @@
 package com.moim.data.feature.room.model
 
-import com.moim.domain.model.RoomInfo
+import com.moim.domain.feature.room.model.RoomInfo
 import kotlinx.serialization.Serializable
 
 @Serializable

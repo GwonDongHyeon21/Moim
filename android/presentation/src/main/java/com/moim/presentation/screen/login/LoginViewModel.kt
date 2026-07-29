@@ -1,7 +1,7 @@
 package com.moim.presentation.screen.login
 
 import androidx.lifecycle.viewModelScope
-import com.moim.domain.repository.UserRepository
+import com.moim.domain.feature.user.repository.UserRepository
 import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.screen.login.model.LoginAction
 import com.moim.presentation.screen.login.model.LoginEvent
@@ -25,6 +25,7 @@ class LoginViewModel @Inject constructor(
     fun onAction(action: LoginAction) {
         when (action) {
             is LoginAction.GoogleLoginSuccess -> getGoogleIdToken(action.idToken)
+
             is LoginAction.GoogleLoginError -> showSnackBar(action.event)
         }
     }

@@ -1,4 +1,4 @@
-package com.moim.domain.model
+package com.moim.domain.feature.user.model
 
 data class UserInfo(
     val id: Long,

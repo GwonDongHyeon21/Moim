@@ -1,6 +1,6 @@
 package com.moim.presentation.model
 
-import com.moim.domain.model.RoomInfo
+import com.moim.domain.feature.room.model.RoomInfo
 
 data class RoomInfoUiModel(
     val id: Long? = null,

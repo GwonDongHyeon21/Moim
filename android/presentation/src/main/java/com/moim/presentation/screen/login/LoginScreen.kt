@@ -46,6 +46,7 @@ fun LoginScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             LoginEvent.NavigateToHome -> onNavigateToHome()
+
             is LoginEvent.ShowSnackBar -> {}
         }
     }

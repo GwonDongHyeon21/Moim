@@ -15,7 +15,7 @@ class RoomDataSourceImpl @Inject constructor(
         return apiCall { roomService.getMyRooms() }
     }
 
-    override suspend fun loadRoomDetail(roomId: String): Result<RoomDetailResponse> {
+    override suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailResponse> {
         return apiCall { roomService.getRoomDetail(roomId) }
     }
 

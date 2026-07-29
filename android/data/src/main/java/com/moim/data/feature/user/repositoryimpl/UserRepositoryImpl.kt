@@ -4,8 +4,8 @@ import com.moim.data.common.source.TokenDataStore
 import com.moim.data.feature.user.datasource.UserDataSource
 import com.moim.data.feature.user.model.toDomain
 import com.moim.domain.model.ErrorType
-import com.moim.domain.model.UserInfo
-import com.moim.domain.repository.UserRepository
+import com.moim.domain.feature.user.model.UserInfo
+import com.moim.domain.feature.user.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -31,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(
         val refreshToken = tokenDataStore.refreshTokenFlow.firstOrNull()
 
         if (refreshToken.isNullOrBlank()) {
-            return Result.failure(ErrorType.TokenNotFound)
+            return Result.failure(ErrorType.TokenNotFound())
         }
 
         tokenDataStore.clearTokens()
@@ -43,7 +43,7 @@ class UserRepositoryImpl @Inject constructor(
         val refreshToken = tokenDataStore.refreshTokenFlow.firstOrNull()
 
         if (refreshToken.isNullOrBlank()) {
-            return Result.failure(ErrorType.TokenNotFound)
+            return Result.failure(ErrorType.TokenNotFound())
         }
 
         return userDataSource.reissueTokens(refreshToken)
