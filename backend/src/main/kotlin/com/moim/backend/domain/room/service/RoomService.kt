@@ -2,6 +2,7 @@ package com.moim.backend.domain.room.service
 
 import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
+import com.moim.backend.core.model.Category
 import com.moim.backend.domain.room.dto.*
 import com.moim.backend.domain.room.entity.Room
 import com.moim.backend.domain.room.entity.RoomMember
@@ -13,7 +14,6 @@ import com.moim.backend.domain.room.service.Room.MAX_ROOM_COUNT
 import com.moim.backend.domain.room.service.Room.ROOM_CODE_LENGTH
 import com.moim.backend.domain.room.service.Room.charPool
 import com.moim.backend.domain.user.repository.UserRepository
-import com.moim.backend.domain.vote.model.Category
 import com.moim.backend.domain.vote.repository.VoteRecordRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
