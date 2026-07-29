@@ -5,10 +5,7 @@ import com.moim.backend.core.error.ErrorException
 import com.moim.backend.core.model.Category
 import com.moim.backend.domain.room.repository.RoomRepository
 import com.moim.backend.domain.user.repository.UserRepository
-import com.moim.backend.domain.vote.dto.CandidateResponse
-import com.moim.backend.domain.vote.dto.CreateCandidateRequest
-import com.moim.backend.domain.vote.dto.VoteRankDto
-import com.moim.backend.domain.vote.dto.VoteResultResponse
+import com.moim.backend.domain.vote.dto.*
 import com.moim.backend.domain.vote.entity.Candidate
 import com.moim.backend.domain.vote.entity.VoteRecord
 import com.moim.backend.domain.vote.repository.CandidateRepository
@@ -26,6 +23,9 @@ class VoteService(
     private val candidateRepository: CandidateRepository,
     private val voteRecordRepository: VoteRecordRepository
 ) {
+    fun getCategories(): List<CategoryResponse> {
+        return Category.entries.map { CategoryResponse.from(it) }
+    }
 
     @Transactional
     fun createCandidate(userId: Long, roomId: Long, request: CreateCandidateRequest) {
