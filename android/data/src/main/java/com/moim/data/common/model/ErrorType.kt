@@ -1,4 +1,4 @@
-package com.moim.domain.model
+package com.moim.data.common.model
 
 sealed class ErrorType(message: String) : Exception(message) {
 
