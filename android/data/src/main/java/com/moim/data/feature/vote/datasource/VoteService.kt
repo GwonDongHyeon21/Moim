@@ -2,6 +2,7 @@ package com.moim.data.feature.vote.datasource
 
 import com.moim.data.common.model.ApiResponse
 import com.moim.data.feature.vote.model.CandidateResponse
+import com.moim.data.feature.vote.model.CategoryResponse
 import com.moim.data.feature.vote.model.CreateCandidateRequest
 import com.moim.data.feature.vote.model.VoteResultResponse
 import retrofit2.http.Body
@@ -12,6 +13,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface VoteService {
+
+    @GET("api/v1/votes/categories")
+    suspend fun getCategories(): ApiResponse<List<CategoryResponse>>
 
     @POST("/api/v1/votes/rooms/{roomId}/candidates")
     suspend fun createCandidate(
