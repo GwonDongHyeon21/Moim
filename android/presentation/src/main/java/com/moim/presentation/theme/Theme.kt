@@ -14,12 +14,12 @@ fun MoimTheme(
     val materialColorScheme = if (darkTheme) darkMaterialScheme else lightMaterialScheme
 
     CompositionLocalProvider(
-        LocalMoimColors provides moimColorScheme,
+        LocalMoimColors provides lightMoimColors, //moimColorScheme, 우선 라이트 색상만 적용
 //        LocalMoimTypography provides moimTypography,
         LocalMoimShapes provides moimShapes
     ) {
         MaterialTheme(
-            colorScheme = materialColorScheme,
+            colorScheme = lightMaterialScheme, //materialColorScheme, 우선 라이트 모드로 고정
             content = content
         )
     }
