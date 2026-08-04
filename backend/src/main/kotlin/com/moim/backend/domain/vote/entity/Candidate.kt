@@ -1,8 +1,8 @@
 package com.moim.backend.domain.vote.entity
 
+import com.moim.backend.core.model.Category
 import com.moim.backend.domain.room.entity.Room
 import com.moim.backend.domain.user.entity.User
-import com.moim.backend.domain.vote.model.Category
 import jakarta.persistence.*
 
 @Entity

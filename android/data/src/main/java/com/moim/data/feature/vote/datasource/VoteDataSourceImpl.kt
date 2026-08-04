@@ -2,6 +2,7 @@ package com.moim.data.feature.vote.datasource
 
 import com.moim.data.common.network.apiCall
 import com.moim.data.feature.vote.model.CandidateResponse
+import com.moim.data.feature.vote.model.CategoryResponse
 import com.moim.data.feature.vote.model.CreateCandidateRequest
 import com.moim.data.feature.vote.model.VoteResultResponse
 import javax.inject.Inject
@@ -9,6 +10,10 @@ import javax.inject.Inject
 class VoteDataSourceImpl @Inject constructor(
     private val voteService: VoteService
 ) : VoteDataSource {
+
+    override suspend fun getCategories(): Result<List<CategoryResponse>> {
+        return apiCall { voteService.getCategories() }
+    }
 
     override suspend fun createCandidate(
         roomId: Long,

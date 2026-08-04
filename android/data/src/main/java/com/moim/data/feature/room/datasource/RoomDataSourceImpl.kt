@@ -11,8 +11,12 @@ class RoomDataSourceImpl @Inject constructor(
     private val roomService: RoomService
 ) : RoomDataSource {
 
-    override suspend fun loadRooms(): Result<List<RoomResponse>> {
-        return apiCall { roomService.getMyRooms() }
+    override suspend fun getRoomsPaging(
+        page: Int,
+        size: Int,
+        status: String
+    ): Result<List<RoomResponse>> {
+        return apiCall { roomService.getRoomsPaging(page, size, status) }
     }
 
     override suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailResponse> {

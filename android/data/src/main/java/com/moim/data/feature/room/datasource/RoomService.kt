@@ -9,11 +9,16 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface RoomService {
 
-    @GET("api/v1/rooms")
-    suspend fun getMyRooms(): ApiResponse<List<RoomResponse>>
+    @GET("/api/v1/rooms")
+    suspend fun getRoomsPaging(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("status") status: String
+    ): ApiResponse<List<RoomResponse>>
 
     @GET("api/v1/rooms/{roomId}")
     suspend fun getRoomDetail(

@@ -1,4 +1,4 @@
-package com.moim.presentation.model
+package com.moim.backend.core.model
 
 enum class Category {
     FOOD,

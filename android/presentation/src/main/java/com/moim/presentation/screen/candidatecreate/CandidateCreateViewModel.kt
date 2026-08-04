@@ -6,6 +6,7 @@ import com.moim.presentation.navigation.CandidateCreate
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateAction
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateEvent
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateUiState
+import com.moim.presentation.screen.candidatecreate.model.toUiModel
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.assisted.Assisted
@@ -26,6 +27,10 @@ class CandidateCreateViewModel @AssistedInject constructor(
 
     private val roomId = route.roomId
 
+    init {
+        getCategories()
+    }
+
     fun onAction(action: CandidateCreateAction) {
         when (action) {
             is CandidateCreateAction.OnCategorySelected -> updateState { copy(selectedCategory = action.category) }
@@ -36,6 +41,17 @@ class CandidateCreateViewModel @AssistedInject constructor(
 
             CandidateCreateAction.NavigateBack -> sendEvent(CandidateCreateEvent.NavigateBack)
         }
+    }
+
+    private fun getCategories() = doAction {
+        voteRepository.getCategories()
+            .onSuccess { data ->
+                updateState { copy(categories = data.map { it.toUiModel() }) }
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
     }
 
     private fun createCandidate() = doAction {

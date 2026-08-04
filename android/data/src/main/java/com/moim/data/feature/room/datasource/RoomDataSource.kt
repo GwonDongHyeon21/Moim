@@ -7,7 +7,7 @@ import com.moim.data.feature.room.model.RoomResponse
 
 interface RoomDataSource {
 
-    suspend fun loadRooms(): Result<List<RoomResponse>>
+    suspend fun getRoomsPaging(page: Int, size: Int, status: String): Result<List<RoomResponse>>
 
     suspend fun loadRoomDetail(roomId: Long): Result<RoomDetailResponse>
 

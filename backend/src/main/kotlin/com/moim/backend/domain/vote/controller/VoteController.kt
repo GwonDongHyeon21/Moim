@@ -1,19 +1,27 @@
 package com.moim.backend.domain.vote.controller
 
+import com.moim.backend.core.model.Category
 import com.moim.backend.core.response.ApiResponse
-import com.moim.backend.domain.vote.model.Category
-import com.moim.backend.domain.vote.dto.CreateCandidateRequest
 import com.moim.backend.domain.vote.dto.CandidateResponse
+import com.moim.backend.domain.vote.dto.CategoryResponse
+import com.moim.backend.domain.vote.dto.CreateCandidateRequest
 import com.moim.backend.domain.vote.dto.VoteResultResponse
 import com.moim.backend.domain.vote.service.VoteService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/votes")
 class VoteController(
     private val voteService: VoteService
 ) {
+
+    @GetMapping("/categories")
+    fun getCategories(): ApiResponse<List<CategoryResponse>> {
+        val categories = voteService.getCategories()
+
+        return ApiResponse.success(categories)
+    }
 
     @PostMapping("/rooms/{roomId}/candidates")
     fun createCandidate(
@@ -47,7 +55,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @DeleteMapping("/rooms/{roomId}/votes/reset")
+    @DeleteMapping("/rooms/{roomId}/reset")
     fun resetVotes(
         @AuthenticationPrincipal userId: Long,
         @PathVariable roomId: Long,
@@ -58,7 +66,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @GetMapping("/rooms/{roomId}/candidates/results")
+    @GetMapping("/rooms/{roomId}/results")
     fun getVoteResults(
         @PathVariable roomId: Long
     ): ApiResponse<List<VoteResultResponse>> {

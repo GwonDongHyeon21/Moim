@@ -50,10 +50,14 @@ internal val darkMoimColors = MoimColors(
 )
 
 internal val lightMaterialScheme = lightColorScheme(
+    primary = lightMoimColors.primary,
+    surface = lightMoimColors.surface,
     background = lightMoimColors.background
 )
 
 internal val darkMaterialScheme = darkColorScheme(
+    primary = darkMoimColors.primary,
+    surface = darkMoimColors.surface,
     background = darkMoimColors.background
 )
 
