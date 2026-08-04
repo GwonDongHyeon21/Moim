@@ -1,10 +1,17 @@
 package com.moim.presentation.screen.home
 
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -12,9 +19,8 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +35,7 @@ import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.screen.component.MoimPagingList
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
+import com.moim.presentation.screen.home.HomeScreen.ANIMATION_DURATION_MILLIS
 import com.moim.presentation.screen.home.component.CreateRoomDialog
 import com.moim.presentation.screen.home.component.JoinRoomDialog
 import com.moim.presentation.screen.home.component.RoomCard
@@ -37,12 +44,18 @@ import com.moim.presentation.screen.home.component.RoomFloatingActionButton
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
+import com.moim.presentation.screen.home.model.RoomFilterStatus
 import com.moim.presentation.screen.home.model.RoomOptions
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
 import com.moim.presentation.util.collectWithLifecycle
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+
+private object HomeScreen {
+    const val ANIMATION_DURATION_MILLIS = 400
+}
 
 @Composable
 fun HomeScreen(
@@ -51,7 +64,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val roomsPagingItems = viewModel.roomsPagingItems.collectAsLazyPagingItems()
+    val ongoingRoomsPagingItems = viewModel.ongoingRoomsPagingItems.collectAsLazyPagingItems()
+    val closedRoomsPagingItems = viewModel.closedRoomsPagingItems.collectAsLazyPagingItems()
+
+    val pagerState = rememberPagerState(pageCount = { RoomFilterStatus.entries.size })
+
+    val pagingItemsList = listOf(ongoingRoomsPagingItems, closedRoomsPagingItems)
+    val roomsPagingItems = pagingItemsList[pagerState.currentPage]
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
@@ -66,9 +85,22 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(pagerState.currentPage) {
+        val status = RoomFilterStatus.entries[pagerState.currentPage]
+        viewModel.onAction(HomeAction.OnRoomFilterStatusSelected(status))
+    }
+
+    LaunchedEffect(roomsPagingItems.loadState.refresh) {
+        if (roomsPagingItems.loadState.refresh !is LoadState.Loading) {
+            viewModel.onAction(HomeAction.OnRefreshing(false))
+        }
+    }
+
     HomeScreen(
         uiState = uiState,
+        pagingItemsList = pagingItemsList,
         roomsPagingItems = roomsPagingItems,
+        pagerState = pagerState,
         onAction = viewModel::onAction,
         modifier = modifier
     )
@@ -81,18 +113,14 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    pagingItemsList: List<LazyPagingItems<RoomInfoUiModel>>,
     roomsPagingItems: LazyPagingItems<RoomInfoUiModel>,
+    pagerState: PagerState,
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
-    var isRefreshing by remember { mutableStateOf(false) }
-
-    LaunchedEffect(roomsPagingItems.loadState.refresh) {
-        if (roomsPagingItems.loadState.refresh !is LoadState.Loading) {
-            isRefreshing = false
-        }
-    }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier,
@@ -116,9 +144,9 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = isRefreshing,
+            isRefreshing = uiState.isRefreshing,
             onRefresh = {
-                isRefreshing = true
+                onAction(HomeAction.OnRefreshing(true))
                 roomsPagingItems.refresh()
             },
             state = pullToRefreshState,
@@ -127,27 +155,43 @@ fun HomeScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 RoomFilterTab(
                     selectedStatus = uiState.roomFilterStatus,
-                    onStatusSelected = { onAction(HomeAction.OnRoomFilterStatusSelected(it)) }
+                    onStatusSelected = { status ->
+                        onAction(HomeAction.OnRoomFilterStatusSelected(status))
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(
+                                page = status.ordinal,
+                                animationSpec = tween(durationMillis = ANIMATION_DURATION_MILLIS)
+                            )
+                        }
+                    }
                 )
 
-                MoimPagingList(
-                    pagingItems = roomsPagingItems,
-                    itemKey = { it.code },
-                    emptyContent = {
-                        Text(
-                            text = stringResource(R.string.empty_rooms),
-                            modifier = Modifier.fillMaxSize()
+                HorizontalPager(state = pagerState) { page ->
+                    MoimPagingList(
+                        pagingItems = pagingItemsList[page],
+                        itemKey = { it.code },
+                        emptyContent = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = stringResource(R.string.empty_rooms))
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = MoimPadding.AppHorizontalPadding)
+                    ) { room ->
+                        Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
+                        RoomCard(
+                            room = room,
+                            onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
                         )
-                    },
-                    modifier = Modifier.padding(horizontal = MoimPadding.AppHorizontalPadding)
-                ) { room ->
+                    }
                     Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
-                    RoomCard(
-                        room = room,
-                        onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
-                    )
                 }
-                Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
             }
         }
     }
@@ -182,10 +226,13 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     val dummyPagingFlow = flowOf(PagingData.from(DummyData.dummyRooms))
     val dummyPagingItems = dummyPagingFlow.collectAsLazyPagingItems()
+    val pagerState = rememberPagerState(pageCount = { RoomFilterStatus.entries.size })
 
     HomeScreen(
         uiState = HomeUiState(),
         roomsPagingItems = dummyPagingItems,
+        pagingItemsList = emptyList(),
+        pagerState = pagerState,
         onAction = {}
     )
 }

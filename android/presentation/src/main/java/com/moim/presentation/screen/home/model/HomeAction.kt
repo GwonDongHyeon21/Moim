@@ -21,5 +21,7 @@ interface HomeAction {
 
     data class JoinRoom(val roomCode: String) : HomeAction
 
+    data class OnRefreshing(val isRefreshing: Boolean) : HomeAction
+
     data object Logout : HomeAction
 }

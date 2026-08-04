@@ -13,13 +13,11 @@ import com.moim.presentation.model.toUiModel
 import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
+import com.moim.presentation.screen.home.model.RoomFilterStatus
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,17 +32,15 @@ class HomeViewModel @Inject constructor(
     override fun checkLoading() = uiState.value.isLoading
     override fun updateLoading(isLoading: Boolean) = updateState { copy(isLoading = isLoading) }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val roomsPagingItems: Flow<PagingData<RoomInfoUiModel>> = uiState
-        .map { it.roomFilterStatus }
-        .distinctUntilChanged()
-        .flatMapLatest { status ->
-            roomRepository.getRoomsPaging(status.name)
-                .map { pagingData ->
-                    pagingData.map { it.toUiModel() }
-                }
-        }
-        .cachedIn(viewModelScope)
+    val ongoingRoomsPagingItems: Flow<PagingData<RoomInfoUiModel>> =
+        roomRepository.getRoomsPaging(RoomFilterStatus.ONGOING.name)
+            .map { pagingData -> pagingData.map { it.toUiModel() } }
+            .cachedIn(viewModelScope)
+
+    val closedRoomsPagingItems: Flow<PagingData<RoomInfoUiModel>> =
+        roomRepository.getRoomsPaging(RoomFilterStatus.CLOSED.name)
+            .map { pagingData -> pagingData.map { it.toUiModel() } }
+            .cachedIn(viewModelScope)
 
     fun onAction(action: HomeAction) {
         when (action) {
@@ -64,6 +60,8 @@ class HomeViewModel @Inject constructor(
             is HomeAction.CreateRoom -> createRoom(action.roomInfo)
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)
+
+            is HomeAction.OnRefreshing -> updateState { copy(isRefreshing = action.isRefreshing) }
 
             HomeAction.Logout -> logout()
         }
