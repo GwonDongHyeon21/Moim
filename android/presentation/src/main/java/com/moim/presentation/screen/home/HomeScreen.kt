@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,9 +24,9 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import com.moim.presentation.R
 import com.moim.presentation.model.RoomInfoUiModel
+import com.moim.presentation.screen.component.MoimPagingList
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.home.component.CreateRoomDialog
@@ -129,25 +130,24 @@ fun HomeScreen(
                     onStatusSelected = { onAction(HomeAction.OnRoomFilterStatusSelected(it)) }
                 )
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = MoimPadding.AppHorizontalPadding)
-                ) {
-                    item { Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall)) }
-                    items(
-                        count = roomsPagingItems.itemCount,
-                        key = roomsPagingItems.itemKey { it.code }
-                    ) { index ->
-                        roomsPagingItems[index]?.let { room ->
-                            RoomCard(
-                                room = room,
-                                onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
-                            )
-                            Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
-                        }
-                    }
+                MoimPagingList(
+                    pagingItems = roomsPagingItems,
+                    itemKey = { it.code },
+                    emptyContent = {
+                        Text(
+                            text = stringResource(R.string.empty_rooms),
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    },
+                    modifier = Modifier.padding(horizontal = MoimPadding.AppHorizontalPadding)
+                ) { room ->
+                    Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
+                    RoomCard(
+                        room = room,
+                        onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
+                    )
                 }
+                Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
             }
         }
     }

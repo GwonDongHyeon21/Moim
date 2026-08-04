@@ -14,6 +14,7 @@
     <string name="please_select_deadline">마감 시간을 선택해주세요</string>
     <string name="on_going">진행 중</string>
     <string name="end">마감</string>
+    <string name="empty_rooms">방이 없습니다.</string>
 
     <!-- Room Detail Screen -->
     <string name="vote_result_index">투표수: %d</string>
