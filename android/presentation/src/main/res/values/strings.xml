@@ -34,6 +34,10 @@
     <string name="select_contentDescription">선택하기</string>
     <string name="select_cancel_contentDescription">선택 취소하기</string>
 
+    <!-- Error Screen -->
+    <string name="error_message">오류가 발생했습니다.</string>
+    <string name="retry">재시도</string>
+
     <!-- SnackBar Message -->
     <string name="snack_bar_network_error">네트워크 연결을 확인해주세요</string>
     <string name="snack_bar_data_load_failed">데이터를 불러오지 못했습니다</string>
