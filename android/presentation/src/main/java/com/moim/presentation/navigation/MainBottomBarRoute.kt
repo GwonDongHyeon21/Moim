@@ -12,15 +12,15 @@ enum class MainBottomBarRoute(
     val route: NavKey
 ) {
     HOME(
-        selectedIconId = R.drawable.ic_launcher_foreground,
-        unselectedIconId = R.drawable.ic_launcher_foreground,
-        titleTextId = R.string.app_name,
+        selectedIconId = R.drawable.home_24,
+        unselectedIconId = R.drawable.home_24,
+        titleTextId = R.string.home,
         route = Home
     ),
     USER(
-        selectedIconId = R.drawable.ic_launcher_foreground,
-        unselectedIconId = R.drawable.ic_launcher_foreground,
-        titleTextId = R.string.app_name,
+        selectedIconId = R.drawable.account_circle_24,
+        unselectedIconId = R.drawable.account_circle_24,
+        titleTextId = R.string.user,
         route = User
     )
 }
