@@ -10,6 +10,9 @@ data object Login : NavKey
 data object Home : NavKey
 
 @Serializable
+data object User : NavKey
+
+@Serializable
 data class RoomDetail(val roomId: Long) : NavKey
 
 @Serializable

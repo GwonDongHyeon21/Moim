@@ -11,16 +11,16 @@ enum class MainBottomBarRoute(
     @param:StringRes val titleTextId: Int,
     val route: NavKey
 ) {
-    LOGIN(
-        selectedIconId = R.drawable.ic_launcher_foreground,
-        unselectedIconId = R.drawable.ic_launcher_foreground,
-        titleTextId = R.string.app_name,
-        route = Login
-    ),
     HOME(
-        selectedIconId = R.drawable.ic_launcher_foreground,
-        unselectedIconId = R.drawable.ic_launcher_foreground,
-        titleTextId = R.string.app_name,
+        selectedIconId = R.drawable.home_24,
+        unselectedIconId = R.drawable.home_24,
+        titleTextId = R.string.home,
         route = Home
+    ),
+    USER(
+        selectedIconId = R.drawable.account_circle_24,
+        unselectedIconId = R.drawable.account_circle_24,
+        titleTextId = R.string.user,
+        route = User
     )
 }

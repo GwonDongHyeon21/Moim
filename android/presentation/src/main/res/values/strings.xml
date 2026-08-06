@@ -5,6 +5,7 @@
     <string name="google_login">구글 로그인</string>
 
     <!-- Home Screen -->
+    <string name="home">홈</string>
     <string name="add">추가</string>
     <string name="join">참여</string>
     <string name="confirm">확인</string>
@@ -15,6 +16,9 @@
     <string name="on_going">진행 중</string>
     <string name="end">마감</string>
     <string name="empty_rooms">방이 없습니다.</string>
+
+    <!-- User Screen -->
+    <string name="user">유저</string>
 
     <!-- Room Detail Screen -->
     <string name="vote_result_index">투표수: %d</string>
