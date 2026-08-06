@@ -41,7 +41,6 @@ services:
       - moim-db
       - moim-redis
     environment:
-      - TZ=Asia/Seoul
       - SPRING_DATASOURCE_URL=jdbc:mysql://moim-mysql:3306/moim_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       - SPRING_DATASOURCE_USERNAME=moim_user
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
