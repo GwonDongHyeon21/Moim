@@ -19,6 +19,7 @@ import com.moim.presentation.screen.candidatecreate.candidateCreate
 import com.moim.presentation.screen.home.home
 import com.moim.presentation.screen.login.login
 import com.moim.presentation.screen.roomdetail.roomDetail
+import com.moim.presentation.screen.user.user
 import com.moim.presentation.screen.vote.vote
 
 private object MoimNavConstant {
@@ -52,6 +53,11 @@ fun MoimNav(
             home(
                 metadata = fadeTransition,
                 onNavigateToRoomDetail = { navigator.navigateToRoomDetail(it) },
+                modifier = modifier.padding(innerPadding)
+            )
+
+            user(
+                metadata = fadeTransition,
                 modifier = modifier.padding(innerPadding)
             )
 
