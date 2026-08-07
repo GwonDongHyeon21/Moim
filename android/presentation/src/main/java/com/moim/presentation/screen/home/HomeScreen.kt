@@ -3,6 +3,7 @@ package com.moim.presentation.screen.home
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -184,7 +185,8 @@ fun HomeScreen(
                         },
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = MoimPadding.AppHorizontalPadding)
+                            .padding(horizontal = MoimPadding.AppHorizontalPadding),
+                        contentPadding = PaddingValues(bottom = MoimPadding.PaddingSmall)
                     ) { room ->
                         Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
                         RoomCard(
@@ -192,7 +194,6 @@ fun HomeScreen(
                             onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
                         )
                     }
-                    Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
                 }
             }
         }
