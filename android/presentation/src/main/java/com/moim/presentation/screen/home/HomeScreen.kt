@@ -87,8 +87,8 @@ fun HomeScreen(
                 ongoingRoomsPagingItems.refresh()
             }
 
-            is HomeEvent.RefreshRoom -> {
-                roomsPagingItems.refresh()
+            HomeEvent.RefreshRoom -> {
+                pagingItemsList[pagerState.currentPage].refresh()
             }
         }
     }
