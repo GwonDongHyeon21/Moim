@@ -102,9 +102,40 @@ class RoomDetailViewModel @AssistedInject constructor(
     }
 
     private fun updateRoom(deadline: String) = doAction {
+        val roomInfo = uiState.value.roomDetail.roomInfo
+        val uiState = uiState.value
+
+        if (roomInfo.title == uiState.title
+            && roomInfo.description == uiState.description
+            && roomInfo.maxCount == uiState.maxCount
+            && roomInfo.deadline == uiState.selectedDateTime.toString()
+        ) return@doAction
+
+        roomRepository.updateRoom(
+            roomId = roomId,
+            roomInfo = CreateUpdateRoomParams(
+                title = uiState.title,
+                description = uiState.description,
+                deadline = deadline
+            )
+        ).onSuccess {
+            sendEvent(RoomDetailEvent.NavigateBack)
+        }.onFailure { exception ->
+            snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+
+            Timber.e(exception)
+        }
     }
 
     private fun deleteRoom() = doAction {
+        roomRepository.deleteRoom(roomId)
+            .onSuccess {
+                sendEvent(RoomDetailEvent.NavigateBack)
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
+
+                Timber.e(exception)
+            }
     }
 
     @AssistedFactory
