@@ -14,6 +14,7 @@ enum class ErrorCode(val message: String) {
     FULL_ROOM("방 정원이 가득 찼습니다."),
     MAX_ROOM_LIMIT("생성 가능한 방 개수가 최대치라 방 생성이 불가능 합니다."),
     ROOM_DEADLINE_EXPIRED("해당 방의 모집 마감 시간이 지났습니다."),
+    NOT_ROOM_PERMISSION("방장만 수정할 수 있습니다."),
 
     CANDIDATE_NOT_FOUND("후보지를 찾을 수 없습니다."),
     VOTE_RESULTS_BLINDED("마감 전에는 투표 결과를 볼 수 없습니다."),

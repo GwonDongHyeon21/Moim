@@ -14,6 +14,9 @@ interface RoomRepository : JpaRepository<Room, Long> {
 
     fun existsByCode(code: String): Boolean
 
+    @Query("SELECT COUNT(r) FROM Room r JOIN RoomMember rm ON r.id = rm.room.id WHERE rm.user.id = :userId")
+    fun countByUserId(userId: Long): Int
+
     @Query("SELECT r FROM Room r JOIN RoomMember rm ON r.id = rm.room.id WHERE rm.user.id = :userId AND r.deadline > :now")
     fun findOngoingRoomsByUserIdPaged(
         @Param("userId") userId: Long,

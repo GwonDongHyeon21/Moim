@@ -57,8 +57,11 @@ class RoomService(
         }
     }
 
-
     fun getRoomDetail(userId: Long, roomId: Long): RoomDetailResponse {
+        val room = roomRepository.findById(roomId).orElseThrow {
+            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.ROOM_NOT_FOUND)
+        }
+
         val roomMember = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
             ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
 
@@ -72,7 +75,6 @@ class RoomService(
 
         val myVoteRecords = voteRecordRepository.findAllByUserIdAndRoomId(userId, roomId)
         val myVotedCategories = myVoteRecords.map { it.candidate.category }.toSet()
-
         val categoryVoteStatus = Category.entries.map { category ->
             CategoryVoteStatusDto(
                 category = category.name,
@@ -81,7 +83,7 @@ class RoomService(
         }
 
         return RoomDetailResponse(
-            roomInfo = RoomResponse.from(roomMember.room, members.size),
+            roomInfo = RoomResponse.from(room, members.size),
             role = roomMember.role.name,
             members = members,
             categoryVoteStatus = categoryVoteStatus
@@ -89,7 +91,7 @@ class RoomService(
     }
 
     @Transactional
-    fun createRoom(userId: Long, request: CreateRoomRequest): RoomResponse {
+    fun createRoom(userId: Long, request: CreateUpdateRoomRequest): RoomResponse {
         val user = userRepository.findById(userId).orElseThrow {
             ErrorException(
                 httpStatus = HttpStatus.NOT_FOUND,
@@ -97,7 +99,7 @@ class RoomService(
             )
         }
 
-        val currentRoomCount = roomMemberRepository.countByUserId(userId)
+        val currentRoomCount = roomRepository.countByUserId(userId)
         if (currentRoomCount >= MAX_ROOM_COUNT) {
             throw ErrorException(
                 httpStatus = HttpStatus.FORBIDDEN,
@@ -185,6 +187,53 @@ class RoomService(
             room = room,
             currentMemberCount = currentMemberCount + 1
         )
+    }
+
+    @Transactional
+    fun updateRoom(userId: Long, roomId: Long, request: CreateUpdateRoomRequest): RoomResponse {
+        val user = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+            ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
+        if (user.role != RoomRole.HOST) {
+            throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.NOT_ROOM_PERMISSION)
+        }
+
+        val room = roomRepository.findById(roomId).orElseThrow {
+            ErrorException(
+                httpStatus = HttpStatus.NOT_FOUND,
+                errorCode = ErrorCode.ROOM_NOT_FOUND
+            )
+        }
+
+        val currentMemberCount = roomMemberRepository.countByRoomId(roomId)
+
+        room.update(
+            title = request.title,
+            description = request.description,
+            maxCount = request.maxCount,
+            deadline = request.deadline
+        )
+
+        return RoomResponse.from(room, currentMemberCount)
+    }
+
+    @Transactional
+    fun deleteRoom(userId: Long, roomId: Long): Long {
+        val user = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+            ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
+        if (user.role != RoomRole.HOST) {
+            throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.NOT_ROOM_PERMISSION)
+        }
+
+        val room = roomRepository.findById(roomId).orElseThrow {
+            ErrorException(
+                httpStatus = HttpStatus.NOT_FOUND,
+                errorCode = ErrorCode.ROOM_NOT_FOUND
+            )
+        }
+
+        room.delete()
+
+        return room.id!!
     }
 
     private fun generateRandomRoomCode(length: Int = ROOM_CODE_LENGTH): String {
