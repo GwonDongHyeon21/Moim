@@ -21,7 +21,10 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -127,6 +130,8 @@ fun HomeScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
 
+    var selectedRoomId by remember { mutableStateOf<Long?>(null) }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -192,7 +197,11 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
                         RoomCard(
                             room = room,
-                            onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
+                            onCardClick = { onAction(HomeAction.ClickRoom(room.id!!)) },
+                            onDeleteClick = {
+                                selectedRoomId = room.id
+                                onAction(HomeAction.ClickDialog(true, DELETE.name))
+                            }
                         )
                     }
                 }
@@ -220,6 +229,15 @@ fun HomeScreen(
             JOIN.name -> {
                 JoinRoomDialog(
                     onConfirm = { onAction(HomeAction.JoinRoom(it)) },
+                    onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
+                )
+            }
+
+            DELETE.name -> {
+                MoimBasicDialog(
+                    value = stringResource(R.string.delete_confirm),
+                    onConfirmValue = stringResource(R.string.confirm),
+                    onConfirm = { onAction(HomeAction.DeleteRoom(selectedRoomId)) },
                     onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }

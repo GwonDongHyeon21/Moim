@@ -61,6 +61,8 @@ class HomeViewModel @Inject constructor(
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)
 
+            is HomeAction.DeleteRoom -> deleteRoom(action.roomId)
+
             is HomeAction.OnRefreshing -> updateState { copy(isRefreshing = action.isRefreshing) }
 
             HomeAction.Logout -> logout()
@@ -105,6 +107,20 @@ class HomeViewModel @Inject constructor(
                 }
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
+    }
+
+    private fun deleteRoom(roomId: Long?) = doAction {
+        if (roomId == null) return@doAction
+
+        updateState { copy(isExpanded = false, roomOption = "") }
+        roomRepository.deleteRoom(roomId)
+            .onSuccess {
+                sendEvent(HomeEvent.RefreshRoom)
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
 
                 Timber.e(exception)
             }
