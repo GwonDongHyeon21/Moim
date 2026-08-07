@@ -134,6 +134,7 @@ fun CreateRoomDialog(
         RoomTimePickerDialog(
             initialHour = LocalDateTime.now().hour,
             initialMinute = LocalDateTime.now().minute,
+            isToday = tempDate == LocalDate.now(),
             onConfirm = { hour, minute ->
                 tempDate?.let { date ->
                     onDateTimeSelected(date.atTime(hour, minute, 0))
