@@ -8,6 +8,7 @@
     <string name="home">홈</string>
     <string name="add">추가</string>
     <string name="join">참여</string>
+    <string name="delete">삭제</string>
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
     <string name="expand_menu_description">메뉴 펼치기</string>
@@ -16,6 +17,9 @@
     <string name="on_going">진행 중</string>
     <string name="end">마감</string>
     <string name="empty_rooms">방이 없습니다.</string>
+    <string name="delete_confirm">정말 삭제하시겠습니까?</string>
+    <string name="expand_menu_description">메뉴 펼치기</string>
+    <string name="more_options_description">더보기</string>
 
     <!-- User Screen -->
     <string name="user">유저</string>
@@ -23,7 +27,10 @@
     <!-- Room Detail Screen -->
     <string name="vote_result_index">투표수: %d</string>
     <string name="vote_result_detail">투표 결과</string>
-    <string name="vote_result_detail_contentDescription">투표 결과 상세보기</string>
+    <string name="room_detail_code">방 코드</string>
+    <string name="room_detail_update">수정</string>
+    <string name="room_detail_delete">삭제</string>
+    <string name="vote_result_detail_description">투표 결과 상세보기</string>
 
     <!-- Candidate Create Screen -->
     <string name="candidate">후보지</string>
@@ -37,11 +44,17 @@
     <string name="empty_candidate">후보지가 없습니다.</string>
     <string name="vote_cancel">투표 취소하기</string>
     <string name="select_contentDescription">선택하기</string>
-    <string name="select_cancel_contentDescription">선택 취소하기</string>
+    <string name="select_cancel_description">선택 취소하기</string>
 
     <!-- Error Screen -->
     <string name="error_message">오류가 발생했습니다.</string>
     <string name="retry">재시도</string>
+
+    <!-- Dialog -->
+    <string name="cancel">취소</string>
+    <string name="add">추가</string>
+    <string name="please_select_deadline">마감 시간을 선택해주세요</string>
+    <string name="deadline_title">"모임 마감 시간"</string>
 
     <!-- SnackBar Message -->
     <string name="snack_bar_network_error">네트워크 연결을 확인해주세요</string>

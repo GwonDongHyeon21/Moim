@@ -113,7 +113,7 @@ fun CandidateCard(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.close_24),
-                    contentDescription = stringResource(R.string.select_cancel_contentDescription)
+                    contentDescription = stringResource(R.string.select_cancel_description)
                 )
             }
         } else {
