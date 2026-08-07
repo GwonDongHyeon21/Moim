@@ -77,7 +77,7 @@ fun HomeScreen(
         when (event) {
             is HomeEvent.NavigateToRoomDetail -> {
                 onNavigateToRoomDetail(event.roomId)
-                roomsPagingItems.refresh()
+                ongoingRoomsPagingItems.refresh()
             }
 
             is HomeEvent.RefreshRoom -> {
