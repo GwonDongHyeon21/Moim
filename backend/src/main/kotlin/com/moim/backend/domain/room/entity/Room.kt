@@ -1,9 +1,11 @@
 package com.moim.backend.domain.room.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
 @Entity
+@SQLRestriction("is_deleted = false")
 @Table(name = "rooms")
 class Room(
     @Id
@@ -23,8 +25,27 @@ class Room(
     var maxCount: Int,
 
     @Column(nullable = false)
-    val deadline: LocalDateTime,
+    var deadline: LocalDateTime,
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
-)
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(name = "is_deleted", nullable = false)
+    var isDeleted: Boolean = false
+) {
+    fun update(
+        title: String,
+        description: String?,
+        maxCount: Int,
+        deadline: LocalDateTime
+    ) {
+        this.title = title
+        this.description = description
+        this.maxCount = maxCount
+        this.deadline = deadline
+    }
+
+    fun delete() {
+        this.isDeleted = true
+    }
+}
