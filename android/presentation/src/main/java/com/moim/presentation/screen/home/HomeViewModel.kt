@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.moim.domain.feature.room.model.CreateRoomParams
+import com.moim.domain.feature.room.model.CreateUpdateRoomParams
 import com.moim.domain.feature.room.repository.RoomRepository
 import com.moim.domain.feature.user.repository.UserRepository
 import com.moim.presentation.base.BaseViewModel
@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
 
             is HomeAction.OnRoomFilterStatusSelected -> updateState { copy(roomFilterStatus = action.roomFilterStatus) }
 
-            is HomeAction.CreateRoom -> createRoom(action.roomInfo)
+            is HomeAction.CreateRoom -> createRoom(action.deadline)
 
             is HomeAction.JoinRoom -> joinRoom(action.roomCode)
 
@@ -67,27 +67,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun createRoom(roomInfo: CreateRoomParams) = doAction {
-        roomRepository.createRoom(roomInfo)
-            .onSuccess { data ->
-                sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
-                updateState {
-                    copy(
-                        title = "",
-                        description = "",
-                        selectedDateTime = null,
-                        isExpanded = false,
-                        roomOption = ""
-                    )
-                }
-            }.onFailure { exception ->
-                snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
-
-                Timber.e(exception)
+    private fun createRoom(deadline: String) = doAction {
+        updateState { copy(isExpanded = false, roomOption = "") }
+        roomRepository.createRoom(
+            CreateUpdateRoomParams(
+                title = uiState.value.title,
+                description = uiState.value.description,
+                deadline = deadline
+            )
+        ).onSuccess { data ->
+            sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
+            updateState {
+                copy(
+                    title = "",
+                    description = "",
+                    selectedDateTime = null
+                )
             }
+        }.onFailure { exception ->
+            snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+
+            Timber.e(exception)
+        }
     }
 
     private fun joinRoom(roomCode: String) = doAction {
+        updateState { copy(isExpanded = false, roomOption = "") }
         roomRepository.joinRoom(roomCode)
             .onSuccess { data ->
                 sendEvent(HomeEvent.NavigateToRoomDetail(data.id))
@@ -95,9 +100,7 @@ class HomeViewModel @Inject constructor(
                     copy(
                         title = "",
                         description = "",
-                        selectedDateTime = null,
-                        isExpanded = false,
-                        roomOption = ""
+                        selectedDateTime = null
                     )
                 }
             }.onFailure { exception ->

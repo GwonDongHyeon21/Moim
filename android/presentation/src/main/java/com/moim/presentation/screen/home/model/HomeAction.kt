@@ -1,6 +1,5 @@
 package com.moim.presentation.screen.home.model
 
-import com.moim.domain.feature.room.model.CreateRoomParams
 import java.time.LocalDateTime
 
 interface HomeAction {
@@ -17,7 +16,7 @@ interface HomeAction {
 
     data class OnRoomFilterStatusSelected(val roomFilterStatus: RoomFilterStatus) : HomeAction
 
-    data class CreateRoom(val roomInfo: CreateRoomParams) : HomeAction
+    data class CreateRoom(val deadline: String) : HomeAction
 
     data class JoinRoom(val roomCode: String) : HomeAction
 
