@@ -1,4 +1,4 @@
-package com.moim.presentation.screen.home.component
+package com.moim.presentation.screen.component.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.moim.domain.feature.room.model.CreateRoomParams
 import com.moim.presentation.R
 import com.moim.presentation.screen.component.MoimButton
 import com.moim.presentation.theme.MoimPadding
@@ -34,16 +33,18 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateRoomDialog(
+fun CreateUpdateRoomDialog(
     title: String,
     description: String,
     selectedDateTime: LocalDateTime?,
+    onConfirmValue: String,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onDateTimeSelected: (LocalDateTime) -> Unit,
-    onConfirm: (CreateRoomParams) -> Unit,
+    onConfirm: (String) -> Unit,
     onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -99,17 +100,9 @@ fun CreateRoomDialog(
                         modifier = Modifier.weight(1f)
                     )
                     MoimButton(
-                        value = stringResource(R.string.add),
-                        onClick = {
-                            onConfirm(
-                                CreateRoomParams(
-                                    title = title,
-                                    description = description,
-                                    deadline = selectedDateTime!!.format(isoFormatter)
-                                )
-                            )
-                        },
-                        enabled = title.isNotBlank() && selectedDateTime != null,
+                        value = onConfirmValue,
+                        onClick = { onConfirm(selectedDateTime!!.format(isoFormatter)) },
+                        enabled = enabled,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -152,11 +145,12 @@ fun CreateRoomDialog(
     showSystemUi = true
 )
 @Composable
-fun RoomOptionDialogPreview() {
-    CreateRoomDialog(
+fun CreateUpdateRoomDialogPreview() {
+    CreateUpdateRoomDialog(
         title = "test title",
         description = "test description",
         selectedDateTime = null,
+        onConfirmValue = "test",
         onTitleChanged = {},
         onDescriptionChanged = {},
         onDateTimeSelected = {},

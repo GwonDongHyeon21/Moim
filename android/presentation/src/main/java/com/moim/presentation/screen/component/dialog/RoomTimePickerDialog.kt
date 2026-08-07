@@ -1,4 +1,4 @@
-package com.moim.presentation.screen.home.component
+package com.moim.presentation.screen.component.dialog
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api

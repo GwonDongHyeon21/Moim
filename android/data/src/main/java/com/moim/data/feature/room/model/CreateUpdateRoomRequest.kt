@@ -3,7 +3,7 @@ package com.moim.data.feature.room.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateRoomRequest(
+data class CreateUpdateRoomRequest(
     val title: String,
     val description: String?,
     val maxCount: Int,
