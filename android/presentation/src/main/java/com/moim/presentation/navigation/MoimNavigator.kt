@@ -24,6 +24,9 @@ class MoimNavigator(
             currentDestination == tab.route
         }
 
+    val isShowBottomBar: Boolean
+        get() = currentTab != null
+
     fun navigateToTab(tab: MainBottomBarRoute) {
         if (currentTab == tab) return
 

@@ -14,23 +14,26 @@ import com.moim.presentation.navigation.MainBottomBarRoute
 
 @Composable
 fun MoimBottomBar(
+    isVisible: Boolean,
     currentDestination: NavKey?,
     onNavigateToDestination: (MainBottomBarRoute) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(modifier = modifier) {
-        MainBottomBarRoute.entries.forEach { destination ->
-            NavigationBarItem(
-                selected = currentDestination == destination.route,
-                onClick = { onNavigateToDestination(destination) },
-                icon = {
-                    Icon(
-                        painter = painterResource(destination.selectedIconId),
-                        contentDescription = stringResource(destination.titleTextId)
-                    )
-                },
-                label = { Text(text = stringResource(destination.titleTextId)) }
-            )
+    if (isVisible) {
+        NavigationBar(modifier = modifier) {
+            MainBottomBarRoute.entries.forEach { destination ->
+                NavigationBarItem(
+                    selected = currentDestination == destination.route,
+                    onClick = { onNavigateToDestination(destination) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(destination.selectedIconId),
+                            contentDescription = stringResource(destination.titleTextId)
+                        )
+                    },
+                    label = { Text(text = stringResource(destination.titleTextId)) }
+                )
+            }
         }
     }
 }
@@ -39,7 +42,8 @@ fun MoimBottomBar(
 @Composable
 fun MoimBottomBarPreview() {
     MoimBottomBar(
+        isVisible = true,
         currentDestination = MainBottomBarRoute.HOME.route,
-        onNavigateToDestination = {}
+        onNavigateToDestination = {},
     )
 }
