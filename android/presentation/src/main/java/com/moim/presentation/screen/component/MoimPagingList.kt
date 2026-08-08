@@ -1,5 +1,6 @@
 package com.moim.presentation.screen.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ fun <T : Any> MoimPagingList(
     itemKey: (T) -> Any,
     emptyContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues.Zero,
     itemContent: @Composable (T) -> Unit
 ) {
     val loadState = pagingItems.loadState
@@ -34,7 +36,10 @@ fun <T : Any> MoimPagingList(
         loadState.mediator?.refresh as? LoadState.Error ?: loadState.refresh as? LoadState.Error
 
     if (pagingItems.itemCount > 0) {
-        LazyColumn(modifier = modifier) {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = contentPadding
+        ) {
             items(
                 count = pagingItems.itemCount,
                 key = pagingItems.itemKey { itemKey(it) }

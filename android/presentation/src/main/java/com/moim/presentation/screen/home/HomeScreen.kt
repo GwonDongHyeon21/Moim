@@ -3,6 +3,7 @@ package com.moim.presentation.screen.home
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +21,10 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,8 +40,9 @@ import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.screen.component.MoimPagingList
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
+import com.moim.presentation.screen.component.dialog.CreateUpdateRoomDialog
+import com.moim.presentation.screen.component.dialog.MoimBasicDialog
 import com.moim.presentation.screen.home.HomeScreen.ANIMATION_DURATION_MILLIS
-import com.moim.presentation.screen.home.component.CreateRoomDialog
 import com.moim.presentation.screen.home.component.JoinRoomDialog
 import com.moim.presentation.screen.home.component.RoomCard
 import com.moim.presentation.screen.home.component.RoomFilterTab
@@ -46,7 +51,9 @@ import com.moim.presentation.screen.home.model.HomeAction
 import com.moim.presentation.screen.home.model.HomeEvent
 import com.moim.presentation.screen.home.model.HomeUiState
 import com.moim.presentation.screen.home.model.RoomFilterStatus
-import com.moim.presentation.screen.home.model.RoomOptions
+import com.moim.presentation.screen.home.model.RoomOptions.CREATE
+import com.moim.presentation.screen.home.model.RoomOptions.DELETE
+import com.moim.presentation.screen.home.model.RoomOptions.JOIN
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
@@ -77,11 +84,11 @@ fun HomeScreen(
         when (event) {
             is HomeEvent.NavigateToRoomDetail -> {
                 onNavigateToRoomDetail(event.roomId)
-                roomsPagingItems.refresh()
+                ongoingRoomsPagingItems.refresh()
             }
 
-            is HomeEvent.RefreshRoom -> {
-                roomsPagingItems.refresh()
+            HomeEvent.RefreshRoom -> {
+                pagingItemsList[pagerState.currentPage].refresh()
             }
         }
     }
@@ -123,6 +130,8 @@ fun HomeScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
 
+    var selectedRoomId by remember { mutableStateOf<Long?>(null) }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -135,11 +144,9 @@ fun HomeScreen(
         floatingActionButton = {
             RoomFloatingActionButton { option ->
                 when (option) {
-                    RoomOptions.CREATE ->
-                        onAction(HomeAction.ClickDialog(true, RoomOptions.CREATE.name))
-
-                    RoomOptions.JOIN ->
-                        onAction(HomeAction.ClickDialog(true, RoomOptions.JOIN.name))
+                    CREATE -> onAction(HomeAction.ClickDialog(true, CREATE.name))
+                    JOIN -> onAction(HomeAction.ClickDialog(true, JOIN.name))
+                    DELETE -> Unit
                 }
             }
         },
@@ -184,15 +191,19 @@ fun HomeScreen(
                         },
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = MoimPadding.AppHorizontalPadding)
+                            .padding(horizontal = MoimPadding.AppHorizontalPadding),
+                        contentPadding = PaddingValues(bottom = MoimPadding.PaddingSmall)
                     ) { room ->
                         Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
                         RoomCard(
                             room = room,
-                            onClick = { onAction(HomeAction.ClickRoom(room.id!!)) }
+                            onCardClick = { onAction(HomeAction.ClickRoom(room.id!!)) },
+                            onDeleteClick = {
+                                selectedRoomId = room.id
+                                onAction(HomeAction.ClickDialog(true, DELETE.name))
+                            }
                         )
                     }
-                    Spacer(modifier = Modifier.height(MoimSpace.SpaceSmall))
                 }
             }
         }
@@ -200,22 +211,33 @@ fun HomeScreen(
 
     if (uiState.isExpanded) {
         when (uiState.roomOption) {
-            RoomOptions.CREATE.name -> {
-                CreateRoomDialog(
+            CREATE.name -> {
+                CreateUpdateRoomDialog(
                     title = uiState.title,
                     description = uiState.description,
                     selectedDateTime = uiState.selectedDateTime,
+                    onConfirmValue = stringResource(R.string.add),
                     onTitleChanged = { onAction(HomeAction.OnTitleChanged(it)) },
                     onDescriptionChanged = { onAction(HomeAction.OnDescriptionChanged(it)) },
                     onDateTimeSelected = { onAction(HomeAction.OnDateTimeSelected(it)) },
                     onConfirm = { onAction(HomeAction.CreateRoom(it)) },
+                    onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) },
+                    enabled = uiState.title.isNotBlank() && uiState.selectedDateTime != null,
+                )
+            }
+
+            JOIN.name -> {
+                JoinRoomDialog(
+                    onConfirm = { onAction(HomeAction.JoinRoom(it)) },
                     onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }
 
-            RoomOptions.JOIN.name -> {
-                JoinRoomDialog(
-                    onConfirm = { onAction(HomeAction.JoinRoom(it)) },
+            DELETE.name -> {
+                MoimBasicDialog(
+                    value = stringResource(R.string.delete_confirm),
+                    onConfirmValue = stringResource(R.string.confirm),
+                    onConfirm = { onAction(HomeAction.DeleteRoom(selectedRoomId)) },
                     onDismissRequest = { onAction(HomeAction.ClickDialog(false, "")) }
                 )
             }

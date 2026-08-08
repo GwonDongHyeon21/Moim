@@ -17,7 +17,8 @@ object DummyData {
             description = "테스트 description1",
             maxCount = 10,
             currentMemberCount = 4,
-            deadline = "2026-05-15T14:30:00"
+            deadline = "2026-05-15T14:30:00",
+            isHost = true
         ),
         RoomInfoUiModel(
             code = "2",
@@ -25,7 +26,8 @@ object DummyData {
             description = "테스트 description2",
             maxCount = 10,
             currentMemberCount = 3,
-            deadline = "2026-07-20T09:15:22"
+            deadline = "2026-07-20T09:15:22",
+            isHost = false
         ),
         RoomInfoUiModel(
             code = "3",
@@ -33,7 +35,8 @@ object DummyData {
             description = "테스트 description3",
             maxCount = 100,
             currentMemberCount = 10,
-            deadline = "2026-08-01T18:45:50"
+            deadline = "2026-08-01T18:45:50",
+            isHost = false
         ),
         RoomInfoUiModel(
             code = "4",
@@ -41,7 +44,8 @@ object DummyData {
             description = "테스트 description4",
             maxCount = 10,
             currentMemberCount = 10,
-            deadline = "2026-08-01T18:45:50"
+            deadline = "2026-08-01T18:45:50",
+            isHost = true
         ),
         RoomInfoUiModel(
             code = "5",
@@ -49,7 +53,8 @@ object DummyData {
             description = "테스트 description5",
             maxCount = 15,
             currentMemberCount = 8,
-            deadline = "2026-10-01T18:45:50"
+            deadline = "2026-10-01T18:45:50",
+            isHost = false
         )
     )
 

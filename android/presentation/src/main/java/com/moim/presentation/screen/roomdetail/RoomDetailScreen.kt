@@ -37,9 +37,10 @@ import com.moim.presentation.R
 import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.navigation.RoomDetail
 import com.moim.presentation.screen.component.MoimProgressIndicator
-import com.moim.presentation.screen.component.MoimTopBar
+import com.moim.presentation.screen.component.dialog.CreateUpdateRoomDialog
 import com.moim.presentation.screen.roomdetail.component.CategoryCard
 import com.moim.presentation.screen.roomdetail.component.RoomCodeDialog
+import com.moim.presentation.screen.roomdetail.component.RoomDetailTopBar
 import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
@@ -113,18 +114,29 @@ fun RoomDetailScreen(
     val categoryVoteStatus = uiState.roomDetail.categoryVoteStatus
     val deadline = LocalDateTime.parse(roomInfo.deadline)
 
-    var showRoomCode by remember { mutableStateOf(false) }
+    val isoFormatter =
+        DateTimeFormatter.ofPattern(stringResource(R.string.iso_time_format), Locale.KOREA)
+
+    val editEnable = !(roomInfo.title == uiState.title
+            && roomInfo.description == uiState.description
+            && roomInfo.maxCount == uiState.maxCount
+            && roomInfo.deadline == uiState.selectedDateTime.format(isoFormatter))
+
     val pullToRefreshState = rememberPullToRefreshState()
+
+    var showRoomCode by remember { mutableStateOf(false) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
         topBar = {
-            MoimTopBar(
+            RoomDetailTopBar(
                 value = roomInfo.title,
-                navigationIcon = R.drawable.arrow_back_24,
-                actionIcon = R.drawable.more_vert_24,
-                onClickNavigationIcon = { onAction(RoomDetailAction.NavigateBack) },
-                onClickActionIcon = { showRoomCode = true }
+                editEnabled = roomInfo.isHost && deadline > LocalDateTime.now(),
+                onClickRoomCode = { showRoomCode = true },
+                onClickUpdate = { showUpdateDialog = true },
+                onClickDelete = { onAction(RoomDetailAction.DeleteRoom) },
+                onClickNavigationIcon = { onAction(RoomDetailAction.NavigateBack) }
             )
         },
         floatingActionButton = {
@@ -177,6 +189,21 @@ fun RoomDetailScreen(
         RoomCodeDialog(
             roomCode = roomInfo.code,
             onDismissRequest = { showRoomCode = false }
+        )
+    }
+
+    if (showUpdateDialog) {
+        CreateUpdateRoomDialog(
+            title = uiState.title,
+            description = uiState.description,
+            selectedDateTime = uiState.selectedDateTime,
+            onConfirmValue = stringResource(R.string.room_detail_update),
+            onTitleChanged = { onAction(RoomDetailAction.OnTitleChanged(it)) },
+            onDescriptionChanged = { onAction(RoomDetailAction.OnDescriptionChanged(it)) },
+            onDateTimeSelected = { onAction(RoomDetailAction.OnDateTimeSelected(it)) },
+            onConfirm = { onAction(RoomDetailAction.UpdateRoom(it)) },
+            onDismissRequest = { showUpdateDialog = false },
+            enabled = editEnable
         )
     }
 }

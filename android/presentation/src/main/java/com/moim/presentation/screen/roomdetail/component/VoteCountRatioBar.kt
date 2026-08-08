@@ -4,7 +4,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +57,7 @@ fun VoteCountRatioBar(
 
         Icon(
             painter = painterResource(R.drawable.chevron_right_24),
-            contentDescription = stringResource(R.string.vote_result_detail_contentDescription),
+            contentDescription = stringResource(R.string.vote_result_detail_description),
             modifier = Modifier.clickable(
                 interactionSource = null,
                 indication = null,

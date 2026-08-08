@@ -6,10 +6,10 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.moim.data.common.paging.BasePagingSource
 import com.moim.data.feature.room.datasource.RoomDataSource
-import com.moim.data.feature.room.model.CreateRoomRequest
+import com.moim.data.feature.room.model.CreateUpdateRoomRequest
 import com.moim.data.feature.room.model.JoinRoomRequest
 import com.moim.data.feature.room.model.toDomain
-import com.moim.domain.feature.room.model.CreateRoomParams
+import com.moim.domain.feature.room.model.CreateUpdateRoomParams
 import com.moim.domain.feature.room.model.RoomDetailInfo
 import com.moim.domain.feature.room.model.RoomInfo
 import com.moim.domain.feature.room.repository.RoomRepository
@@ -55,9 +55,9 @@ class RoomRepositoryImpl @Inject constructor(
             .map { it.toDomain() }
     }
 
-    override suspend fun createRoom(roomInfo: CreateRoomParams): Result<RoomInfo> {
+    override suspend fun createRoom(roomInfo: CreateUpdateRoomParams): Result<RoomInfo> {
         return roomDataSource.createRoom(
-            CreateRoomRequest(
+            CreateUpdateRoomRequest(
                 title = roomInfo.title,
                 description = roomInfo.description,
                 maxCount = roomInfo.maxCount,
@@ -69,6 +69,25 @@ class RoomRepositoryImpl @Inject constructor(
     override suspend fun joinRoom(roomCode: String): Result<RoomInfo> {
         return roomDataSource.joinRoom(JoinRoomRequest(roomCode))
             .map { it.toDomain() }
+    }
+
+    override suspend fun updateRoom(
+        roomId: Long,
+        roomInfo: CreateUpdateRoomParams
+    ): Result<RoomInfo> {
+        return roomDataSource.updateRoom(
+            roomId = roomId,
+            request = CreateUpdateRoomRequest(
+                title = roomInfo.title,
+                description = roomInfo.description,
+                maxCount = roomInfo.maxCount,
+                deadline = roomInfo.deadline
+            )
+        ).map { it.toDomain() }
+    }
+
+    override suspend fun deleteRoom(roomId: Long): Result<Long> {
+        return roomDataSource.deleteRoom(roomId)
     }
 
     companion object {

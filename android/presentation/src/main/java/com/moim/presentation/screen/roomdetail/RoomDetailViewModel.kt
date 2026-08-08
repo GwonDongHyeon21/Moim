@@ -1,5 +1,6 @@
 package com.moim.presentation.screen.roomdetail
 
+import com.moim.domain.feature.room.model.CreateUpdateRoomParams
 import com.moim.domain.feature.room.repository.RoomRepository
 import com.moim.domain.feature.vote.repository.VoteRepository
 import com.moim.presentation.base.BaseViewModel
@@ -36,6 +37,16 @@ class RoomDetailViewModel @AssistedInject constructor(
 
             RoomDetailAction.RefreshRoomDetail -> refreshRoomDetail()
 
+            RoomDetailAction.DeleteRoom -> deleteRoom()
+
+            is RoomDetailAction.OnTitleChanged -> updateState { copy(title = action.title) }
+
+            is RoomDetailAction.OnDescriptionChanged -> updateState { copy(description = action.description) }
+
+            is RoomDetailAction.OnDateTimeSelected -> updateState { copy(selectedDateTime = action.selectedDateTime) }
+
+            is RoomDetailAction.UpdateRoom -> updateRoom(action.deadline)
+
             is RoomDetailAction.NavigateToVote ->
                 sendEvent(RoomDetailEvent.NavigateToVote(roomId, action.category))
 
@@ -49,7 +60,15 @@ class RoomDetailViewModel @AssistedInject constructor(
     private suspend fun loadRoomDetail() {
         roomRepository.loadRoomDetail(roomId)
             .onSuccess { data ->
-                updateState { copy(roomDetail = data.toUiModel()) }
+                updateState {
+                    copy(
+                        roomDetail = data.toUiModel(),
+                        title = data.roomInfo.title,
+                        description = data.roomInfo.description.toString(),
+                        maxCount = data.roomInfo.maxCount,
+                        selectedDateTime = LocalDateTime.parse(data.roomInfo.deadline)
+                    )
+                }
 
                 if (LocalDateTime.parse(data.roomInfo.deadline) < LocalDateTime.now()) {
                     loadVoteResults()
@@ -77,6 +96,43 @@ class RoomDetailViewModel @AssistedInject constructor(
             }.onFailure { exception ->
                 sendEvent(RoomDetailEvent.NavigateBack)
                 snackBarManager.show(SnackBarEvent.DATA_LOAD_FAILED)
+
+                Timber.e(exception)
+            }
+    }
+
+    private fun updateRoom(deadline: String) = doAction {
+        val roomInfo = uiState.value.roomDetail.roomInfo
+        val uiState = uiState.value
+
+        if (roomInfo.title == uiState.title
+            && roomInfo.description == uiState.description
+            && roomInfo.maxCount == uiState.maxCount
+            && roomInfo.deadline == uiState.selectedDateTime.toString()
+        ) return@doAction
+
+        roomRepository.updateRoom(
+            roomId = roomId,
+            roomInfo = CreateUpdateRoomParams(
+                title = uiState.title,
+                description = uiState.description,
+                deadline = deadline
+            )
+        ).onSuccess {
+            sendEvent(RoomDetailEvent.NavigateBack)
+        }.onFailure { exception ->
+            snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
+
+            Timber.e(exception)
+        }
+    }
+
+    private fun deleteRoom() = doAction {
+        roomRepository.deleteRoom(roomId)
+            .onSuccess {
+                sendEvent(RoomDetailEvent.NavigateBack)
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
 
                 Timber.e(exception)
             }

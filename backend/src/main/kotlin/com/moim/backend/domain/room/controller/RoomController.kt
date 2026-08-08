@@ -1,7 +1,7 @@
 package com.moim.backend.domain.room.controller
 
 import com.moim.backend.core.response.ApiResponse
-import com.moim.backend.domain.room.dto.CreateRoomRequest
+import com.moim.backend.domain.room.dto.CreateUpdateRoomRequest
 import com.moim.backend.domain.room.dto.JoinRoomRequest
 import com.moim.backend.domain.room.dto.RoomDetailResponse
 import com.moim.backend.domain.room.dto.RoomResponse
@@ -40,7 +40,7 @@ class RoomController(
     @PostMapping("/create")
     fun createRoom(
         @AuthenticationPrincipal userId: Long,
-        @RequestBody request: CreateRoomRequest
+        @RequestBody request: CreateUpdateRoomRequest
     ): ApiResponse<RoomResponse> {
         val response = roomService.createRoom(userId, request)
 
@@ -53,6 +53,27 @@ class RoomController(
         @RequestBody request: JoinRoomRequest
     ): ApiResponse<RoomResponse> {
         val response = roomService.joinRoom(userId, request)
+
+        return ApiResponse.success(response)
+    }
+
+    @PutMapping("/{roomId}")
+    fun updateRoom(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable roomId: Long,
+        @RequestBody request: CreateUpdateRoomRequest
+    ): ApiResponse<RoomResponse> {
+        val response = roomService.updateRoom(userId, roomId, request)
+
+        return ApiResponse.success(response)
+    }
+
+    @DeleteMapping("/{roomId}")
+    fun deleteRoom(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable roomId: Long
+    ): ApiResponse<Long> {
+        val response = roomService.deleteRoom(userId, roomId)
 
         return ApiResponse.success(response)
     }

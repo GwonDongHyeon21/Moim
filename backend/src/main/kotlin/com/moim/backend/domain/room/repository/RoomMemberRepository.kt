@@ -10,8 +10,6 @@ interface RoomMemberRepository : JpaRepository<RoomMember, Long> {
 
     fun existsByRoomIdAndUserId(roomId: Long, userId: Long): Boolean
 
-    fun countByUserId(userId: Long): Int
-
     @Query("SELECT rm FROM RoomMember rm JOIN FETCH rm.user WHERE rm.room.id = :roomId")
     fun findAllByRoomIdWithUser(roomId: Long): List<RoomMember>
 

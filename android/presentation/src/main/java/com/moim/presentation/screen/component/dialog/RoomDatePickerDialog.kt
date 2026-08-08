@@ -1,17 +1,21 @@
-package com.moim.presentation.screen.home.component
+package com.moim.presentation.screen.component.dialog
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.moim.presentation.R
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 @Composable
 fun RoomDatePickerDialog(
@@ -20,7 +24,20 @@ fun RoomDatePickerDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialTimeInMillis)
+    val todayTimeMillis = remember {
+        LocalDate.now()
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+    }
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialTimeInMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= todayTimeMillis
+            }
+        }
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismissRequest,
@@ -54,7 +71,10 @@ fun RoomDatePickerDialog(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 fun RoomDatePickerDialogPreview() {
     RoomDatePickerDialog(

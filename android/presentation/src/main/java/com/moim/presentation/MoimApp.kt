@@ -66,6 +66,7 @@ fun MoimApp(
     Scaffold(
         bottomBar = {
             MoimBottomBar(
+                isVisible = navigator.isShowBottomBar,
                 currentDestination = navigator.currentDestination,
                 onNavigateToDestination = navigator::navigateToTab
             )
