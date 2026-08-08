@@ -10,10 +10,11 @@ data class RoomResponse(
     val description: String?,
     val maxCount: Int,
     val currentMemberCount: Int,
-    val deadline: LocalDateTime
+    val deadline: LocalDateTime,
+    val isHost: Boolean
 ) {
     companion object {
-        fun from(room: Room, currentMemberCount: Int): RoomResponse {
+        fun from(room: Room, currentMemberCount: Int, isHost: Boolean): RoomResponse {
             return RoomResponse(
                 id = room.id,
                 code = room.code,
@@ -21,7 +22,8 @@ data class RoomResponse(
                 description = room.description,
                 maxCount = room.maxCount,
                 currentMemberCount = currentMemberCount,
-                deadline = room.deadline
+                deadline = room.deadline,
+                isHost = isHost
             )
         }
     }

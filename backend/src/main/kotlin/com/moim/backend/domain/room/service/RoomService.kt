@@ -53,7 +53,14 @@ class RoomService(
         return rooms.map { room ->
             val currentMemberCount = roomMemberRepository.countByRoomId(room.id!!)
 
-            RoomResponse.from(room, currentMemberCount)
+            val myMemberInfo = roomMemberRepository.findByRoomIdAndUserId(room.id!!, userId)
+            val isHost = myMemberInfo?.role == RoomRole.HOST
+
+            RoomResponse.from(
+                room = room,
+                currentMemberCount = currentMemberCount,
+                isHost = isHost
+            )
         }
     }
 
@@ -82,8 +89,11 @@ class RoomService(
             )
         }
 
+        val myMemberInfo = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+        val isHost = myMemberInfo?.role == RoomRole.HOST
+
         return RoomDetailResponse(
-            roomInfo = RoomResponse.from(room, members.size),
+            roomInfo = RoomResponse.from(room, members.size, isHost),
             role = roomMember.role.name,
             members = members,
             categoryVoteStatus = categoryVoteStatus
@@ -132,7 +142,8 @@ class RoomService(
 
         return RoomResponse.from(
             room = newRoom,
-            currentMemberCount = 1
+            currentMemberCount = 1,
+            isHost = true
         )
     }
 
@@ -185,7 +196,8 @@ class RoomService(
 
         return RoomResponse.from(
             room = room,
-            currentMemberCount = currentMemberCount + 1
+            currentMemberCount = currentMemberCount + 1,
+            isHost = false
         )
     }
 
@@ -213,7 +225,11 @@ class RoomService(
             deadline = request.deadline
         )
 
-        return RoomResponse.from(room, currentMemberCount)
+        return RoomResponse.from(
+            room = room,
+            currentMemberCount = currentMemberCount,
+            isHost = true
+        )
     }
 
     @Transactional
