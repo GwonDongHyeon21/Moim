@@ -132,6 +132,7 @@ fun RoomDetailScreen(
         topBar = {
             RoomDetailTopBar(
                 value = roomInfo.title,
+                editEnabled = roomInfo.isHost && deadline > LocalDateTime.now(),
                 onClickRoomCode = { showRoomCode = true },
                 onClickUpdate = { showUpdateDialog = true },
                 onClickDelete = { onAction(RoomDetailAction.DeleteRoom) },

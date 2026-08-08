@@ -22,6 +22,7 @@ import com.moim.presentation.R
 @Composable
 fun RoomDetailTopBar(
     value: String,
+    editEnabled: Boolean,
     onClickRoomCode: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit,
@@ -52,20 +53,22 @@ fun RoomDetailTopBar(
                     expanded = dropdownMenuExpanded,
                     onDismissRequest = { dropdownMenuExpanded = false }
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.room_detail_code)) },
-                        onClick = {
-                            dropdownMenuExpanded = false
-                            onClickRoomCode()
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.room_detail_update)) },
-                        onClick = {
-                            dropdownMenuExpanded = false
-                            onClickUpdate()
-                        }
-                    )
+                    if (editEnabled) {
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(R.string.room_detail_code)) },
+                            onClick = {
+                                dropdownMenuExpanded = false
+                                onClickRoomCode()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(R.string.room_detail_update)) },
+                            onClick = {
+                                dropdownMenuExpanded = false
+                                onClickUpdate()
+                            }
+                        )
+                    }
                     DropdownMenuItem(
                         text = { Text(text = stringResource(R.string.room_detail_delete)) },
                         onClick = {
@@ -84,9 +87,10 @@ fun RoomDetailTopBar(
 fun RoomDetailTopBarPreview() {
     RoomDetailTopBar(
         value = "test",
+        editEnabled = true,
         onClickRoomCode = {},
         onClickUpdate = {},
         onClickDelete = {},
-        onClickNavigationIcon = {}
+        onClickNavigationIcon = {},
     )
 }

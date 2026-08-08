@@ -48,25 +48,27 @@ fun RoomCard(
                 Text(text = room.description.toString())
             }
 
-            Box {
-                IconButton(onClick = { dropdownMenuExpanded = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.more_vert_24),
-                        contentDescription = stringResource(R.string.more_options_description)
-                    )
-                }
+            if (room.isHost) {
+                Box {
+                    IconButton(onClick = { dropdownMenuExpanded = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.more_vert_24),
+                            contentDescription = stringResource(R.string.more_options_description)
+                        )
+                    }
 
-                DropdownMenu(
-                    expanded = dropdownMenuExpanded,
-                    onDismissRequest = { dropdownMenuExpanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.delete)) },
-                        onClick = {
-                            dropdownMenuExpanded = false
-                            onDeleteClick()
-                        }
-                    )
+                    DropdownMenu(
+                        expanded = dropdownMenuExpanded,
+                        onDismissRequest = { dropdownMenuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(R.string.delete)) },
+                            onClick = {
+                                dropdownMenuExpanded = false
+                                onDeleteClick()
+                            }
+                        )
+                    }
                 }
             }
         }
