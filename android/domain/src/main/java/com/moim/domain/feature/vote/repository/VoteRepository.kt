@@ -16,5 +16,7 @@ interface VoteRepository {
 
     suspend fun resetVotes(roomId: Long, category: String): Result<Boolean>
 
+    suspend fun getMyCandidates(roomId: Long, category: String): Result<List<CandidateInfo>>
+
     suspend fun getVoteResults(roomId: Long): Result<List<VoteResultInfo>>
 }

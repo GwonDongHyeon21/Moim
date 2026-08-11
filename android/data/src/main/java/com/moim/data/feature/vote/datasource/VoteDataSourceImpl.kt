@@ -43,6 +43,13 @@ class VoteDataSourceImpl @Inject constructor(
         return apiCall { voteService.resetVotes(roomId, category) }
     }
 
+    override suspend fun getMyCandidates(
+        roomId: Long,
+        category: String
+    ): Result<List<CandidateResponse>> {
+        return apiCall { voteService.getMyCandidates(roomId, category) }
+    }
+
     override suspend fun getVoteResults(roomId: Long): Result<List<VoteResultResponse>> {
         return apiCall { voteService.getVoteResults(roomId) }
     }

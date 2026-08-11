@@ -40,6 +40,12 @@ interface VoteService {
         @Query("category") category: String
     ): ApiResponse<Boolean>
 
+    @GET("/api/v1/votes/{roomId}/candidates/me")
+    suspend fun getMyCandidates(
+        @Path("roomId") roomId: Long,
+        @Query("category") category: String
+    ): ApiResponse<List<CandidateResponse>>
+
     @GET("/api/v1/votes/{roomId}/results")
     suspend fun getVoteResults(
         @Path("roomId") roomId: Long

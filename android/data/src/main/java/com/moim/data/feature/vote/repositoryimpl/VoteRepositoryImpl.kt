@@ -41,6 +41,14 @@ class VoteRepositoryImpl @Inject constructor(
         return voteDataSource.resetVotes(roomId, category)
     }
 
+    override suspend fun getMyCandidates(
+        roomId: Long,
+        category: String
+    ): Result<List<CandidateInfo>> {
+        return voteDataSource.getMyCandidates(roomId, category)
+            .map { it.map { candidate -> candidate.toDomain() } }
+    }
+
     override suspend fun getVoteResults(roomId: Long): Result<List<VoteResultInfo>> {
         return voteDataSource.getVoteResults(roomId)
             .map { it.map { result -> result.toDomain() } }
