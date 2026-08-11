@@ -17,30 +17,30 @@ interface VoteService {
     @GET("api/v1/votes/categories")
     suspend fun getCategories(): ApiResponse<List<CategoryResponse>>
 
-    @POST("/api/v1/votes/rooms/{roomId}/candidates")
+    @POST("/api/v1/votes/{roomId}/candidates")
     suspend fun createCandidate(
         @Path("roomId") roomId: Long,
         @Body request: CreateCandidateRequest
     ): ApiResponse<Boolean>
 
-    @GET("/api/v1/votes/rooms/{roomId}/candidates")
+    @GET("/api/v1/votes/{roomId}/candidates")
     suspend fun getCandidates(
         @Path("roomId") roomId: Long,
         @Query("category") category: String
     ): ApiResponse<List<CandidateResponse>>
 
-    @POST("/api/v1/votes/candidates/{candidateId}/vote")
+    @POST("/api/v1/votes/{candidateId}/vote")
     suspend fun castVote(
         @Path("candidateId") candidateId: Long
     ): ApiResponse<Boolean>
 
-    @DELETE("/api/v1/votes/rooms/{roomId}/reset")
+    @DELETE("/api/v1/votes/{roomId}/reset")
     suspend fun resetVotes(
         @Path("roomId") roomId: Long,
         @Query("category") category: String
     ): ApiResponse<Boolean>
 
-    @GET("/api/v1/votes/rooms/{roomId}/results")
+    @GET("/api/v1/votes/{roomId}/results")
     suspend fun getVoteResults(
         @Path("roomId") roomId: Long
     ): ApiResponse<List<VoteResultResponse>>

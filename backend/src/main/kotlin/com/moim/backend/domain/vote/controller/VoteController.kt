@@ -23,7 +23,7 @@ class VoteController(
         return ApiResponse.success(categories)
     }
 
-    @PostMapping("/rooms/{roomId}/candidates")
+    @PostMapping("/{roomId}/candidates")
     fun createCandidate(
         @AuthenticationPrincipal userId: Long,
         @PathVariable roomId: Long,
@@ -34,7 +34,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @GetMapping("/rooms/{roomId}/candidates")
+    @GetMapping("/{roomId}/candidates")
     fun getCandidates(
         @AuthenticationPrincipal userId: Long,
         @PathVariable roomId: Long,
@@ -45,7 +45,7 @@ class VoteController(
         return ApiResponse.success(response)
     }
 
-    @PostMapping("/candidates/{candidateId}/vote")
+    @PostMapping("/{candidateId}/vote")
     fun castVote(
         @AuthenticationPrincipal userId: Long,
         @PathVariable candidateId: Long
@@ -55,7 +55,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @DeleteMapping("/rooms/{roomId}/reset")
+    @DeleteMapping("/{roomId}/reset")
     fun resetVotes(
         @AuthenticationPrincipal userId: Long,
         @PathVariable roomId: Long,
@@ -66,7 +66,7 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
-    @GetMapping("/rooms/{roomId}/results")
+    @GetMapping("/{roomId}/results")
     fun getVoteResults(
         @PathVariable roomId: Long
     ): ApiResponse<List<VoteResultResponse>> {
