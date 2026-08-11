@@ -1,5 +1,6 @@
 package com.moim.presentation.screen.candidateupdate
 
+import com.moim.domain.feature.vote.model.UpdateCandidateParams
 import com.moim.domain.feature.vote.repository.VoteRepository
 import com.moim.presentation.base.BaseViewModel
 import com.moim.presentation.model.toUiModel
@@ -52,7 +53,7 @@ class CandidateUpdateViewModel @AssistedInject constructor(
                 copy(newCandidates = newCandidates)
             }
 
-            CandidateUpdateAction.UpdateCandidate -> Unit
+            CandidateUpdateAction.UpdateCandidate -> updateCandidates()
         }
     }
 
@@ -81,6 +82,41 @@ class CandidateUpdateViewModel @AssistedInject constructor(
 
                 val exception =
                     categoriesResult.exceptionOrNull() ?: candidatesResult.exceptionOrNull()
+                Timber.e(exception)
+            }
+        }
+    }
+
+    private fun updateCandidates() {
+        val originals = uiState.value.originalCandidates
+        val news = uiState.value.newCandidates
+
+        val changedCandidates = news.filterIndexed { index, new ->
+            val original = originals.getOrNull(index)
+            original != new
+        }
+
+        if (changedCandidates.isEmpty()) {
+            sendEvent(CandidateUpdateEvent.NavigateBack)
+
+            return
+        }
+
+        doAction {
+            voteRepository.updateCandidates(
+                roomId = roomId,
+                candidates = changedCandidates.map { candidate ->
+                    UpdateCandidateParams(
+                        id = candidate.id,
+                        category = candidate.category,
+                        content = candidate.content
+                    )
+                }
+            ).onSuccess {
+                sendEvent(CandidateUpdateEvent.NavigateBack)
+            }.onFailure { exception ->
+                snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
+
                 Timber.e(exception)
             }
         }
