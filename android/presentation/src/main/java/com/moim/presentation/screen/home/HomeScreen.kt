@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.result.ResultEffect
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -54,6 +55,7 @@ import com.moim.presentation.screen.home.model.RoomFilterStatus
 import com.moim.presentation.screen.home.model.RoomOptions.CREATE
 import com.moim.presentation.screen.home.model.RoomOptions.DELETE
 import com.moim.presentation.screen.home.model.RoomOptions.JOIN
+import com.moim.presentation.screen.roomdetail.RoomDetailResult
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
@@ -90,6 +92,13 @@ fun HomeScreen(
             HomeEvent.RefreshRoom -> {
                 pagingItemsList[pagerState.currentPage].refresh()
             }
+        }
+    }
+
+    ResultEffect<RoomDetailResult> { result ->
+        if (result.shouldRefresh) {
+            ongoingRoomsPagingItems.refresh()
+            closedRoomsPagingItems.refresh()
         }
     }
 

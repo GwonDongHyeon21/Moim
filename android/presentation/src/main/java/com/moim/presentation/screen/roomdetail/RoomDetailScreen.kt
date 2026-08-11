@@ -33,6 +33,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.result.ResultEffect
 import com.moim.presentation.R
 import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.navigation.RoomDetail
@@ -45,6 +46,7 @@ import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiState
+import com.moim.presentation.screen.vote.VoteResult
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
@@ -59,6 +61,7 @@ fun RoomDetailScreen(
     onNavigateToVote: (roomId: Long, category: String) -> Unit,
     onNavigateToCandidateCreate: (Long) -> Unit,
     onNavigateBack: () -> Unit,
+    onNavigateBackRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
         creationCallback = { factory ->
@@ -76,6 +79,8 @@ fun RoomDetailScreen(
             is RoomDetailEvent.NavigateToCandidateCreate -> onNavigateToCandidateCreate(event.roomId)
 
             RoomDetailEvent.NavigateBack -> onNavigateBack()
+
+            RoomDetailEvent.NavigateBackRefresh -> onNavigateBackRefresh()
         }
     }
 

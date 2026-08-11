@@ -119,7 +119,7 @@ class RoomDetailViewModel @AssistedInject constructor(
                 deadline = deadline
             )
         ).onSuccess {
-            sendEvent(RoomDetailEvent.NavigateBack)
+            sendEvent(RoomDetailEvent.NavigateBackRefresh)
         }.onFailure { exception ->
             snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
@@ -130,7 +130,7 @@ class RoomDetailViewModel @AssistedInject constructor(
     private fun deleteRoom() = doAction {
         roomRepository.deleteRoom(roomId)
             .onSuccess {
-                sendEvent(RoomDetailEvent.NavigateBack)
+                sendEvent(RoomDetailEvent.NavigateBackRefresh)
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
 

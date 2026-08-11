@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.runtime.result.rememberResultEventBusNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moim.presentation.navigation.MoimNavConstant.fadeTransition
 import com.moim.presentation.navigation.MoimNavConstant.slideTransition
@@ -39,7 +40,8 @@ fun MoimNav(
         onBack = navigator::popBackStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
+            rememberViewModelStoreNavEntryDecorator(),
+            rememberResultEventBusNavEntryDecorator()
         ),
         transitionSpec = { slideTransition },
         popTransitionSpec = { slideTransition },
