@@ -21,7 +21,7 @@ ksp = "2.2.21-2.0.4"
 firebaseCrashlytics = "3.0.2"
 googleServices = "4.4.2"
 
-navigation3Runtime = "1.1.3"
+navigation3Runtime = "1.2.0-alpha02"
 navigation3Ui = "1.1.3"
 lifecycleViewmodelNavigation3 = "2.10.0"
 
