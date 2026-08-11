@@ -5,8 +5,9 @@ import com.moim.presentation.model.CategoryUiModel
 
 data class CandidateUpdateUiState(
     val isLoading: Boolean = false,
-    val candidates: List<CandidateUiModel> = emptyList(),
+    val originalCandidates: List<CandidateUiModel> = emptyList(),
+    val newCandidates: List<CandidateUiModel> = emptyList(),
     val categories: List<CategoryUiModel> = emptyList(),
-    val category: String = "",
-    val content: String = ""
+    val category: List<String> = emptyList(),
+    val content: List<String> = emptyList()
 )

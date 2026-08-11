@@ -4,9 +4,15 @@ interface CandidateUpdateAction {
 
     data object NavigateBack : CandidateUpdateAction
 
-    data class OnCategorySelected(val category: String) : CandidateUpdateAction
+    data class OnCategorySelected(
+        val num: Int,
+        val category: String
+    ) : CandidateUpdateAction
 
-    data class OnContentChanged(val content: String) : CandidateUpdateAction
+    data class OnContentChanged(
+        val num: Int,
+        val content: String
+    ) : CandidateUpdateAction
 
     data object UpdateCandidate : CandidateUpdateAction
 }

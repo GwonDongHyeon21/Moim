@@ -3,7 +3,6 @@ package com.moim.presentation.screen.candidateupdate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -34,7 +33,8 @@ import com.moim.presentation.screen.candidateupdate.CandidateUpdateScreen.MAX_LI
 import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateAction
 import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateEvent
 import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateUiState
-import com.moim.presentation.screen.component.MoimButton
+import com.moim.presentation.screen.component.MoimBottomBarButton
+import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
@@ -65,11 +65,15 @@ fun CandidateUpdateScreen(
         }
     }
 
-    CandidateUpdateScreen(
-        uiState = uiState,
-        onAction = viewModel::onAction,
-        modifier = modifier
-    )
+    if (uiState.isLoading) {
+        MoimProgressIndicator()
+    } else {
+        CandidateUpdateScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -78,8 +82,7 @@ fun CandidateUpdateScreen(
     onAction: (CandidateUpdateAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pagerState = rememberPagerState { uiState.candidates.size }
-    val createEnabled = uiState.category.isNotEmpty() && uiState.content.isNotEmpty()
+    val pagerState = rememberPagerState { uiState.newCandidates.size }
 
     Scaffold(
         modifier = modifier,
@@ -91,35 +94,37 @@ fun CandidateUpdateScreen(
             )
         },
         bottomBar = {
-            MoimButton(
+            MoimBottomBarButton(
                 value = stringResource(R.string.candidate_update),
-                onClick = { onAction(CandidateUpdateAction.UpdateCandidate) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding(),
-                enabled = createEnabled
+                onClick = { onAction(CandidateUpdateAction.UpdateCandidate) }
             )
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = MoimPadding.AppHorizontalPadding),
+            modifier = Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "${pagerState.currentPage} / ${pagerState.pageCount}")
+            Text(text = "${pagerState.currentPage + 1} / ${pagerState.pageCount}")
 
             HorizontalPager(pagerState) { page ->
-                Column(verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)) {
+                val candidate = uiState.newCandidates[page]
+                Column(
+                    modifier = Modifier.padding(horizontal = MoimPadding.AppHorizontalPadding),
+                    verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
+                ) {
                     CategorySelectSection(
                         categories = uiState.categories,
-                        selectedCategory = uiState.category,
-                        onCategorySelected = { onAction(CandidateUpdateAction.OnCategorySelected(it)) }
+                        selectedCategory = candidate.category,
+                        onCategorySelected = {
+                            onAction(CandidateUpdateAction.OnCategorySelected(page, it))
+                        }
                     )
 
                     ContentInputSection(
-                        content = uiState.content,
-                        onContentChanged = { onAction(CandidateUpdateAction.OnContentChanged(it)) }
+                        content = candidate.content,
+                        onContentChanged = {
+                            onAction(CandidateUpdateAction.OnContentChanged(page, it))
+                        }
                     )
                 }
             }
@@ -192,7 +197,7 @@ private fun ContentInputSection(
 @Composable
 fun CandidateUpdateScreenPreview() {
     CandidateUpdateScreen(
-        uiState = CandidateUpdateUiState(candidates = DummyData.dummyCandidates),
+        uiState = CandidateUpdateUiState(newCandidates = DummyData.dummyCandidates),
         onAction = {}
     )
 }
