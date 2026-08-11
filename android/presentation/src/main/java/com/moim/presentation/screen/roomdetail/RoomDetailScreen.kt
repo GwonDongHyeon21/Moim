@@ -165,9 +165,17 @@ fun RoomDetailScreen(
                     )
 
                     categoryVoteStatus.forEach { category ->
-                        CategoryCard(category = category) {
-                            onAction(RoomDetailAction.NavigateToVote(category.category))
-                        }
+                        CategoryCard(
+                            category = category,
+                            onClickCard = { onAction(RoomDetailAction.NavigateToVote(category.category)) },
+                            onClickUpdate = {
+                                onAction(
+                                    RoomDetailAction.NavigateToCandidateUpdate(
+                                        category.category
+                                    )
+                                )
+                            }
+                        )
                     }
                 }
             }

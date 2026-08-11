@@ -15,6 +15,10 @@ fun EntryProviderScope<NavKey>.candidateUpdate(
     modifier: Modifier = Modifier
 ) {
     entry<CandidateUpdate>(metadata = metadata) { route ->
-//        CandidateUpdateScreen()
+        CandidateUpdateScreen(
+            route = route,
+            onNavigateBack = {},
+            modifier = modifier
+        )
     }
 }
