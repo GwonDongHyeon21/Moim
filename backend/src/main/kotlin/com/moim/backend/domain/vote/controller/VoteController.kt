@@ -66,6 +66,17 @@ class VoteController(
         return ApiResponse.success(true)
     }
 
+    @GetMapping("/{roomId}/candidates/me")
+    fun getMyCandidates(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable roomId: Long,
+        @RequestParam category: Category
+    ): ApiResponse<List<CandidateResponse>> {
+        val response = voteService.getMyCandidatesByCategory(userId, roomId, category)
+
+        return ApiResponse.success(response)
+    }
+
     @GetMapping("/{roomId}/results")
     fun getVoteResults(
         @PathVariable roomId: Long
