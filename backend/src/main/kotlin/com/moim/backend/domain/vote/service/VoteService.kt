@@ -62,6 +62,28 @@ class VoteService(
         )
     }
 
+    @Transactional
+    fun updateCandidates(userId: Long, roomId: Long, request: List<UpdateCandidateRequest>) {
+        request.forEach { newCandidate ->
+            val candidate = candidateRepository.findById(newCandidate.id).orElseThrow {
+                ErrorException(HttpStatus.NOT_FOUND, ErrorCode.CANDIDATE_NOT_FOUND)
+            }
+
+            if (candidate.user.id != userId) {
+                throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.NOT_ROOM_PERMISSION)
+            }
+
+            if (candidate.room.id != roomId) {
+                throw ErrorException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND)
+            }
+
+            candidate.updateContent(
+                category = newCandidate.category,
+                content = newCandidate.content
+            )
+        }
+    }
+
     fun getCandidates(userId: Long, roomId: Long, category: Category): List<CandidateResponse> {
         val candidates = candidateRepository.findAllByRoomIdAndCategory(roomId, category)
 
