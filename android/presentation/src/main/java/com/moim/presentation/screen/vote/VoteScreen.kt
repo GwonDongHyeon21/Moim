@@ -29,7 +29,7 @@ import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.vote.VoteScreen.REDUCTION_RATE
 import com.moim.presentation.screen.vote.component.CandidateCard
 import com.moim.presentation.screen.vote.component.EmptyCard
-import com.moim.presentation.screen.vote.model.CandidateUiModel
+import com.moim.presentation.model.CandidateUiModel
 import com.moim.presentation.screen.vote.model.VoteAction
 import com.moim.presentation.screen.vote.model.VoteEvent
 import com.moim.presentation.screen.vote.model.VoteUiState

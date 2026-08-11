@@ -124,7 +124,7 @@ fun CandidateCreateScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategorySelectSection(
+private fun CategorySelectSection(
     categories: List<CategoryUiModel>,
     selectedCategory: String,
     onCategorySelected: (String) -> Unit
@@ -168,7 +168,7 @@ fun CategorySelectSection(
 }
 
 @Composable
-fun ContentInputSection(
+private fun ContentInputSection(
     content: String,
     onContentChanged: (String) -> Unit
 ) {

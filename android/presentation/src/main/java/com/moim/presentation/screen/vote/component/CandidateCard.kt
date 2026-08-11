@@ -25,7 +25,7 @@ import com.moim.presentation.screen.vote.component.CandidateCard.BORDER_COLOR_AL
 import com.moim.presentation.screen.vote.component.CandidateCard.borderWidth
 import com.moim.presentation.screen.vote.component.CandidateCard.fontSize
 import com.moim.presentation.screen.vote.component.CandidateCard.iconButtonSize
-import com.moim.presentation.screen.vote.model.CandidateUiModel
+import com.moim.presentation.model.CandidateUiModel
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.theme.MoimTheme
