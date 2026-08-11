@@ -17,6 +17,7 @@ fun EntryProviderScope<NavKey>.roomDetail(
     metadata: Map<String, Any>,
     onNavigateToVote: (roomId: Long, category: String) -> Unit,
     onNavigateToCandidateCreate: (Long) -> Unit,
+    onNavigateToCandidateUpdate: (String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -27,6 +28,7 @@ fun EntryProviderScope<NavKey>.roomDetail(
             route = route,
             onNavigateToVote = onNavigateToVote,
             onNavigateToCandidateCreate = onNavigateToCandidateCreate,
+            onNavigateToCandidateUpdate = onNavigateToCandidateUpdate,
             onNavigateBack = onNavigateBack,
             onNavigateBackRefresh = {
                 resultBus.sendResult(RoomDetailResult(true))

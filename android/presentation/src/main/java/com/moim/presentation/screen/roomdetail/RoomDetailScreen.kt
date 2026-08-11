@@ -56,6 +56,7 @@ fun RoomDetailScreen(
     route: RoomDetail,
     onNavigateToVote: (roomId: Long, category: String) -> Unit,
     onNavigateToCandidateCreate: (Long) -> Unit,
+    onNavigateToCandidateUpdate: (String) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateBackRefresh: () -> Unit,
     modifier: Modifier = Modifier,
@@ -72,6 +73,8 @@ fun RoomDetailScreen(
             is RoomDetailEvent.NavigateToVote -> onNavigateToVote(event.roomId, event.category)
 
             is RoomDetailEvent.NavigateToCandidateCreate -> onNavigateToCandidateCreate(event.roomId)
+
+            is RoomDetailEvent.NavigateToCandidateUpdate -> onNavigateToCandidateUpdate(event.category)
 
             RoomDetailEvent.NavigateBack -> onNavigateBack()
 
