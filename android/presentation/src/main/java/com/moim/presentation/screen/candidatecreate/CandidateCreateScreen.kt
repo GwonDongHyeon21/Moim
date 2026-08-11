@@ -30,7 +30,7 @@ import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.MAX_LI
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateAction
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateEvent
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateUiState
-import com.moim.presentation.screen.candidatecreate.model.CategoryUiModel
+import com.moim.presentation.model.CategoryUiModel
 import com.moim.presentation.screen.component.MoimButton
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar

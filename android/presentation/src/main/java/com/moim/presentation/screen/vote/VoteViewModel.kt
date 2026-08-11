@@ -6,7 +6,7 @@ import com.moim.presentation.navigation.Vote
 import com.moim.presentation.screen.vote.model.VoteAction
 import com.moim.presentation.screen.vote.model.VoteEvent
 import com.moim.presentation.screen.vote.model.VoteUiState
-import com.moim.presentation.screen.vote.model.toUiModel
+import com.moim.presentation.model.toUiModel
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.assisted.Assisted

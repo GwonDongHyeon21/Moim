@@ -6,7 +6,7 @@ import com.moim.presentation.navigation.CandidateCreate
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateAction
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateEvent
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateUiState
-import com.moim.presentation.screen.candidatecreate.model.toUiModel
+import com.moim.presentation.model.toUiModel
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.assisted.Assisted

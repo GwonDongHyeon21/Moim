@@ -1,4 +1,4 @@
-package com.moim.presentation.screen.candidatecreate.model
+package com.moim.presentation.model
 
 import com.moim.domain.feature.vote.model.CategoryInfo
 
