@@ -31,6 +31,10 @@ class RoomDetailViewModel @AssistedInject constructor(
 
     private val roomId = route.roomId
 
+    init {
+        doAction { loadRoomDetail() }
+    }
+
     fun onAction(action: RoomDetailAction) {
         when (action) {
             RoomDetailAction.LoadRoomDetail -> doAction { loadRoomDetail() }

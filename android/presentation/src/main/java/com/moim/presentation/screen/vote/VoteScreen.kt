@@ -48,6 +48,7 @@ private object VoteScreen {
 fun VoteScreen(
     route: Vote,
     onNavigateBack: () -> Unit,
+    onNavigateBackRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VoteViewModel = hiltViewModel<VoteViewModel, VoteViewModel.Factory>(
         creationCallback = { factory ->
@@ -60,6 +61,8 @@ fun VoteScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             VoteEvent.NavigateBack -> onNavigateBack()
+
+            VoteEvent.NavigateBackRefresh -> onNavigateBackRefresh()
         }
     }
 

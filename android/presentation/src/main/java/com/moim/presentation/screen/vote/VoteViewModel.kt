@@ -56,7 +56,7 @@ class VoteViewModel @AssistedInject constructor(
     private fun castVote(candidateId: Long) = doAction(loadingOff = false) {
         voteRepository.castVote(candidateId)
             .onSuccess {
-                sendEvent(VoteEvent.NavigateBack)
+                sendEvent(VoteEvent.NavigateBackRefresh)
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
@@ -67,7 +67,7 @@ class VoteViewModel @AssistedInject constructor(
     private fun resetVote() = doAction(loadingOff = false) {
         voteRepository.resetVotes(roomId, category)
             .onSuccess {
-                sendEvent(VoteEvent.NavigateBack)
+                sendEvent(VoteEvent.NavigateBackRefresh)
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
 
