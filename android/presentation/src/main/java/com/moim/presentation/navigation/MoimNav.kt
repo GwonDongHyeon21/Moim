@@ -55,7 +55,7 @@ fun MoimNav(
 
             home(
                 metadata = fadeTransition,
-                onNavigateToRoomDetail = { navigator.navigateToRoomDetail(it) },
+                onNavigateToRoomDetail = navigator::navigateToRoomDetail,
                 modifier = modifier.padding(innerPadding)
             )
 
@@ -66,14 +66,10 @@ fun MoimNav(
 
             roomDetail(
                 metadata = fadeTransition,
-                onNavigateToVote = { roomId, category ->
-                    navigator.navigateToVote(roomId, category)
-                },
-                onNavigateToCandidateCreate = { navigator.navigateToCandidateCreate(it) },
+                onNavigateToVote = navigator::navigateToVote,
+                onNavigateToCandidateCreate = navigator::navigateToCandidateCreate,
                 onNavigateBack = navigator::popBackStack,
-                onNavigateToCandidateUpdate = { roomId, category ->
-                    navigator.navigateToCandidateUpdate(roomId, category)
-                },
+                onNavigateToCandidateUpdate = navigator::navigateToCandidateUpdate,
                 modifier = modifier.padding(innerPadding)
             )
 
@@ -91,6 +87,7 @@ fun MoimNav(
 
             candidateUpdate(
                 metadata = fadeTransition,
+                onNavigateBack = navigator::popBackStack,
                 modifier = modifier.padding(innerPadding)
             )
         }

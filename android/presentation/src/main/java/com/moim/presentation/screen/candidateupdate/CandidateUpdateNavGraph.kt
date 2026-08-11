@@ -12,12 +12,13 @@ fun NavBackStack<NavKey>.navigateToCandidateUpdate(roomId: Long, category: Strin
 
 fun EntryProviderScope<NavKey>.candidateUpdate(
     metadata: Map<String, Any>,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     entry<CandidateUpdate>(metadata = metadata) { route ->
         CandidateUpdateScreen(
             route = route,
-            onNavigateBack = {},
+            onNavigateBack = onNavigateBack,
             modifier = modifier
         )
     }
