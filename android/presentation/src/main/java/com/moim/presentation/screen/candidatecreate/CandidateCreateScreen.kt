@@ -3,7 +3,6 @@ package com.moim.presentation.screen.candidatecreate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,14 +23,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
+import com.moim.presentation.model.CategoryUiModel
 import com.moim.presentation.navigation.CandidateCreate
 import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.CONTENT_LENGTH_LIMIT
 import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.MAX_LINES
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateAction
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateEvent
 import com.moim.presentation.screen.candidatecreate.model.CandidateCreateUiState
-import com.moim.presentation.model.CategoryUiModel
-import com.moim.presentation.screen.component.MoimButton
+import com.moim.presentation.screen.component.MoimBottomBarButton
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.theme.MoimPadding
@@ -92,12 +91,9 @@ fun CandidateCreateScreen(
             )
         },
         bottomBar = {
-            MoimButton(
+            MoimBottomBarButton(
                 value = stringResource(R.string.create),
                 onClick = { onAction(CandidateCreateAction.CreateCandidate) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding(),
                 enabled = createEnabled
             )
         }
