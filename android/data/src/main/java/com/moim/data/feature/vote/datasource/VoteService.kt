@@ -4,11 +4,13 @@ import com.moim.data.common.model.ApiResponse
 import com.moim.data.feature.vote.model.CandidateResponse
 import com.moim.data.feature.vote.model.CategoryResponse
 import com.moim.data.feature.vote.model.CreateCandidateRequest
+import com.moim.data.feature.vote.model.UpdateCandidateRequest
 import com.moim.data.feature.vote.model.VoteResultResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -21,6 +23,12 @@ interface VoteService {
     suspend fun createCandidate(
         @Path("roomId") roomId: Long,
         @Body request: CreateCandidateRequest
+    ): ApiResponse<Boolean>
+
+    @PUT("/api/v1/votes/{roomId}/candidates")
+    suspend fun updateCandidates(
+        @Path("roomId") roomId: Long,
+        @Body request: List<UpdateCandidateRequest>
     ): ApiResponse<Boolean>
 
     @GET("/api/v1/votes/{roomId}/candidates")

@@ -2,13 +2,20 @@ package com.moim.data.feature.vote.datasource
 
 import com.moim.data.feature.vote.model.CandidateResponse
 import com.moim.data.feature.vote.model.CategoryResponse
+import com.moim.data.feature.vote.model.UpdateCandidateRequest
 import com.moim.data.feature.vote.model.VoteResultResponse
+import com.moim.domain.feature.vote.model.UpdateCandidateParams
 
 interface VoteDataSource {
 
     suspend fun getCategories(): Result<List<CategoryResponse>>
 
     suspend fun createCandidate(roomId: Long, category: String, content: String): Result<Boolean>
+
+    suspend fun updateCandidates(
+        roomId: Long,
+        candidates: List<UpdateCandidateRequest>
+    ): Result<Boolean>
 
     suspend fun getCandidates(roomId: Long, category: String): Result<List<CandidateResponse>>
 

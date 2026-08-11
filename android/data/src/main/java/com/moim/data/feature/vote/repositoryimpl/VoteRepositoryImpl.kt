@@ -1,9 +1,11 @@
 package com.moim.data.feature.vote.repositoryimpl
 
 import com.moim.data.feature.vote.datasource.VoteDataSource
+import com.moim.data.feature.vote.model.UpdateCandidateRequest
 import com.moim.data.feature.vote.model.toDomain
 import com.moim.domain.feature.vote.model.CandidateInfo
 import com.moim.domain.feature.vote.model.CategoryInfo
+import com.moim.domain.feature.vote.model.UpdateCandidateParams
 import com.moim.domain.feature.vote.model.VoteResultInfo
 import com.moim.domain.feature.vote.repository.VoteRepository
 import javax.inject.Inject
@@ -23,6 +25,22 @@ class VoteRepositoryImpl @Inject constructor(
         content: String
     ): Result<Boolean> {
         return voteDataSource.createCandidate(roomId, category, content)
+    }
+
+    override suspend fun updateCandidates(
+        roomId: Long,
+        candidates: List<UpdateCandidateParams>
+    ): Result<Boolean> {
+        return voteDataSource.updateCandidates(
+            roomId = roomId,
+            candidates = candidates.map { candidate ->
+                UpdateCandidateRequest(
+                    id = candidate.id,
+                    category = candidate.category,
+                    content = candidate.content
+                )
+            }
+        )
     }
 
     override suspend fun getCandidates(

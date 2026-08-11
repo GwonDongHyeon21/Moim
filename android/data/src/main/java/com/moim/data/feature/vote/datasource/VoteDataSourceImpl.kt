@@ -4,6 +4,7 @@ import com.moim.data.common.network.apiCall
 import com.moim.data.feature.vote.model.CandidateResponse
 import com.moim.data.feature.vote.model.CategoryResponse
 import com.moim.data.feature.vote.model.CreateCandidateRequest
+import com.moim.data.feature.vote.model.UpdateCandidateRequest
 import com.moim.data.feature.vote.model.VoteResultResponse
 import javax.inject.Inject
 
@@ -23,6 +24,13 @@ class VoteDataSourceImpl @Inject constructor(
         return apiCall {
             voteService.createCandidate(roomId, CreateCandidateRequest(category, content))
         }
+    }
+
+    override suspend fun updateCandidates(
+        roomId: Long,
+        candidates: List<UpdateCandidateRequest>
+    ): Result<Boolean> {
+        return apiCall { voteService.updateCandidates(roomId, candidates) }
     }
 
     override suspend fun getCandidates(
