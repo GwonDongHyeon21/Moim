@@ -6,8 +6,8 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.moim.presentation.navigation.CandidateUpdate
 
-fun NavBackStack<NavKey>.navigateToCandidateUpdate(category: String) {
-    add(CandidateUpdate(category))
+fun NavBackStack<NavKey>.navigateToCandidateUpdate(roomId: Long, category: String) {
+    add(CandidateUpdate(roomId, category))
 }
 
 fun EntryProviderScope<NavKey>.candidateUpdate(

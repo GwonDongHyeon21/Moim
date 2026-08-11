@@ -70,8 +70,10 @@ fun MoimNav(
                     navigator.navigateToVote(roomId, category)
                 },
                 onNavigateToCandidateCreate = { navigator.navigateToCandidateCreate(it) },
-                onNavigateToCandidateUpdate = { navigator.navigateToCandidateUpdate(it) },
                 onNavigateBack = navigator::popBackStack,
+                onNavigateToCandidateUpdate = { roomId, category ->
+                    navigator.navigateToCandidateUpdate(roomId, category)
+                },
                 modifier = modifier.padding(innerPadding)
             )
 

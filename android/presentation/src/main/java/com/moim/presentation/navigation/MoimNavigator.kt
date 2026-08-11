@@ -50,7 +50,8 @@ class MoimNavigator(
 
     fun navigateToCandidateCreate(roomId: Long) = backStack.navigateToCandidateCreate(roomId)
 
-    fun navigateToCandidateUpdate(category: String) = backStack.navigateToCandidateUpdate(category)
+    fun navigateToCandidateUpdate(roomId: Long, category: String) =
+        backStack.navigateToCandidateUpdate(roomId, category)
 
     fun popBackStack() = backStack.removeLastOrNull()
 }

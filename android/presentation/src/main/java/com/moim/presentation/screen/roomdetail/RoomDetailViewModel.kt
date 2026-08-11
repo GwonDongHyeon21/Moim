@@ -58,7 +58,7 @@ class RoomDetailViewModel @AssistedInject constructor(
                 sendEvent(RoomDetailEvent.NavigateToCandidateCreate(roomId))
 
             is RoomDetailAction.NavigateToCandidateUpdate ->
-                sendEvent(RoomDetailEvent.NavigateToCandidateUpdate(action.category))
+                sendEvent(RoomDetailEvent.NavigateToCandidateUpdate(roomId, action.category))
 
             RoomDetailAction.NavigateBack -> sendEvent(RoomDetailEvent.NavigateBack)
         }

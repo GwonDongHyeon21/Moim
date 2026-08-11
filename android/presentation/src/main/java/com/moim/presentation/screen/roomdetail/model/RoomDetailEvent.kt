@@ -9,7 +9,10 @@ interface RoomDetailEvent {
 
     data class NavigateToCandidateCreate(val roomId: Long) : RoomDetailEvent
 
-    data class NavigateToCandidateUpdate(val category: String) : RoomDetailEvent
+    data class NavigateToCandidateUpdate(
+        val roomId: Long,
+        val category: String
+    ) : RoomDetailEvent
 
     data object NavigateBack : RoomDetailEvent
 

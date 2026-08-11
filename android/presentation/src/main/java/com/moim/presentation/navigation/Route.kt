@@ -22,4 +22,4 @@ data class Vote(val roomId: Long, val category: String) : NavKey
 data class CandidateCreate(val roomId: Long) : NavKey
 
 @Serializable
-data class CandidateUpdate(val category: String) : NavKey
+data class CandidateUpdate(val roomId: Long, val category: String) : NavKey
