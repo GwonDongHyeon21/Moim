@@ -3,6 +3,7 @@ package com.moim.presentation.screen.candidateupdate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -96,7 +97,8 @@ fun CandidateUpdateScreen(
         bottomBar = {
             MoimBottomBarButton(
                 value = stringResource(R.string.candidate_update),
-                onClick = { onAction(CandidateUpdateAction.UpdateCandidate) }
+                onClick = { onAction(CandidateUpdateAction.UpdateCandidate) },
+                modifier = Modifier.imePadding()
             )
         }
     ) { innerPadding ->
