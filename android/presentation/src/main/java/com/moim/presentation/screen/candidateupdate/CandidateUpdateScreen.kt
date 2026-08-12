@@ -1,10 +1,12 @@
-package com.moim.presentation.screen.candidatecreate
+package com.moim.presentation.screen.candidateupdate
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -18,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,30 +28,32 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moim.presentation.R
 import com.moim.presentation.model.CategoryUiModel
-import com.moim.presentation.navigation.CandidateCreate
-import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.CONTENT_LENGTH_LIMIT
-import com.moim.presentation.screen.candidatecreate.CandidateCreateScreen.MAX_LINES
-import com.moim.presentation.screen.candidatecreate.model.CandidateCreateAction
-import com.moim.presentation.screen.candidatecreate.model.CandidateCreateEvent
-import com.moim.presentation.screen.candidatecreate.model.CandidateCreateUiState
+import com.moim.presentation.navigation.CandidateUpdate
+import com.moim.presentation.screen.candidateupdate.CandidateUpdateScreen.CONTENT_LENGTH_LIMIT
+import com.moim.presentation.screen.candidateupdate.CandidateUpdateScreen.MAX_LINES
+import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateAction
+import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateEvent
+import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateUiState
 import com.moim.presentation.screen.component.MoimBottomBarButton
+import com.moim.presentation.screen.component.MoimEmptyScreen
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
+import com.moim.presentation.util.DummyData
 import com.moim.presentation.util.collectWithLifecycle
 
-private object CandidateCreateScreen {
+private object CandidateUpdateScreen {
     const val CONTENT_LENGTH_LIMIT = 100
     const val MAX_LINES = 1
 }
 
 @Composable
-fun CandidateCreateScreen(
-    route: CandidateCreate,
+fun CandidateUpdateScreen(
+    route: CandidateUpdate,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CandidateCreateViewModel = hiltViewModel<CandidateCreateViewModel, CandidateCreateViewModel.Factory>(
+    viewModel: CandidateUpdateViewModel = hiltViewModel<CandidateUpdateViewModel, CandidateUpdateViewModel.Factory>(
         creationCallback = { factory ->
             factory.create(route)
         }
@@ -58,64 +63,79 @@ fun CandidateCreateScreen(
 
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
-            CandidateCreateEvent.NavigateBack -> onNavigateBack()
+            CandidateUpdateEvent.NavigateBack -> onNavigateBack()
         }
     }
 
-    CandidateCreateScreen(
-        uiState = uiState,
-        onAction = viewModel::onAction,
-        modifier = modifier
-    )
-
     if (uiState.isLoading) {
         MoimProgressIndicator()
+    } else {
+        CandidateUpdateScreen(
+            uiState = uiState,
+            onAction = viewModel::onAction,
+            modifier = modifier
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CandidateCreateScreen(
-    uiState: CandidateCreateUiState,
-    onAction: (CandidateCreateAction) -> Unit,
+fun CandidateUpdateScreen(
+    uiState: CandidateUpdateUiState,
+    onAction: (CandidateUpdateAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val createEnabled = uiState.selectedCategory.isNotEmpty() && uiState.content.isNotEmpty()
+    val pagerState = rememberPagerState { uiState.newCandidates.size }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             MoimTopBar(
-                value = stringResource(R.string.candidate_create),
+                value = stringResource(R.string.candidate_update_title),
                 navigationIcon = R.drawable.arrow_back_24,
-                onClickNavigationIcon = { onAction(CandidateCreateAction.NavigateBack) },
+                onClickNavigationIcon = { onAction(CandidateUpdateAction.NavigateBack) },
             )
         },
         bottomBar = {
             MoimBottomBarButton(
-                value = stringResource(R.string.create),
-                onClick = { onAction(CandidateCreateAction.CreateCandidate) },
+                value = stringResource(R.string.candidate_update),
+                onClick = { onAction(CandidateUpdateAction.UpdateCandidate) },
                 modifier = Modifier.imePadding(),
-                enabled = createEnabled
+                enabled = uiState.originalCandidates.isNotEmpty()
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = MoimPadding.AppHorizontalPadding),
-            verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
-        ) {
-            CategorySelectSection(
-                categories = uiState.categories,
-                selectedCategory = uiState.selectedCategory,
-                onCategorySelected = { onAction(CandidateCreateAction.OnCategorySelected(it)) }
-            )
+        if (uiState.originalCandidates.isEmpty()) {
+            MoimEmptyScreen(value = stringResource(R.string.candidate_update_empty))
+        } else {
+            Column(
+                modifier = Modifier.padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "${pagerState.currentPage + 1} / ${pagerState.pageCount}")
 
-            ContentInputSection(
-                content = uiState.content,
-                onContentChanged = { onAction(CandidateCreateAction.OnContentChanged(it)) }
-            )
+                HorizontalPager(pagerState) { page ->
+                    val candidate = uiState.newCandidates[page]
+                    Column(
+                        modifier = Modifier.padding(horizontal = MoimPadding.AppHorizontalPadding),
+                        verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
+                    ) {
+                        CategorySelectSection(
+                            categories = uiState.categories,
+                            selectedCategory = candidate.category,
+                            onCategorySelected = {
+                                onAction(CandidateUpdateAction.OnCategorySelected(page, it))
+                            }
+                        )
+
+                        ContentInputSection(
+                            content = candidate.content,
+                            onContentChanged = {
+                                onAction(CandidateUpdateAction.OnContentChanged(page, it))
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -135,7 +155,7 @@ private fun CategorySelectSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column {
-            Text(text = stringResource(R.string.category))
+            Text(text = stringResource(R.string.candidate_update_category))
             TextField(
                 value = selectedCategory,
                 onValueChange = {},
@@ -143,7 +163,7 @@ private fun CategorySelectSection(
                     .fillMaxWidth()
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 readOnly = true,
-                placeholder = { Text(text = stringResource(R.string.category_placeholder)) },
+                placeholder = { Text(text = stringResource(R.string.candidate_update_category_placeholder)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showCategory) }
             )
         }
@@ -171,7 +191,7 @@ private fun ContentInputSection(
     onContentChanged: (String) -> Unit
 ) {
     Column {
-        Text(text = stringResource(R.string.candidate))
+        Text(text = stringResource(R.string.candidate_update_candidate))
         TextField(
             value = content,
             onValueChange = { if (it.length <= CONTENT_LENGTH_LIMIT) onContentChanged(it) },
@@ -183,9 +203,9 @@ private fun ContentInputSection(
 
 @Preview(showBackground = true)
 @Composable
-fun CandidateCreateScreenPreview() {
-    CandidateCreateScreen(
-        uiState = CandidateCreateUiState(),
+fun CandidateUpdateScreenPreview() {
+    CandidateUpdateScreen(
+        uiState = CandidateUpdateUiState(newCandidates = DummyData.dummyCandidates),
         onAction = {}
     )
 }

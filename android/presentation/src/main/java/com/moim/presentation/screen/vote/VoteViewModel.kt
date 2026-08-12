@@ -6,7 +6,7 @@ import com.moim.presentation.navigation.Vote
 import com.moim.presentation.screen.vote.model.VoteAction
 import com.moim.presentation.screen.vote.model.VoteEvent
 import com.moim.presentation.screen.vote.model.VoteUiState
-import com.moim.presentation.screen.vote.model.toUiModel
+import com.moim.presentation.model.toUiModel
 import com.moim.presentation.util.snackbar.SnackBarEvent
 import com.moim.presentation.util.snackbar.SnackBarManager
 import dagger.assisted.Assisted
@@ -56,7 +56,7 @@ class VoteViewModel @AssistedInject constructor(
     private fun castVote(candidateId: Long) = doAction(loadingOff = false) {
         voteRepository.castVote(candidateId)
             .onSuccess {
-                sendEvent(VoteEvent.NavigateBack)
+                sendEvent(VoteEvent.NavigateBackRefresh)
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
@@ -67,7 +67,7 @@ class VoteViewModel @AssistedInject constructor(
     private fun resetVote() = doAction(loadingOff = false) {
         voteRepository.resetVotes(roomId, category)
             .onSuccess {
-                sendEvent(VoteEvent.NavigateBack)
+                sendEvent(VoteEvent.NavigateBackRefresh)
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
 

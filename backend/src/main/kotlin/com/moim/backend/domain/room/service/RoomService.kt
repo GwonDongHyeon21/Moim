@@ -50,11 +50,18 @@ class RoomService(
             roomRepository.findClosedRoomsByUserIdPaged(userId, now, pageable)
         }
 
-        return rooms.map { room ->
-            val currentMemberCount = roomMemberRepository.countByRoomId(room.id!!)
+        if (rooms.isEmpty()) return emptyList()
 
-            val myMemberInfo = roomMemberRepository.findByRoomIdAndUserId(room.id!!, userId)
-            val isHost = myMemberInfo?.role == RoomRole.HOST
+        val roomIds = rooms.map { it.id!! }
+
+        val memberCounts = roomMemberRepository.countByRoomIds(roomIds)
+            .associate { it.getRoomId() to it.getCount() }
+        val myMemberInfos = roomMemberRepository.findByUserIdAndRoomIdIn(userId, roomIds)
+            .associateBy { it.room.id }
+
+        return rooms.map { room ->
+            val currentMemberCount = memberCounts[room.id] ?: 0
+            val isHost = myMemberInfos[room.id]?.role == RoomRole.HOST
 
             RoomResponse.from(
                 room = room,

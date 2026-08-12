@@ -31,6 +31,10 @@ class RoomDetailViewModel @AssistedInject constructor(
 
     private val roomId = route.roomId
 
+    init {
+        doAction { loadRoomDetail() }
+    }
+
     fun onAction(action: RoomDetailAction) {
         when (action) {
             RoomDetailAction.LoadRoomDetail -> doAction { loadRoomDetail() }
@@ -52,6 +56,9 @@ class RoomDetailViewModel @AssistedInject constructor(
 
             is RoomDetailAction.NavigateToCandidateCreate ->
                 sendEvent(RoomDetailEvent.NavigateToCandidateCreate(roomId))
+
+            is RoomDetailAction.NavigateToCandidateUpdate ->
+                sendEvent(RoomDetailEvent.NavigateToCandidateUpdate(roomId, action.category))
 
             RoomDetailAction.NavigateBack -> sendEvent(RoomDetailEvent.NavigateBack)
         }
@@ -119,7 +126,7 @@ class RoomDetailViewModel @AssistedInject constructor(
                 deadline = deadline
             )
         ).onSuccess {
-            sendEvent(RoomDetailEvent.NavigateBack)
+            sendEvent(RoomDetailEvent.NavigateBackRefresh)
         }.onFailure { exception ->
             snackBarManager.show(SnackBarEvent.DATA_SAVE_FAILED)
 
@@ -130,7 +137,7 @@ class RoomDetailViewModel @AssistedInject constructor(
     private fun deleteRoom() = doAction {
         roomRepository.deleteRoom(roomId)
             .onSuccess {
-                sendEvent(RoomDetailEvent.NavigateBack)
+                sendEvent(RoomDetailEvent.NavigateBackRefresh)
             }.onFailure { exception ->
                 snackBarManager.show(SnackBarEvent.NETWORK_ERROR)
 

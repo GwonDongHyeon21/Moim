@@ -4,11 +4,13 @@ import com.moim.data.common.model.ApiResponse
 import com.moim.data.feature.vote.model.CandidateResponse
 import com.moim.data.feature.vote.model.CategoryResponse
 import com.moim.data.feature.vote.model.CreateCandidateRequest
+import com.moim.data.feature.vote.model.UpdateCandidateRequest
 import com.moim.data.feature.vote.model.VoteResultResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -17,30 +19,42 @@ interface VoteService {
     @GET("api/v1/votes/categories")
     suspend fun getCategories(): ApiResponse<List<CategoryResponse>>
 
-    @POST("/api/v1/votes/rooms/{roomId}/candidates")
+    @POST("/api/v1/votes/{roomId}/candidates")
     suspend fun createCandidate(
         @Path("roomId") roomId: Long,
         @Body request: CreateCandidateRequest
     ): ApiResponse<Boolean>
 
-    @GET("/api/v1/votes/rooms/{roomId}/candidates")
+    @PUT("/api/v1/votes/{roomId}/candidates")
+    suspend fun updateCandidates(
+        @Path("roomId") roomId: Long,
+        @Body request: List<UpdateCandidateRequest>
+    ): ApiResponse<Boolean>
+
+    @GET("/api/v1/votes/{roomId}/candidates")
     suspend fun getCandidates(
         @Path("roomId") roomId: Long,
         @Query("category") category: String
     ): ApiResponse<List<CandidateResponse>>
 
-    @POST("/api/v1/votes/candidates/{candidateId}/vote")
+    @POST("/api/v1/votes/{candidateId}/vote")
     suspend fun castVote(
         @Path("candidateId") candidateId: Long
     ): ApiResponse<Boolean>
 
-    @DELETE("/api/v1/votes/rooms/{roomId}/reset")
+    @DELETE("/api/v1/votes/{roomId}/reset")
     suspend fun resetVotes(
         @Path("roomId") roomId: Long,
         @Query("category") category: String
     ): ApiResponse<Boolean>
 
-    @GET("/api/v1/votes/rooms/{roomId}/results")
+    @GET("/api/v1/votes/{roomId}/candidates/me")
+    suspend fun getMyCandidates(
+        @Path("roomId") roomId: Long,
+        @Query("category") category: String
+    ): ApiResponse<List<CandidateResponse>>
+
+    @GET("/api/v1/votes/{roomId}/results")
     suspend fun getVoteResults(
         @Path("roomId") roomId: Long
     ): ApiResponse<List<VoteResultResponse>>

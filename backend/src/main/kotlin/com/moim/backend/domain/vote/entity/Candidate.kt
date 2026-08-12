@@ -17,7 +17,7 @@ class Candidate(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    val category: Category,
+    var category: Category,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -25,4 +25,9 @@ class Candidate(
 
     @Column(nullable = false, length = 100)
     var content: String
-)
+) {
+    fun updateContent(category: Category, content: String) {
+        this.category = category
+        this.content = content
+    }
+}

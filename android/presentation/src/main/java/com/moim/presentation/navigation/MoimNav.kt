@@ -12,10 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.runtime.result.rememberResultEventBusNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moim.presentation.navigation.MoimNavConstant.fadeTransition
 import com.moim.presentation.navigation.MoimNavConstant.slideTransition
 import com.moim.presentation.screen.candidatecreate.candidateCreate
+import com.moim.presentation.screen.candidateupdate.candidateUpdate
 import com.moim.presentation.screen.home.home
 import com.moim.presentation.screen.login.login
 import com.moim.presentation.screen.roomdetail.roomDetail
@@ -39,7 +41,8 @@ fun MoimNav(
         onBack = navigator::popBackStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
+            rememberViewModelStoreNavEntryDecorator(),
+            rememberResultEventBusNavEntryDecorator()
         ),
         transitionSpec = { slideTransition },
         popTransitionSpec = { slideTransition },
@@ -52,7 +55,7 @@ fun MoimNav(
 
             home(
                 metadata = fadeTransition,
-                onNavigateToRoomDetail = { navigator.navigateToRoomDetail(it) },
+                onNavigateToRoomDetail = navigator::navigateToRoomDetail,
                 modifier = modifier.padding(innerPadding)
             )
 
@@ -63,11 +66,10 @@ fun MoimNav(
 
             roomDetail(
                 metadata = fadeTransition,
-                onNavigateToVote = { roomId, category ->
-                    navigator.navigateToVote(roomId, category)
-                },
-                onNavigateToCandidateCreate = { navigator.navigateToCandidateCreate(it) },
+                onNavigateToVote = navigator::navigateToVote,
+                onNavigateToCandidateCreate = navigator::navigateToCandidateCreate,
                 onNavigateBack = navigator::popBackStack,
+                onNavigateToCandidateUpdate = navigator::navigateToCandidateUpdate,
                 modifier = modifier.padding(innerPadding)
             )
 
@@ -78,6 +80,12 @@ fun MoimNav(
             )
 
             candidateCreate(
+                metadata = fadeTransition,
+                onNavigateBack = navigator::popBackStack,
+                modifier = modifier.padding(innerPadding)
+            )
+
+            candidateUpdate(
                 metadata = fadeTransition,
                 onNavigateBack = navigator::popBackStack,
                 modifier = modifier.padding(innerPadding)

@@ -22,5 +22,7 @@ interface RoomDetailAction {
 
     data object NavigateToCandidateCreate : RoomDetailAction
 
+    data class NavigateToCandidateUpdate(val category: String) : RoomDetailAction
+
     data object NavigateBack : RoomDetailAction
 }

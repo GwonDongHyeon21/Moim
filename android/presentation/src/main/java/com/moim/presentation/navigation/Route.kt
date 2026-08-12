@@ -20,3 +20,6 @@ data class Vote(val roomId: Long, val category: String) : NavKey
 
 @Serializable
 data class CandidateCreate(val roomId: Long) : NavKey
+
+@Serializable
+data class CandidateUpdate(val roomId: Long, val category: String) : NavKey

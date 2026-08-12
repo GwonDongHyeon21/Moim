@@ -3,6 +3,7 @@ package com.moim.backend.domain.vote.service
 import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
 import com.moim.backend.core.model.Category
+import com.moim.backend.domain.room.repository.RoomMemberRepository
 import com.moim.backend.domain.room.repository.RoomRepository
 import com.moim.backend.domain.user.repository.UserRepository
 import com.moim.backend.domain.vote.dto.*
@@ -21,7 +22,8 @@ class VoteService(
     private val userRepository: UserRepository,
     private val roomRepository: RoomRepository,
     private val candidateRepository: CandidateRepository,
-    private val voteRecordRepository: VoteRecordRepository
+    private val voteRecordRepository: VoteRecordRepository,
+    private val roomMemberRepository: RoomMemberRepository
 ) {
     fun getCategories(): List<CategoryResponse> {
         return Category.entries.map { CategoryResponse.from(it) }
@@ -60,6 +62,28 @@ class VoteService(
         )
     }
 
+    @Transactional
+    fun updateCandidates(userId: Long, roomId: Long, request: List<UpdateCandidateRequest>) {
+        request.forEach { newCandidate ->
+            val candidate = candidateRepository.findById(newCandidate.id).orElseThrow {
+                ErrorException(HttpStatus.NOT_FOUND, ErrorCode.CANDIDATE_NOT_FOUND)
+            }
+
+            if (candidate.user.id != userId) {
+                throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.NOT_ROOM_PERMISSION)
+            }
+
+            if (candidate.room.id != roomId) {
+                throw ErrorException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND)
+            }
+
+            candidate.updateContent(
+                category = newCandidate.category,
+                content = newCandidate.content
+            )
+        }
+    }
+
     fun getCandidates(userId: Long, roomId: Long, category: Category): List<CandidateResponse> {
         val candidates = candidateRepository.findAllByRoomIdAndCategory(roomId, category)
 
@@ -67,13 +91,8 @@ class VoteService(
             .map { it.candidate.id }
 
         return candidates.map {
-            CandidateResponse(
-                id = it.id!!,
-                category = it.category,
-                content = it.content,
-                creatorNickname = it.user.nickname,
-                isVotedByMe = myVotedCandidateIds.contains(it.id)
-            )
+            val isVotedByMe = myVotedCandidateIds.contains(it.id)
+            CandidateResponse.from(it, isVotedByMe)
         }
     }
 
@@ -107,6 +126,25 @@ class VoteService(
         if (candidateIds.isNotEmpty()) {
             voteRecordRepository.deleteByUserIdAndCandidateIdIn(userId, candidateIds)
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun getMyCandidatesByCategory(userId: Long, roomId: Long, category: Category): List<CandidateResponse> {
+        val isMember = roomMemberRepository.existsByRoomIdAndUserId(roomId, userId)
+        if (!isMember) {
+            throw ErrorException(
+                httpStatus = HttpStatus.FORBIDDEN,
+                errorCode = ErrorCode.ROOM_NOT_FOUND
+            )
+        }
+
+        val myCandidates = candidateRepository.findAllByRoomIdAndCategoryAndUserId(
+            roomId = roomId,
+            category = category,
+            userId = userId
+        )
+
+        return myCandidates.map { CandidateResponse.from(it, false) }
     }
 
     fun getVoteResults(roomId: Long): List<VoteResultResponse> {

@@ -11,4 +11,6 @@ interface CandidateRepository : JpaRepository<Candidate, Long> {
     fun findAllByRoomId(roomId: Long): List<Candidate>
 
     fun countByRoomIdAndCategoryAndUserId(roomId: Long, category: Category, userId: Long): Int
+
+    fun findAllByRoomIdAndCategoryAndUserId(roomId: Long, category: Category, userId: Long): List<Candidate>
 }

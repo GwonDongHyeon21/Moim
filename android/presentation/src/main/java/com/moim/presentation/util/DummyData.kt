@@ -6,7 +6,7 @@ import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomMemberInfoUiModel
 import com.moim.presentation.screen.roomdetail.model.VoteRankUiModel
 import com.moim.presentation.screen.roomdetail.model.VoteResultUiModel
-import com.moim.presentation.screen.vote.model.CandidateUiModel
+import com.moim.presentation.model.CandidateUiModel
 
 object DummyData {
 

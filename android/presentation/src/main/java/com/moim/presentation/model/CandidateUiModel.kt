@@ -1,4 +1,4 @@
-package com.moim.presentation.screen.vote.model
+package com.moim.presentation.model
 
 import com.moim.domain.feature.vote.model.CandidateInfo
 

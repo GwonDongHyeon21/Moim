@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,10 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.result.ResultEffect
 import com.moim.presentation.R
 import com.moim.presentation.model.RoomInfoUiModel
 import com.moim.presentation.navigation.RoomDetail
@@ -45,6 +42,7 @@ import com.moim.presentation.screen.roomdetail.model.RoomDetailAction
 import com.moim.presentation.screen.roomdetail.model.RoomDetailEvent
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiModel
 import com.moim.presentation.screen.roomdetail.model.RoomDetailUiState
+import com.moim.presentation.screen.vote.VoteResult
 import com.moim.presentation.theme.MoimPadding
 import com.moim.presentation.theme.MoimSpace
 import com.moim.presentation.util.DummyData
@@ -58,7 +56,9 @@ fun RoomDetailScreen(
     route: RoomDetail,
     onNavigateToVote: (roomId: Long, category: String) -> Unit,
     onNavigateToCandidateCreate: (Long) -> Unit,
+    onNavigateToCandidateUpdate: (Long, String) -> Unit,
     onNavigateBack: () -> Unit,
+    onNavigateBackRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RoomDetailViewModel = hiltViewModel<RoomDetailViewModel, RoomDetailViewModel.Factory>(
         creationCallback = { factory ->
@@ -66,7 +66,6 @@ fun RoomDetailScreen(
         }
     )
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.uiEvent.collectWithLifecycle { event ->
@@ -75,21 +74,18 @@ fun RoomDetailScreen(
 
             is RoomDetailEvent.NavigateToCandidateCreate -> onNavigateToCandidateCreate(event.roomId)
 
+            is RoomDetailEvent.NavigateToCandidateUpdate ->
+                onNavigateToCandidateUpdate(event.roomId, event.category)
+
             RoomDetailEvent.NavigateBack -> onNavigateBack()
+
+            RoomDetailEvent.NavigateBackRefresh -> onNavigateBackRefresh()
         }
     }
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.onAction(RoomDetailAction.LoadRoomDetail)
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
+    ResultEffect<VoteResult> { result ->
+        if (result.shouldRefresh) {
+            viewModel.onAction(RoomDetailAction.LoadRoomDetail)
         }
     }
 
@@ -170,9 +166,17 @@ fun RoomDetailScreen(
                     )
 
                     categoryVoteStatus.forEach { category ->
-                        CategoryCard(category = category) {
-                            onAction(RoomDetailAction.NavigateToVote(category.category))
-                        }
+                        CategoryCard(
+                            category = category,
+                            onClickCard = { onAction(RoomDetailAction.NavigateToVote(category.category)) },
+                            onClickUpdate = {
+                                onAction(
+                                    RoomDetailAction.NavigateToCandidateUpdate(
+                                        category.category
+                                    )
+                                )
+                            }
+                        )
                     }
                 }
             }

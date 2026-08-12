@@ -29,7 +29,7 @@ import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.screen.vote.VoteScreen.REDUCTION_RATE
 import com.moim.presentation.screen.vote.component.CandidateCard
 import com.moim.presentation.screen.vote.component.EmptyCard
-import com.moim.presentation.screen.vote.model.CandidateUiModel
+import com.moim.presentation.model.CandidateUiModel
 import com.moim.presentation.screen.vote.model.VoteAction
 import com.moim.presentation.screen.vote.model.VoteEvent
 import com.moim.presentation.screen.vote.model.VoteUiState
@@ -48,6 +48,7 @@ private object VoteScreen {
 fun VoteScreen(
     route: Vote,
     onNavigateBack: () -> Unit,
+    onNavigateBackRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VoteViewModel = hiltViewModel<VoteViewModel, VoteViewModel.Factory>(
         creationCallback = { factory ->
@@ -60,6 +61,8 @@ fun VoteScreen(
     viewModel.uiEvent.collectWithLifecycle { event ->
         when (event) {
             VoteEvent.NavigateBack -> onNavigateBack()
+
+            VoteEvent.NavigateBackRefresh -> onNavigateBackRefresh()
         }
     }
 
