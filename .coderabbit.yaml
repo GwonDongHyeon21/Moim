@@ -1,0 +1,82 @@
+# .coderabbit.yaml (프로젝트 최상단 위치)
+language: "ko-KR"
+tone_instructions: "리뷰는 전문가답게 명확하고 친절한 어조로 작성해 줘. 단순 지적보다는 '왜 이렇게 수정해야 하는지' 이유와 함께 '가장 간결하고 모던한 Kotlin 개선 코드'를 제안해 줘."
+
+reviews:
+  profile: "chill"
+  high_level_summary: true
+
+  # 공통 제외 파일 (프론트/백엔드 빌드 파일 모두 무시)
+  path_filters:
+    - "!**/*.lock"
+    - "!**/build/**"
+    - "!**/.gradle/**"
+    - "!**/gradle/**"
+    - "!**/*.properties"
+    - "!**/*.xml"
+    - "!**/*.pro"
+
+  path_instructions:
+    # ==========================================
+    # 📱 [Android 프로젝트 규칙] (android 폴더 내부)
+    # ==========================================
+    - path: "android/**/*Screen.kt"
+      instructions: |
+        - [리컴포지션 최적화]: List나 객체를 파라미터로 넘길 때 Stable/Immutable 상태인지 확인하고, 불필요한 리컴포지션을 유발하는 코드가 있다면 `remember`나 콜백 분리를 제안해.
+        - [Navigation3]: Type-safe한 라우팅이 잘 적용되었는지 확인해.
+
+    - path: "android/**/*ViewModel.kt"
+      instructions: |
+        - [비동기 오류]: GlobalScope 사용을 엄격히 금지하고, viewModelScope를 사용했는지 확인해. CancellationException을 무시하지 않는지 점검해.
+        - [상태 관리]: UI 상태는 StateFlow로 노출하고 캡슐화가 잘 되었는지 확인해.
+
+    - path: "android/**/data/**/*.kt"
+      instructions: |
+        - [보안]: API Key나 Token이 하드코딩되지 않게 하고, Timber 로깅 시 개인정보(PII)가 노출되지 않도록 해.
+        - [스레드 분리]: 하드코딩된 Dispatchers.IO 대신 Hilt로 주입받은 Dispatcher를 사용하도록 권장해.
+
+    - path: "android/**/domain/**/*.kt"
+      instructions: |
+        - [클린 아키텍처]: domain 계층에 `android.*` 패키지 의존성이 포함되지 않도록 강하게 경고해.
+
+    # ==========================================
+    # 💻 [Backend 프로젝트 규칙] (backend 폴더 내부)
+    # ==========================================
+    - path: "backend/**/domain/**/*.kt" # JPA Entity 계층 (또는 entity 폴더)
+      instructions: |
+        - [JPA 연관관계 및 성능]: 엔티티 매핑 시 반드시 지연 로딩(`FetchType.LAZY`)을 사용했는지 확인해. 즉시 로딩(`EAGER`)이 있다면 경고해.
+        - [순환 참조]: 엔티티 간 양방향 매핑 시 `toString()`, `equals()`, `hashCode()`에서 무한 루프(순환 참조)가 발생하지 않도록 점검해.
+        - [Kotlin + JPA]: 엔티티의 ID 생성 방식과 필드 널 안정성(nullable vs non-null)이 DB 스키마와 논리적으로 일치하는지 확인해.
+
+    - path: "backend/**/repository/**/*.kt"
+      instructions: |
+        - [N+1 쿼리 문제]: Spring Data JPA 사용 시, 연관된 엔티티를 조회할 때 N+1 문제가 발생할 여지가 없는지 최우선으로 검토해. 필요시 `@EntityGraph`나 `Fetch Join` 사용을 제안해.
+
+    - path: "backend/**/service/**/*.kt"
+      instructions: |
+        - [트랜잭션]: `@Transactional` 어노테이션이 적절한 메서드(특히 CUD 작업)에 붙어있는지 확인해. (읽기 전용에는 `readOnly = true` 권장)
+        - [비즈니스 로직]: Kotlin의 컬렉션 API(`map`, `filter` 등)를 활용해 데이터를 더 효율적이고 간결하게 가공할 수 있다면 리팩토링을 제안해.
+
+    - path: "backend/**/controller/**/*.kt" # WebMVC & WebSocket
+      instructions: |
+        - [REST API 설계]: RESTful한 엔드포인트 네이밍과 적절한 HTTP Status Code 반환을 지켰는지 확인해.
+        - [WebSocket]: STOMP나 WebSocket 세션 연결/해제 시 자원 누수(Connection Leak)가 발생하지 않도록 세션 관리가 안전하게 구현되었는지 점검해.
+
+    - path: "backend/**/security/**/*.kt" # Spring Security & JWT & Google Login
+      instructions: |
+        - [보안 및 인가]: JWT 토큰(JJWT) 파싱 시 서명 검증 예외(만료, 조작 등) 처리가 누락되지 않았는지 꼼꼼히 확인해.
+        - [세션 관리]: JWT를 사용하므로 Spring Security의 세션 정책이 `STATELESS`로 설정되어 있는지 확인해.
+        - [비밀키 관리]: JWT Secret Key나 Google API Secret이 코드에 하드코딩되어 있다면 절대 머지하지 못하게 강하게 경고해.
+
+    - path: "backend/**/config/**/*.kt" # Redis 등 설정
+      instructions: |
+        - [Redis 캐싱/세션]: RedisTemplate 사용 시 Key/Value의 직렬화(Serialization) 방식이 적절한지(예: StringRedisSerializer 등) 점검해.
+
+    # ==========================================
+    # 🌟 [공통 Kotlin 코드 규칙]
+    # ==========================================
+    - path: "**/*.kt"
+      instructions: |
+        - 불필요한 주석 처리된 코드(Dead code)나 `println`, `e.printStackTrace()` 등이 남아있다면 로거(Logger)를 사용하도록 권고해.
+        - 가변 변수(`var`) 사용을 최소화하고 불변 변수(`val`) 사용을 우선적으로 지향해.
+        - Kotlin의 스코프 함수(`let`, `run`, `apply`, `also`)를 오남용하여 가독성을 해치지 않았는지 점검하고, 더 간결한 코드를 제안해.
