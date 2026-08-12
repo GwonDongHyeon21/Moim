@@ -35,6 +35,7 @@ import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateAction
 import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateEvent
 import com.moim.presentation.screen.candidateupdate.model.CandidateUpdateUiState
 import com.moim.presentation.screen.component.MoimBottomBarButton
+import com.moim.presentation.screen.component.MoimEmptyScreen
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
 import com.moim.presentation.theme.MoimPadding
@@ -98,36 +99,41 @@ fun CandidateUpdateScreen(
             MoimBottomBarButton(
                 value = stringResource(R.string.candidate_update),
                 onClick = { onAction(CandidateUpdateAction.UpdateCandidate) },
-                modifier = Modifier.imePadding()
+                modifier = Modifier.imePadding(),
+                enabled = uiState.originalCandidates.isNotEmpty()
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "${pagerState.currentPage + 1} / ${pagerState.pageCount}")
+        if (uiState.originalCandidates.isEmpty()) {
+            MoimEmptyScreen(value = stringResource(R.string.candidate_update_empty))
+        } else {
+            Column(
+                modifier = Modifier.padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "${pagerState.currentPage + 1} / ${pagerState.pageCount}")
 
-            HorizontalPager(pagerState) { page ->
-                val candidate = uiState.newCandidates[page]
-                Column(
-                    modifier = Modifier.padding(horizontal = MoimPadding.AppHorizontalPadding),
-                    verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
-                ) {
-                    CategorySelectSection(
-                        categories = uiState.categories,
-                        selectedCategory = candidate.category,
-                        onCategorySelected = {
-                            onAction(CandidateUpdateAction.OnCategorySelected(page, it))
-                        }
-                    )
+                HorizontalPager(pagerState) { page ->
+                    val candidate = uiState.newCandidates[page]
+                    Column(
+                        modifier = Modifier.padding(horizontal = MoimPadding.AppHorizontalPadding),
+                        verticalArrangement = Arrangement.spacedBy(MoimSpace.SpaceSmall)
+                    ) {
+                        CategorySelectSection(
+                            categories = uiState.categories,
+                            selectedCategory = candidate.category,
+                            onCategorySelected = {
+                                onAction(CandidateUpdateAction.OnCategorySelected(page, it))
+                            }
+                        )
 
-                    ContentInputSection(
-                        content = candidate.content,
-                        onContentChanged = {
-                            onAction(CandidateUpdateAction.OnContentChanged(page, it))
-                        }
-                    )
+                        ContentInputSection(
+                            content = candidate.content,
+                            onContentChanged = {
+                                onAction(CandidateUpdateAction.OnContentChanged(page, it))
+                            }
+                        )
+                    }
                 }
             }
         }

@@ -1,7 +1,6 @@
 package com.moim.presentation.screen.home
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +14,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -25,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +35,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.moim.presentation.R
 import com.moim.presentation.model.RoomInfoUiModel
+import com.moim.presentation.screen.component.MoimEmptyScreen
 import com.moim.presentation.screen.component.MoimPagingList
 import com.moim.presentation.screen.component.MoimProgressIndicator
 import com.moim.presentation.screen.component.MoimTopBar
@@ -189,14 +187,10 @@ fun HomeScreen(
                         pagingItems = pagingItemsList[page],
                         itemKey = { it.code },
                         emptyContent = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .verticalScroll(rememberScrollState()),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = stringResource(R.string.empty_rooms))
-                            }
+                            MoimEmptyScreen(
+                                value = stringResource(R.string.empty_rooms),
+                                modifier = Modifier.verticalScroll(rememberScrollState())
+                            )
                         },
                         modifier = Modifier
                             .fillMaxSize()
