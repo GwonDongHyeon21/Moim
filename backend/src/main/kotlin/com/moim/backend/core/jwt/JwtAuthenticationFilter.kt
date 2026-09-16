@@ -2,6 +2,7 @@ package com.moim.backend.core.jwt
 
 import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
+import com.moim.backend.domain.user.repository.UserRepository
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver
 @Component
 class JwtAuthenticationFilter(
     private val jwtProvider: JwtProvider,
+    private val userRepository: UserRepository,
     private val handlerExceptionResolver: HandlerExceptionResolver
 ) : OncePerRequestFilter() {
 
@@ -42,6 +44,14 @@ class JwtAuthenticationFilter(
                 }
 
                 val userId = jwtProvider.getUserIdFromToken(it)
+
+                if (!userRepository.existsById(userId)) {
+                    throw ErrorException(
+                        httpStatus = HttpStatus.UNAUTHORIZED,
+                        errorCode = ErrorCode.USER_NOT_FOUND
+                    )
+                }
+
                 val authentication = UsernamePasswordAuthenticationToken(userId, null, emptyList())
 
                 SecurityContextHolder.getContext().authentication = authentication
