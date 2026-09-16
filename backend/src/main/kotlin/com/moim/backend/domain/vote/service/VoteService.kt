@@ -147,10 +147,8 @@ class VoteService(
         return myCandidates.map { CandidateResponse.from(it, false) }
     }
 
-    fun getVoteResults(roomId: Long): List<VoteResultResponse> {
-        val room = roomRepository.findById(roomId).orElseThrow {
-            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.ROOM_NOT_FOUND)
-        }
+    fun getVoteResults(userId: Long, roomId: Long): List<VoteResultResponse> {
+        val (room, _) = roomAccessValidator.getRoomAsMember(userId, roomId)
 
         if (LocalDateTime.now().isBefore(room.deadline)) {
             throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.VOTE_RESULTS_BLINDED)
