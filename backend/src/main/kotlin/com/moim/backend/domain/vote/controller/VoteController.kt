@@ -87,9 +87,10 @@ class VoteController(
 
     @GetMapping("/{roomId}/results")
     fun getVoteResults(
+        @AuthenticationPrincipal userId: Long,
         @PathVariable roomId: Long
     ): ApiResponse<List<VoteResultResponse>> {
-        val response = voteService.getVoteResults(roomId)
+        val response = voteService.getVoteResults(userId, roomId)
 
         return ApiResponse.success(response)
     }

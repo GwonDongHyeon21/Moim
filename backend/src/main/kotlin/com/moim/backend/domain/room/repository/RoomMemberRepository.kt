@@ -18,7 +18,7 @@ interface RoomMemberRepository : JpaRepository<RoomMember, Long> {
     fun existsByRoomIdAndUserId(roomId: Long, userId: Long): Boolean
 
     @Query("SELECT rm FROM RoomMember rm JOIN FETCH rm.user WHERE rm.room.id = :roomId")
-    fun findAllByRoomIdWithUser(roomId: Long): List<RoomMember>
+    fun findAllByRoomIdWithUser(@Param("roomId") roomId: Long): List<RoomMember>
 
     fun findByRoomIdAndUserId(roomId: Long, userId: Long): RoomMember?
 }

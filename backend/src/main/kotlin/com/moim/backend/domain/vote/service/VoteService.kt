@@ -3,8 +3,7 @@ package com.moim.backend.domain.vote.service
 import com.moim.backend.core.error.ErrorCode
 import com.moim.backend.core.error.ErrorException
 import com.moim.backend.core.model.Category
-import com.moim.backend.domain.room.repository.RoomMemberRepository
-import com.moim.backend.domain.room.repository.RoomRepository
+import com.moim.backend.domain.room.service.RoomAccessValidator
 import com.moim.backend.domain.user.repository.UserRepository
 import com.moim.backend.domain.vote.dto.*
 import com.moim.backend.domain.vote.entity.Candidate
@@ -20,10 +19,9 @@ import java.time.LocalDateTime
 @Transactional(readOnly = true)
 class VoteService(
     private val userRepository: UserRepository,
-    private val roomRepository: RoomRepository,
     private val candidateRepository: CandidateRepository,
     private val voteRecordRepository: VoteRecordRepository,
-    private val roomMemberRepository: RoomMemberRepository
+    private val roomAccessValidator: RoomAccessValidator
 ) {
     fun getCategories(): List<CategoryResponse> {
         return Category.entries.map { CategoryResponse.from(it) }
@@ -31,17 +29,8 @@ class VoteService(
 
     @Transactional
     fun createCandidate(userId: Long, roomId: Long, request: CreateCandidateRequest) {
-        val user = userRepository.findById(userId).orElseThrow {
-            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND)
-        }
-
-        val room = roomRepository.findById(roomId).orElseThrow {
-            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.ROOM_NOT_FOUND)
-        }
-
-        if (LocalDateTime.now().isAfter(room.deadline)) {
-            throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_DEADLINE_EXPIRED)
-        }
+        val user = userRepository.getReferenceById(userId)
+        val (room, _) = roomAccessValidator.getActiveRoomAsMember(userId, roomId)
 
         val currentCount = candidateRepository.countByRoomIdAndCategoryAndUserId(
             roomId = roomId,
@@ -64,6 +53,8 @@ class VoteService(
 
     @Transactional
     fun updateCandidates(userId: Long, roomId: Long, request: List<UpdateCandidateRequest>) {
+        roomAccessValidator.getRoomAsMember(userId, roomId)
+
         request.forEach { newCandidate ->
             val candidate = candidateRepository.findById(newCandidate.id).orElseThrow {
                 ErrorException(HttpStatus.NOT_FOUND, ErrorCode.CANDIDATE_NOT_FOUND)
@@ -85,6 +76,8 @@ class VoteService(
     }
 
     fun getCandidates(userId: Long, roomId: Long, category: Category): List<CandidateResponse> {
+        roomAccessValidator.getRoomAsMember(userId, roomId)
+
         val candidates = candidateRepository.findAllByRoomIdAndCategory(roomId, category)
 
         val myVotedCandidateIds = voteRecordRepository.findAllByUserIdAndRoomId(userId, roomId)
@@ -98,13 +91,13 @@ class VoteService(
 
     @Transactional
     fun castVote(userId: Long, candidateId: Long) {
-        val user = userRepository.findById(userId).orElseThrow {
-            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND)
-        }
+        val user = userRepository.getReferenceById(userId)
 
         val candidate = candidateRepository.findById(candidateId).orElseThrow {
             ErrorException(HttpStatus.NOT_FOUND, ErrorCode.CANDIDATE_NOT_FOUND)
         }
+
+        roomAccessValidator.getActiveRoomAsMember(userId, candidate.room.id!!)
 
         val isExistingRecord = voteRecordRepository.findByUserIdAndCandidateId(userId, candidateId)
         if (isExistingRecord != null) {
@@ -121,6 +114,8 @@ class VoteService(
 
     @Transactional
     fun resetVotes(userId: Long, roomId: Long, category: Category) {
+        roomAccessValidator.getRoomAsMember(userId, roomId)
+
         val candidateIds = candidateRepository.findAllByRoomIdAndCategory(roomId, category).map { it.id!! }
 
         if (candidateIds.isNotEmpty()) {
@@ -130,13 +125,7 @@ class VoteService(
 
     @Transactional(readOnly = true)
     fun getMyCandidatesByCategory(userId: Long, roomId: Long, category: Category): List<CandidateResponse> {
-        val isMember = roomMemberRepository.existsByRoomIdAndUserId(roomId, userId)
-        if (!isMember) {
-            throw ErrorException(
-                httpStatus = HttpStatus.FORBIDDEN,
-                errorCode = ErrorCode.ROOM_NOT_FOUND
-            )
-        }
+        roomAccessValidator.getRoomAsMember(userId, roomId)
 
         val myCandidates = candidateRepository.findAllByRoomIdAndCategoryAndUserId(
             roomId = roomId,
@@ -147,10 +136,8 @@ class VoteService(
         return myCandidates.map { CandidateResponse.from(it, false) }
     }
 
-    fun getVoteResults(roomId: Long): List<VoteResultResponse> {
-        val room = roomRepository.findById(roomId).orElseThrow {
-            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.ROOM_NOT_FOUND)
-        }
+    fun getVoteResults(userId: Long, roomId: Long): List<VoteResultResponse> {
+        val (room, _) = roomAccessValidator.getRoomAsMember(userId, roomId)
 
         if (LocalDateTime.now().isBefore(room.deadline)) {
             throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.VOTE_RESULTS_BLINDED)
