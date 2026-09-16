@@ -35,7 +35,8 @@ class RoomService(
     private val roomRepository: RoomRepository,
     private val roomMemberRepository: RoomMemberRepository,
     private val voteRecordRepository: VoteRecordRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val roomAccessValidator: RoomAccessValidator
 ) {
 
     private val secureRandom = SecureRandom()
@@ -72,12 +73,7 @@ class RoomService(
     }
 
     fun getRoomDetail(userId: Long, roomId: Long): RoomDetailResponse {
-        val room = roomRepository.findById(roomId).orElseThrow {
-            ErrorException(HttpStatus.NOT_FOUND, ErrorCode.ROOM_NOT_FOUND)
-        }
-
-        val roomMember = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-            ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
+        val (room, roomMember) = roomAccessValidator.getRoomAsMember(userId, roomId)
 
         val roomMembers = roomMemberRepository.findAllByRoomIdWithUser(roomId)
         val members = roomMembers.map { member ->
@@ -96,8 +92,7 @@ class RoomService(
             )
         }
 
-        val myMemberInfo = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-        val isHost = myMemberInfo?.role == RoomRole.HOST
+        val isHost = roomMember.role == RoomRole.HOST
 
         return RoomDetailResponse(
             roomInfo = RoomResponse.from(room, members.size, isHost),
@@ -109,12 +104,7 @@ class RoomService(
 
     @Transactional
     fun createRoom(userId: Long, request: CreateUpdateRoomRequest): RoomResponse {
-        val user = userRepository.findById(userId).orElseThrow {
-            ErrorException(
-                httpStatus = HttpStatus.NOT_FOUND,
-                errorCode = ErrorCode.USER_NOT_FOUND
-            )
-        }
+        val user = userRepository.getReferenceById(userId)
 
         val currentRoomCount = roomRepository.countByUserId(userId)
         if (currentRoomCount >= MAX_ROOM_COUNT) {
@@ -156,12 +146,7 @@ class RoomService(
 
     @Transactional
     fun joinRoom(userId: Long, request: JoinRoomRequest): RoomResponse {
-        val user = userRepository.findById(userId).orElseThrow {
-            ErrorException(
-                httpStatus = HttpStatus.NOT_FOUND,
-                errorCode = ErrorCode.USER_NOT_FOUND
-            )
-        }
+        val user = userRepository.getReferenceById(userId)
 
         val room = roomRepository.findByCode(request.roomCode).orElseThrow {
             ErrorException(
@@ -210,18 +195,7 @@ class RoomService(
 
     @Transactional
     fun updateRoom(userId: Long, roomId: Long, request: CreateUpdateRoomRequest): RoomResponse {
-        val user = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-            ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
-        if (user.role != RoomRole.HOST) {
-            throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.NOT_ROOM_PERMISSION)
-        }
-
-        val room = roomRepository.findById(roomId).orElseThrow {
-            ErrorException(
-                httpStatus = HttpStatus.NOT_FOUND,
-                errorCode = ErrorCode.ROOM_NOT_FOUND
-            )
-        }
+        val (room, _) = roomAccessValidator.getRoomAsHost(userId, roomId)
 
         val currentMemberCount = roomMemberRepository.countByRoomId(roomId)
 
@@ -241,18 +215,7 @@ class RoomService(
 
     @Transactional
     fun deleteRoom(userId: Long, roomId: Long): Long {
-        val user = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-            ?: throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.ROOM_NOT_FOUND)
-        if (user.role != RoomRole.HOST) {
-            throw ErrorException(HttpStatus.FORBIDDEN, ErrorCode.NOT_ROOM_PERMISSION)
-        }
-
-        val room = roomRepository.findById(roomId).orElseThrow {
-            ErrorException(
-                httpStatus = HttpStatus.NOT_FOUND,
-                errorCode = ErrorCode.ROOM_NOT_FOUND
-            )
-        }
+        val (room, _) = roomAccessValidator.getRoomAsHost(userId, roomId)
 
         room.delete()
 
